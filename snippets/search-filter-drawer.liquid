@@ -1,0 +1,300 @@
+<style>
+  .page-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: none;
+  }
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: -400px;
+    width: 400px;
+    height: 100vh;
+    background: #fff;
+    z-index: 10000;
+    transition: left 0.3s ease;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+  }
+  .overlay.open {
+    left: 0;
+  }
+  .overlay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 40px 0 40px;
+  }
+  .overlay-header img {
+    width: 14px;
+    height: 14px;
+  }
+  .overlay-content {
+    padding: 30px 40px 50px;
+    display: flex;
+    flex-direction: column;
+  }
+  #filtersOverlay .overlay-content .grid-uniform h3 {
+    padding: 15px 0;
+    margin: 0 !important;
+    background: #fff;
+    color: #000 !important;
+    text-transform: capitalize;
+    font-size: 22px !important;
+    border-top: 2px solid #f1f1f1;
+    position: relative;
+  }
+</style>
+
+<div id="pageOverlay" class="page-overlay"></div>
+<div id="filtersOverlay" class="overlay">
+  <div class="overlay-header">
+    <h2 style="color:#e0592a;">Filters</h2>
+    <button id="closeOverlay" class="close-button">
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Black_Cross_Thin.png?v=1738012931" alt="close icon">
+    </button>
+  </div>
+  <div class="overlay-content">
+    {%- if request.page_type == 'search'
+      and search.performed
+      and search.results_count > 0
+      and search.results.first.object_type == 'article'
+    -%}
+      {% assign categories = '' %}
+      {% for result in search.results %}
+        {% for tag in result.tags %}
+          {% if tag contains '_' %}
+            {% capture categories %}{% unless categories == blank %}{{ categories }}|{% endunless %}{{ tag | split: '_' | first }}{% endcapture %}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+      {% assign cat_array = categories | split: '|' | uniq %}
+
+      {% include 'search-blog-sidebar' %}
+    {% endif %}
+    
+      {%- if request.page_type == 'search'
+      and search.performed
+      and search.results_count > 0
+      and search.results.first.object_type == 'product'
+    -%}
+      {% assign categories = '' %}
+      {% for result in search.results %}
+        {% for tag in result.tags %}
+          {% if tag contains '_' %}
+            {% capture categories %}{% unless categories == blank %}{{ categories }}|{% endunless %}{{ tag | split: '_' | first }}{% endcapture %}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+      {% assign cat_array = categories | split: '|' | uniq %}
+
+      {% include 'search-product-sidebar' %}
+    {% endif %}
+
+    {% comment %}
+       {% include 'blog-filter-sidebar' %}
+      {% if search.all_tags.size > 0 %}
+        <div class="search-filters grid-uniform">
+          {% for cat_item in cat_array %}
+            <div class="grid-item small--one-half medium--one-third toggle-filters sidebar-items-{{ cat_item }}">
+              <h2 class="accordion">
+                {{ cat_item }} <span><i class="fa fa-angle-down"></i></span>
+              </h2>
+              <ul id="matchKey-{{ cat_item }}" class="advanced-filters panel_1">
+                <div class="af-panel-body">
+                  <input type="text" class="txtInput form-control" id="searchTheKey-{{ cat_item }}" placeholder="Search {{ cat_item }}">
+                  <span class="af-filter-clear af_filter_clear-{{ cat_item }}" style="display:none;">×</span>
+                </div>
+                {% for tag in search.all_tags %}
+                  {% assign cat = tag | split: '_' | first %}
+                  {% if cat != tag and cat_item == cat %}
+                    {% if current_tags contains tag %}
+                      <li class="advanced-filter active-filter" data-group="{{ cat_item }}" data-handle="{{ tag | handle }}">
+                        {{ tag | remove_first: cat_item | remove_first: '_' | link_to_remove_tag: tag }}
+                      </li>
+                    {% else %}
+                      <li class="advanced-filter" data-group="{{ cat_item }}" data-handle="{{ tag | handle }}">
+                        {{ tag | remove_first: cat_item | remove_first: '_' | link_to_add_tag: tag }}
+                      </li>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </div>
+            <script>
+              $("#searchTheKey-{{ cat_item }}").on('keyup', function(){
+                var value = $(this).val().toLowerCase();
+                $("#matchKey-{{ cat_item }} li").each(function () {
+                  if ($(this).text().toLowerCase().indexOf(value) > -1) {
+                    $(this).show();
+                    $(".af_filter_clear-{{ cat_item }}").hide();
+                    $(this).prev('.subjectName').last().hide();
+                  } else {
+                    $(this).hide();
+                    $(".af_filter_clear-{{ cat_item }}").show();
+                  }
+                });
+              });
+              $(document).ready(function() {
+                $(".af_filter_clear-{{ cat_item }}").on('click', function () {
+                  $("#matchKey-{{ cat_item }} li").show();
+                  $("#searchTheKey-{{ cat_item }}").val('');
+                  $(this).hide();
+                });
+                var liCount = $("#matchKey-{{ cat_item }}").find("li").length;
+                if (liCount > 19){
+                  $("#matchKey-{{ cat_item }}").addClass("af_overflow_scroll");
+                }
+                $("#matchKey-{{ cat_item }} li.active-filter").parents('ul').css("display", "block");
+                $("#matchKey-{{ cat_item }} li.active-filter").parents('ul').prev('h2').addClass("active");
+              });
+            </script>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No filters available.</p>
+      {% endif %}
+      <div class="selectedFiltersCont"></div>
+    {% endcomment %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const filtersOverlay = document.querySelector('#filtersOverlay');
+    const pageOverlay = document.querySelector('#pageOverlay');
+    const openOverlayButton = document.querySelector('#show-filters');
+    const closeOverlayButton = document.querySelector('#closeOverlay');
+
+    if (openOverlayButton) {
+      openOverlayButton.addEventListener('click', () => {
+        filtersOverlay.classList.add('open');
+        pageOverlay.style.display = 'block';
+      });
+    }
+    if (closeOverlayButton) {
+      closeOverlayButton.addEventListener('click', () => {
+        filtersOverlay.classList.remove('open');
+        pageOverlay.style.display = 'none';
+      });
+    }
+    if (pageOverlay) {
+      pageOverlay.addEventListener('click', () => {
+        filtersOverlay.classList.remove('open');
+        pageOverlay.style.display = 'none';
+      });
+    }
+  });
+</script>
+
+<script>
+
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Get the current URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryValue = urlParams.get("q"); // Get 'q' parameter from URL
+
+
+    if (queryValue) {
+        // Decode the query string and split values
+        const filterValues = decodeURIComponent(queryValue).split("+"); 
+
+        document.querySelectorAll(".advanced-filter").forEach(li => {
+            const filterHandle = li.getAttribute("data-handle");
+
+            // Extract only the value after "topic_" (or any prefix)
+            const extractedValue = filterHandle.split("_").pop(); 
+
+            // Check if extracted value EXACTLY matches any filter from URL
+            if (filterValues.includes(extractedValue)) {
+                li.classList.add("active-filter"); // Add active class
+            }
+        });
+    }
+
+
+   
+});
+</script>
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    let currentUrl = new URL(window.location.href);
+    let urlParams = currentUrl.searchParams;
+    let queryValue = urlParams.get("q"); // Get 'q' parameter
+
+    const showFilters = document.querySelector(".selectedFiltersCont");
+
+    if (queryValue) {
+        let filterValues = decodeURIComponent(queryValue).split("+"); // Split by '+'
+
+        // Get all filters from the page to validate against
+        let filterElements = document.querySelectorAll(".advanced-filter");
+        let validFilters = [];
+        let userQueryParts = [];
+
+        // Separate user query and filters
+        filterValues.forEach((value) => {
+            let matchedFilter = [...filterElements].find(el => el.getAttribute("data-handle").endsWith(value));
+            if (matchedFilter) {
+                validFilters.push({
+                    group: matchedFilter.getAttribute("data-group"),
+                    value: value
+                });
+            } else {
+                userQueryParts.push(value); // Store user query separately
+            }
+        });
+
+        if (validFilters.length > 0) {
+            let newUl = document.createElement("ul");
+            newUl.classList.add("selected-filters");
+
+            validFilters.forEach((filter) => {
+                let li = document.createElement("li");
+                li.textContent = `${filter.group}: ${filter.value} `; // Show "Group: Value"
+
+                // Create Remove (X) Icon
+                let img = document.createElement("img");
+                img.src = "https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Black_Cross_Thin.png?v=1738012931";
+                img.alt = "Remove filter";
+                img.style.cursor = "pointer";
+                img.style.width = "12px";
+                img.style.height = "12px";
+
+                // Remove filter on click
+                img.addEventListener("click", function () {
+                    let updatedQuery = decodeURIComponent(urlParams.get("q")); // Get full q value
+
+                    // Remove the filter with the preceding '+'
+                    let regex = new RegExp(`(\\+)?${filter.value}(\\+)?`, "g");
+                    updatedQuery = updatedQuery.replace(regex, "+");
+
+                    // Remove any trailing or leading '+'
+                    updatedQuery = updatedQuery.replace(/^\+|\+$/g, "");
+
+                    urlParams.set("q", updatedQuery); // Update URL params
+                    if (!updatedQuery) urlParams.delete("q"); // Remove q if empty
+                    window.location.search = urlParams.toString(); // Redirect with new URL
+                });
+
+                li.appendChild(img);
+                newUl.appendChild(li);
+            });
+
+            showFilters.appendChild(newUl);
+        }
+    }
+});
+
+
+
+
+</script>

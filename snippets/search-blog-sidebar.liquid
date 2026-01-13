@@ -1,0 +1,143 @@
+  {% if cat_array.size > 0 %}
+    <div class="grid-uniform">
+      {%- for cat_item in cat_array -%}
+        <div class="grid-item small--one-whole medium--one-third toogle-filters sidebar-items-{{ cat_item }}">
+          <h2 class="accordion">
+            {{ cat_item }}
+            <span><i class="fa fa-angle-down"></i></span>
+          </h2>
+          <ul id="matchKey-{{ cat_item }}" class="advanced-filters panel_1">
+            <div class="af-panel-body">
+              <input
+                type="text"
+                class="txtInput form-control"
+                id="searchTheKey-{{ cat_item }}"
+                placeholder="Search {{ cat_item }}"
+              >
+              <span class="af-filter-clear af_filter_clear-{{ cat_item }}" style="display:none;">×</span>
+            </div>
+            {% comment %} Collect unique tags for this category {% endcomment %}
+            {% assign unique_tags = '' %}
+            {%- for result in search.results -%}
+              {%- for tag in result.tags -%}
+                {%- assign cat = tag | split: '_' | first | downcase | strip -%}
+                {%- assign normalized_cat_item = cat_item | downcase | strip -%}
+                {%- if cat != tag and normalized_cat_item == cat -%}
+                  {% unless unique_tags contains tag %}
+                    {% capture unique_tags %}{% unless unique_tags == blank %}{{ unique_tags }}|{% endunless %}{{ tag }}{% endcapture %}
+                  {% endunless %}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endfor -%}
+
+            {% comment %} Render unique tags for this category {% endcomment %}
+            {% assign tag_array = unique_tags | split: '|' %}
+            {% for tag in tag_array %}
+              {% if tag != blank %}
+                {% if current_tags contains tag %}
+                  <li
+                    class="advanced-filter active-filter"
+                    data-group="{{ cat_item }}"
+                    data-handle="{{ tag | handle }}"
+                    test-tag="{{ tag }}"
+                  >
+                    {{ tag | remove_first: cat_item | remove_first: '_' | link_to_remove_tag: tag }}
+                  </li>
+                {% else %}
+                  <li
+                    class="advanced-filter"
+                    data-group="{{ cat_item }}"
+                    data-handle="{{ tag | handle }}"
+                    test-tag="{{ tag }}"
+                  >
+                    <a href="#" class="custom-filter-link">{{ tag | remove_first: cat_item | remove_first: '_' }}</a>
+                  </li>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+
+        <script>
+          $('#searchTheKey-{{ cat_item }}').on('keyup', function () {
+            var value = $(this).val().toLowerCase();
+            $('#matchKey-{{ cat_item }} li').each(function () {
+              if ($(this).text().toLowerCase().search(value) > -1) {
+                $(this).show();
+                $('.af_filter_clear-{{ cat_item }}').hide();
+              } else {
+                $(this).hide();
+                $('.af_filter_clear-{{ cat_item }}').show();
+              }
+            });
+          });
+
+          $(function () {
+            var filters = $('.advanced-filter'),
+              el,
+              elGroup,
+              elHandle,
+              activeTagInGroup;
+
+            filters.on('click', function (e) {
+              el = $(this);
+              elGroup = el.data('group');
+              elHandle = el.data('handle');
+              activeTagInGroup = $('.active-filter[data-group="' + elGroup + '"]');
+
+              e.preventDefault();
+
+              var currentUrl = new URL(window.location.href);
+              var currentPath = currentUrl.pathname;
+              var currentQuery = currentUrl.searchParams;
+              var tagPart = el.data('tag-part') || elHandle.split('_').pop(); // Use data-tag-part or fall back to parsing handle
+
+              if (!el.hasClass('active-filter') && !activeTagInGroup.length) {
+                // Add the tag to the 'q' parameter with a '+'
+                var currentQ = currentQuery.get('q') || '';
+                var newQ = currentQ ? `${currentQ}+${tagPart}` : tagPart;
+                currentQuery.set('q', newQ);
+                currentQuery.delete('tag'); // Remove any existing 'tag' parameter if present
+                window.location.href = currentUrl.href;
+              } else if (el.hasClass('active-filter')) {
+                // Remove the tag from the 'q' parameter
+                var currentQ = currentQuery.get('q') || '';
+                var qParts = currentQ.split('+');
+                var updatedQ = qParts.filter((part) => part !== tagPart).join('+');
+                if (updatedQ) {
+                  currentQuery.set('q', updatedQ);
+                } else {
+                  currentQuery.delete('q');
+                }
+                currentQuery.delete('tag'); // Ensure 'tag' parameter is removed
+                window.location.href = currentUrl.href;
+              }
+            });
+          });
+        </script>
+      {%- endfor -%}
+    </div>
+
+    <script>
+      $(function () {
+        var filters = $('.advanced-filter'),
+          el,
+          elGroup,
+          elHandle,
+          activeTagInGroup;
+
+        filters.on('click', function (e) {
+          el = $(this);
+          elGroup = el.data('group');
+          elHandle = el.data('handle');
+          activeTagInGroup = $('.active-filter[data-group="' + elGroup + '"]');
+          if (!el.hasClass('active-filter') && activeTagInGroup.length) {
+            e.preventDefault();
+            location.href = location.href + elHandle;
+          }
+        });
+      });
+    </script>
+  {% else %}
+    <p>No filters available for this search.</p>
+  {% endif %}

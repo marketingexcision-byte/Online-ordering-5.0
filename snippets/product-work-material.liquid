@@ -1,0 +1,2001 @@
+{% if product.tags contains 'Carbon Steels_Good'
+  or product.tags contains 'Carbon Steels_Great'
+  or product.tags contains 'Carbon Steels_Excellent'
+  or product.tags contains 'Alloy Steels_Good'
+  or product.tags contains 'Alloy Steels_Great'
+  or product.tags contains 'Alloy Steels_Excellent'
+  or product.tags contains 'Aluminium_Good'
+  or product.tags contains 'Aluminium_Great'
+  or product.tags contains 'Aluminium_Excellent'
+  or product.tags contains 'Bronze_Good'
+  or product.tags contains 'Bronze_Great'
+  or product.tags contains 'Bronze_Excellent'
+  or product.tags contains 'Graphite_Good'
+  or product.tags contains 'Graphite_Great'
+  or product.tags contains 'Graphite_Excellent'
+  or product.tags contains 'Plastic_Good'
+  or product.tags contains 'Plastic_Great'
+  or product.tags contains 'Plastic_Excellent'
+  or product.tags contains 'Prehardened Steels_Good'
+  or product.tags contains 'Prehardened Steels_Great'
+  or product.tags contains 'Prehardened Steels_Excellent'
+  or product.tags contains 'Stainless Steels_Good'
+  or product.tags contains 'Stainless Steels_Great'
+  or product.tags contains 'Stainless Steels_Excellent'
+  or product.tags contains 'Cast Iron_Good'
+  or product.tags contains 'Cast Iron_Great'
+  or product.tags contains 'Cast Iron_Excellent'
+  or product.tags contains 'Inconel_Good'
+  or product.tags contains 'Inconel_Great'
+  or product.tags contains 'Inconel_Excellent'
+  or product.tags contains 'Titanium_Good'
+  or product.tags contains 'Titanium_Great'
+  or product.tags contains 'Titanium_Excellent'
+  or product.tags contains 'Acrylic_Good'
+  or product.tags contains 'Acrylic_Great'
+  or product.tags contains 'Acrylic_Excellent'
+  or product.tags contains 'Structural Steels_Good'
+  or product.tags contains 'Structural Steels_Great'
+  or product.tags contains 'Structural Steels_Excellent'
+  or product.tags contains 'Mild & Free Machining_Good'
+  or product.tags contains 'Mild & Free Machining_Great'
+  or product.tags contains 'Mild & Free Machining_Excellent'
+  or product.tags contains 'Tool Steels_Good'
+  or product.tags contains 'Tool Steels_Great'
+  or product.tags contains 'Tool Steels_Excellent'
+  or product.tags contains 'Hardened Steels(HRc40~45)_Good'
+  or product.tags contains 'Hardened Steels(HRc40~45)_Great'
+  or product.tags contains 'Hardened Steels(HRc40~45)_Excellent'
+  or product.tags contains 'Hardened Steels(HRc30~45)_Good'
+  or product.tags contains 'Hardened Steels(HRc30~45)_Great'
+  or product.tags contains 'Hardened Steels(HRc30~45)_Excellent'
+  or product.tags contains 'Hardened Steels(HRc45~55)_Good'
+  or product.tags contains 'Hardened Steels(HRc45~55)_Great'
+  or product.tags contains 'Hardened Steels(HRc45~55)_Excellent'
+  or product.tags contains 'High Hardened Steels(HRc55~70)_Good'
+  or product.tags contains 'High Hardened Steels(HRc55~70)_Great'
+  or product.tags contains 'High Hardened Steels(HRc55~70)_Excellent'
+  or product.tags contains 'High Alloy Steels_Good'
+  or product.tags contains 'High Alloy Steels_Great'
+  or product.tags contains 'High Alloy Steels_Excellent'
+  or product.tags contains 'High Carbon Steels_Good'
+  or product.tags contains 'High Carbon Steels_Great'
+  or product.tags contains 'High Carbon Steels_Excellent'
+  or product.tags contains 'High Alloyed_Good'
+  or product.tags contains 'High Alloyed_Great'
+  or product.tags contains 'High Alloyed_Excellent'
+  or product.tags contains 'Aluminum & Aluminum alloy_Good'
+  or product.tags contains 'Aluminum & Aluminum alloy_Great'
+  or product.tags contains 'Aluminum & Aluminum alloy_Excellent'
+  or product.tags contains 'Structural & Low Carbon Steels_Good'
+  or product.tags contains 'Structural & Low Carbon Steels_Great'
+  or product.tags contains 'Structural & Low Carbon Steels_Excellent'
+  or product.tags contains 'Work Material_No option'
+%}
+      <div class="work-material series-cont con-box">
+        <div class="work-material-cont full-width">
+          <div id="product-info" data-tags="{{ product.tags | join: ',' }}" style="display: none;"></div>
+
+          <!-- Carbon Steels Good -->
+          {% if product.tags contains 'Carbon Steels_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#0069a7">P</span> Carbon Steels</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Carbon Steels_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#0069a7">P</span> Carbon Steels</div>
+                <h3 class="rating-label Great">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Carbon Steels Excellent -->
+          {% if product.tags contains 'Carbon Steels_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#0069a7">P</span> Carbon Steels</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Alloy Steels Good -->
+          {% if product.tags contains 'Alloy Steels_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#0069a7">P</span> Alloy Steels</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Alloy Steels Great -->
+          {% if product.tags contains 'Alloy Steels_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#0069a7">P</span> Alloy Steels</div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Alloy Steels Excellent -->
+          {% if product.tags contains 'Alloy Steels_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#0069a7">P</span> Alloy Steels</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- High Alloy Steels Good -->
+          {% if product.tags contains 'High Alloy Steels_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> High Alloy Steels
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- High Alloy Steels Great -->
+          {% if product.tags contains 'High Alloy Steels_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> High Alloy Steels
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- High Alloy Steels Excellent -->
+          {% if product.tags contains 'High Alloy Steels_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> High Alloy Steels
+                </div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- High Carbon Steels Good -->
+          {% if product.tags contains ' High Carbon Steels_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> High Carbon Steels
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- High Carbon Steels Great -->
+          {% if product.tags contains 'High Carbon Steels_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> High Carbon Steels
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- High Carbon Steels Excellent -->
+          {% if product.tags contains 'High Carbon Steels_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> High Carbon Steels
+                </div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Prehardened Steels Good -->
+          {% if product.tags contains 'Prehardened Steels_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> Prehardened Steels
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Prehardened Steels Good -->
+          {% if product.tags contains 'Prehardened Steels_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> Prehardened Steels
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Prehardened Steels Great -->
+          {% if product.tags contains 'Prehardened Steels_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> Prehardened Steels
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Prehardened Steels Excellent -->
+          {% if product.tags contains 'Prehardened Steels_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> Prehardened Steels
+                </div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Structural Steels Good -->
+          {% if product.tags contains 'Structural Steels_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> Structural Steels
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Structural Steels Great -->
+          {% if product.tags contains 'Structural Steels_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> Structural Steels
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Structural Steels Excellent -->
+          {% if product.tags contains 'Structural Steels_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> Structural Steels
+                </div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Mild & Free Machining Good -->
+          {% if product.tags contains 'Mild & Free Machining_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> Mild & Free Machining
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Mild & Free Machining Great -->
+          {% if product.tags contains 'Mild & Free Machining_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> Mild & Free Machining
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Mild & Free Machining Excellent -->
+          {% if product.tags contains 'Mild & Free Machining_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#0069a7">P</span> Mild & Free Machining
+                </div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Tool Steels Good -->
+          {% if product.tags contains 'Tool Steels_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#0069a7">P</span> Tool Steels</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Tool Steels Great -->
+          {% if product.tags contains 'Tool Steels_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#0069a7">P</span> Tool Steels</div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Tool Steels Excellent -->
+          {% if product.tags contains 'Tool Steels_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#0069a7">P</span> Tool Steels</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- High Alloyed Good -->
+          {% if product.tags contains 'High Alloyed_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#0069a7">P</span> High Alloyed</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- High Alloyed Great -->
+          {% if product.tags contains 'High Alloyed_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#0069a7">P</span> High Alloyed</div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- High Alloyed Excellent -->
+          {% if product.tags contains 'High Alloyed_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#0069a7">P</span> High Alloyed</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Structural & Low Carbon Steels Good -->
+          {% if product.tags contains 'Structural & Low Carbon Steels_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#f6b519">M</span> Structural & Low Carbon Steels
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #f6b519;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Structural & Low Carbon Steels Great -->
+          {% if product.tags contains 'Structural & Low Carbon Steels_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#f6b519">M</span> Structural & Low Carbon Steels
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #f6b519;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Structural & Low Carbon Steels Excellent -->
+          {% if product.tags contains 'Structural & Low Carbon Steels_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#f6b519">M</span> Structural & Low Carbon Steels
+                </div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #f6b519;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Stainless Steels Good -->
+          {% if product.tags contains 'Stainless Steels_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#f6b519">M</span> Stainless Steels
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #f6b519;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Stainless Steels Great -->
+          {% if product.tags contains 'Stainless Steels_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#f6b519">M</span> Stainless Steels
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #f6b519;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Stainless Steels Excellent -->
+          {% if product.tags contains 'Stainless Steels_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#f6b519">M</span> Stainless Steels
+                </div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #f6b519;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Cast Iron Good -->
+          {% if product.tags contains 'Cast Iron_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#E0592A">K</span> Cast Iron</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #E0592A;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Cast Iron Great -->
+          {% if product.tags contains 'Cast Iron_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#E0592A">K</span> Cast Iron</div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #E0592A;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Cast Iron Excellent -->
+          {% if product.tags contains 'Cast Iron_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#E0592A">K</span> Cast Iron</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #E0592A;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Aluminium Good -->
+          {% if product.tags contains 'Aluminium_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Aluminium</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Aluminium Great -->
+          {% if product.tags contains 'Aluminium_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Aluminium</div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Aluminium Excellent -->
+          {% if product.tags contains 'Aluminium_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Aluminium</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Bronze Good -->
+          {% if product.tags contains 'Bronze_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Bronze</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Bronze Great -->
+          {% if product.tags contains 'Bronze_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Bronze</div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Bronze Excellent -->
+          {% if product.tags contains 'Bronze_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Bronze</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Brass Bronze Good -->
+          {% if product.tags contains 'Brass Bronze_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Brass Bronze</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Brass Bronze Great -->
+          {% if product.tags contains 'Brass Bronze_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Brass Bronze</div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Brass Bronze Excellent -->
+          {% if product.tags contains 'Brass Bronze_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Brass Bronze</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+          <!-- Copper Good -->
+          {% if product.tags contains 'Copper_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Copper</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Copper Great -->
+          {% if product.tags contains 'Copper_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Copper</div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Copper Excellent -->
+          {% if product.tags contains 'Copper_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Copper</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- CFRP Good -->
+          {% if product.tags contains 'CFRP_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> CFRP</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- CFRP Great -->
+          {% if product.tags contains 'CFRP_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> CFRP</div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- CFRP Excellent -->
+          {% if product.tags contains 'CFRP_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> CFRP</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Non-ferrous Good -->
+          {% if product.tags contains 'Non-ferrous_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Non-ferrous</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Non-ferrous Great -->
+          {% if product.tags contains 'Non-ferrous_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Non-ferrous</div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Non-ferrous Excellent -->
+          {% if product.tags contains 'Non-ferrous_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Non-ferrous</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Aluminum & Aluminum alloy Good -->
+          {% if product.tags contains 'Aluminum & Aluminum alloy_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#109954">N</span> Aluminum & Aluminum alloy
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Aluminum & Aluminum alloy Great -->
+          {% if product.tags contains 'Aluminum & Aluminum alloy_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#109954">N</span> Aluminum & Aluminum alloy
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Aluminum & Aluminum alloy Excellent -->
+          {% if product.tags contains 'Aluminum & Aluminum alloy_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#109954">N</span> Aluminum & Aluminum alloy
+                </div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Magnesium & Magnesium Alloys Good -->
+          {% if product.tags contains 'Magnesium & Magnesium Alloys_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#109954">N</span> Magnesium & Magnesium Alloys
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Magnesium & Magnesium Alloys Great -->
+          {% if product.tags contains 'Magnesium & Magnesium Alloys_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#109954">N</span> Magnesium & Magnesium Alloys
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Magnesium & Magnesium Alloys Excellent -->
+          {% if product.tags contains 'Magnesium & Magnesium Alloys_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#109954">N</span> Magnesium & Magnesium Alloys
+                </div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Plastic Good -->
+          {% if product.tags contains 'Plastic_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Plastic</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Plastic Great -->
+          {% if product.tags contains 'Plastic_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Plastic</div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Plastic Excellent -->
+          {% if product.tags contains 'Plastic_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Plastic</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Inconel Good -->
+          {% if product.tags contains 'Inconel_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#f88d2b">S</span> Inconel</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #f88d2b;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Inconel Great -->
+          {% if product.tags contains 'Inconel_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#f88d2b">S</span> Inconel</div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #f88d2b;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Inconel Excellent -->
+          {% if product.tags contains 'Inconel_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#f88d2b">S</span> Inconel</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #f88d2b;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Titanium_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#f88d2b">S</span> Titanium</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #f88d2b;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Titanium_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#f88d2b">S</span> Titanium</div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #f88d2b;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Titanium_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#f88d2b">S</span> Titanium</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #f88d2b;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Nickel_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#f88d2b">S</span> Nickel</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #f88d2b;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Nickel_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#f88d2b">S</span> Nickel</div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #f88d2b;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Nickel_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#f88d2b">S</span> Nickel</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #f88d2b;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Hardened Steels (HRc40~45) Good -->
+          {% if product.tags contains 'Hardened Steels(HRc40~45)_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#666666">H</span> Hardened Steels (HRc40~45)
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #666666;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Hardened Steels (HRc40~45) Great -->
+          {% if product.tags contains 'Hardened Steels(HRc40~45)_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#666666">H</span> Hardened Steels (HRc40~45)
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #666666;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Hardened Steels (HRc40~45) Excellent -->
+          {% if product.tags contains 'Hardened Steels(HRc40~45)_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#666666">H</span> Hardened Steels (HRc40~45)
+                </div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #666666;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Hardened Steels (HRc30~45) Good -->
+          {% if product.tags contains 'Hardened Steels(HRc30~45)_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#666666">H</span> Hardened Steels (HRc30~45)
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #666666;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Hardened Steels (HRc30~45) Great -->
+          {% if product.tags contains 'Hardened Steels(HRc30~45)_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#666666">H</span> Hardened Steels (HRc30~45)
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #666666;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Hardened Steels (HRc30~45) Excellent -->
+          {% if product.tags contains 'Hardened Steels(HRc30~45)_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#666666">H</span> Hardened Steels (HRc30~45)
+                </div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #666666;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Hardened Steels(HRc45~) Good -->
+          {% if product.tags contains 'Hardened Steels(HRc45~)_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#666666">H</span> Hardened Steels(HRc45~)
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #666666;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Hardened Steels(HRc45~) Great -->
+          {% if product.tags contains 'Hardened Steels(HRc45~)_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#666666">H</span> Hardened Steels(HRc45~)
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #666666;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Hardened Steels(HRc45~) Excellent -->
+          {% if product.tags contains 'Hardened Steels(HRc45~)_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#666666">H</span> Hardened Steels(HRc45~)
+                </div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #666666;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Hardened Steels (HRc45~55) Good -->
+          {% if product.tags contains 'Hardened Steels(HRc45~55)_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#666666">H</span> Hardened Steels (HRc45~55)
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #666666;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Hardened Steels (HRc45~55) Great -->
+          {% if product.tags contains 'Hardened Steels(HRc45~55)_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#666666">H</span> Hardened Steels (HRc45~55)
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #666666;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Hardened Steels (HRc45~55) Excellent -->
+          {% if product.tags contains 'Hardened Steels(HRc45~55)_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#666666">H</span> Hardened Steels (HRc45~55)
+                </div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #666666;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- High Hardened Steels (HRc55~70) Good -->
+          {% if product.tags contains 'High Hardened Steels(HRc55~70)_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#666666">H</span> High Hardened Steels (HRc55~70)
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #666666;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- High Hardened Steels (HRc55~70) Great -->
+          {% if product.tags contains 'High Hardened Steels(HRc55~70)_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#666666">H</span> High Hardened Steels (HRc55~70)
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #666666;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- High Hardened Steels (HRc55~70) Excellent -->
+          {% if product.tags contains 'High Hardened Steels(HRc55~70)_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <span class="graph-icon" style="background:#666666">H</span> High Hardened Steels (HRc55~70)
+                </div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #666666;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Acrylic Good -->
+          {% if product.tags contains 'Acrylic_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Acrylic</div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Acrylic Great -->
+          {% if product.tags contains 'Acrylic_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Acrylic</div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Acrylic Excellent -->
+          {% if product.tags contains 'Acrylic_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name"><span class="graph-icon" style="background:#109954">N</span> Acrylic</div>
+                <h3 class="rating-label Excellent">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Excellent" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #109954;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Work Material No option -->
+          {% if product.tags contains 'Work Material_No option' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <h3 class="rating-label work-material_no-option">No Option</h3>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+{% endif %}
+
+{%- comment -%}
+  VDI -> Material cards
+  Uses metafields:
+    - custom.vdi_excellent   (List.Integer)
+    - custom.vdi_good        (List.Integer)
+{%- endcomment -%}
+
+{%- assign vdi_excellent = product.metafields.custom.vdi_excellent.value -%}
+{%- assign vdi_good      = product.metafields.custom.vdi_good.value -%}
+
+
+{%- assign __empty = '' | split: '' -%}
+{%- if vdi_excellent == blank -%}{%- assign vdi_excellent = __empty -%}{%- endif -%}
+{%- if vdi_good      == blank -%}{%- assign vdi_good      = __empty -%}{%- endif -%}
+
+{%- comment -%}
+  DATA FORMAT (one line per card):
+  ISO|Label|vdi:hrc:hb, vdi:hrc:hb, ...
+
+  Leave HRc or HB empty if that VDI doesn’t have it. e.g. "2::190"
+  We only render chips whose VDI is present in vdi_excellent or vdi_good.
+{%- endcomment -%}
+{%- assign rows = "
+P|Non-alloy steel|1::125,2:13:190,3:25:250,4:28:270,5:32:300|
+P|Low alloy steel|6:10:180,7:29:275,8:32:300,9:38:350|
+P|High alloy & tool steel|10:15:200,11:35:325|
+M|Stainless steel|12:15:200,13:23:240,14:10:180|
+K|Grey cast iron|15:10:180,16:26:260|
+K|Nodular cast iron|17:3:160,18:25:250|
+K|Malleable cast iron|19:21:130,20::230|
+N|Aluminium. wrought|21::60,22::100|
+N|Aluminium. cast|23::75,24::90,25::130|
+N|Copper. bronze. brass|26::110,27::90,28::100|
+N|Non-metallics|29::,30::|
+S|Heat-resistant superalloys|31::200,32::280,33::250,34::350|
+S|Titanium alloys|35::,36::,37::|
+H|Hardened steels & cast irons|38:38:400,39:39:—,40:40:630,41:41:—
+" | strip | split: "|
+" -%}
+
+{%- assign any_rendered = false -%}
+<div class="vdi-cards">
+  {%- for r in rows -%}
+    {%- assign r = r | strip -%}
+    {%- if r == "" -%}{% continue %}{%- endif -%}
+
+    {%- assign parts = r | split: "|" -%}
+    {%- assign iso   = parts[0] -%}
+    {%- assign label = parts[1] -%}
+    {%- assign pairs = parts[2] | split: "," -%}
+
+    {%- comment -%} Determine if this card has at least one matching VDI {%- endcomment -%}
+    {%- assign has_match = false -%}
+    {%- for p in pairs -%}
+      {%- assign p = p | strip -%}
+      {%- assign t = p | split: ":" -%}
+      {%- assign vdi = t[0] | plus: 0 -%}
+      {%- if vdi_excellent contains vdi or vdi_good contains vdi -%}
+        {%- assign has_match = true -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- unless has_match -%}{% continue %}{%- endunless -%}
+    {%- assign any_rendered = true -%}
+
+    {%- assign iso_class = iso | downcase -%}
+    <article class="card vdi-card iso-{{ iso_class }}">
+      <div class="vdi-card__iso-pill"><span class="vdi-card__iso-letter"><strong>{{ iso }}</strong></span></div>
+
+      {%- comment -%} Badge. Excellent beats Good if both present {%- endcomment -%}
+      {%- assign has_ex = false -%}
+      {%- assign has_gd = false -%}
+      {%- for p in pairs -%}
+        {%- assign t = p | split: ":" -%}
+        {%- assign vdi = t[0] | plus: 0 -%}
+        {%- if vdi_excellent contains vdi -%}{%- assign has_ex = true -%}{%- endif -%}
+        {%- if vdi_good contains vdi -%}{%- assign has_gd = true -%}{%- endif -%}
+      {%- endfor -%}
+
+      <header class="vdi-card__head vdi-card__head--under">
+        <h4 class="vdi-card__title">{{ label }}</h4>
+        <div class="vdi-card__badge">
+{%- if has_ex -%}
+  <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Black_Excellent.png?v=1737001898" alt="Excellent" width="16" height="16">
+  <span class="vdi-card__rating">Excellent</span>
+{%- elsif has_gd -%}
+  <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Black_Good.png?v=1737001888" alt="Good" width="16" height="16">
+  <span class="vdi-card__rating">Good</span>
+{%- endif -%}
+
+        </div>
+      </header>
+
+      <div class="vdi-card__body">
+        {%- comment -%} HRc chips. only for matched VDIs. skip blanks {%- endcomment -%}
+        <div class="vdi-field">
+  <div class="vdi-field__label">HRc</div>
+  <div class="vdi-chips">
+    {%- for p in pairs -%}
+      {%- assign t = p | split: ":" -%}
+      {%- assign vdi = t[0] | plus: 0 -%}
+      {%- assign hrc = t[1] | strip -%}
+
+      {%- assign matched = false -%}
+      {%- if vdi_excellent contains vdi -%}
+        {%- assign matched = true -%}
+      {%- elsif vdi_good contains vdi -%}
+        {%- assign matched = true -%}
+      {%- endif -%}
+
+      {%- if hrc != '' and matched -%}
+        <span class="vdi-chip">{{ hrc }}</span>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+        {%- comment -%} HB chips. only for matched VDIs. skip blanks. NO dash {%- endcomment -%}
+        <div class="vdi-field">
+  <div class="vdi-field__label">HB</div>
+  <div class="vdi-chips">
+    {%- for p in pairs -%}
+      {%- assign t = p | split: ":" -%}
+      {%- assign vdi = t[0] | plus: 0 -%}
+      {%- assign hb  = t[2] | strip -%}
+
+      {%- assign matched = false -%}
+      {%- if vdi_excellent contains vdi -%}
+        {%- assign matched = true -%}
+      {%- elsif vdi_good contains vdi -%}
+        {%- assign matched = true -%}
+      {%- endif -%}
+
+      {%- if hb != '' and hb != '—' and matched -%}
+        <span class="vdi-chip">{{ hb }}</span>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+    </article>
+  {%- endfor -%}
+
+  {%- unless any_rendered -%}
+    <p class="vdi-empty">No VDI recommendations set for this product.</p>
+  {%- endunless -%}
+</div>
+
+<style>
+/* VDI cards grid: 1 → 2 → 3 → 4 across */
+.vdi-cards{
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: 1fr;
+  margin-top: var(--space-6);
+}
+@media (min-width: 600px){ .vdi-cards{ grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 900px){ .vdi-cards{ grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1200px){ .vdi-cards{ grid-template-columns: repeat(4, 1fr); } }
+
+.vdi-card{ height: 100%; padding: var(--space-5); background: #f1f1f1; border-radius: var(--radius-lg); }
+
+.vdi-card__head{
+  display:flex; align-items:center; gap: var(--space-3);
+  margin-bottom: var(--space-5); flex-direction: column;
+}
+.vdi-card__head--under{ margin-top: var(--space-5); }
+.vdi-card__title{ margin:0; font-family: var(--font-bold); line-height:1.15; }
+.vdi-card__badge{ display:inline-flex; gap: var(--space-3); align-items:center; }
+
+/* ISO pill across the full card width */
+.vdi-card__iso-pill{
+  height: 40px; border-radius: 999px;
+  display:flex; align-items:center; justify-content:center;
+  letter-spacing:.3px; color:#fff;
+}
+.vdi-card.iso-p .vdi-card__iso-pill{ background:#0069a7; }
+.vdi-card.iso-m .vdi-card__iso-pill{ background:#f6b519; color:#111; }
+.vdi-card.iso-k .vdi-card__iso-pill{ background:#e0592a; }
+.vdi-card.iso-n .vdi-card__iso-pill{ background:#109954; }
+.vdi-card.iso-s .vdi-card__iso-pill{ background:#f88d2b; }
+.vdi-card.iso-h .vdi-card__iso-pill{ background:#666666; }
+
+.vdi-field{
+  display: grid; grid-template-columns: 38px 1fr;
+  gap: 8px; align-items: center; background: #fff;
+  padding: var(--space-2); border-radius: 99px; margin-bottom: var(--space-3);
+}
+.vdi-field__label{
+  font-size: 0.8rem; background: #f1f1f1; border-radius: 99px;
+  padding: var(--space-1) var(--space-2); text-align:center; line-height: normal;
+}
+.vdi-chips{ display:flex; flex-wrap:wrap; gap: 6px; }
+.vdi-chip{ display:inline-flex; align-items:center; justify-content:center; padding:0 5px; font-size:.85rem; }
+</style>

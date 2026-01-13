@@ -1,0 +1,797 @@
+<!-- Modal -->
+<div class="modal fade downloadKeyModalForm" id="myModal" role="dialog">
+   <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+         <div class="modal-body">
+            <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
+              <script>
+                hbspt.forms.create({
+                  region: "na1",
+                  portalId: "2595431",
+                  formId: "28b0e3f3-c392-4474-b7f6-a7e712e0dbc6",
+                  onFormSubmit: function ($form) {
+                    // Get the value of the first name input
+                    var firstName = $('input[name="firstname"]').val();              
+                    // Add a delay of 2 seconds (2000 milliseconds) before reloading the page
+                    setTimeout(function () {
+                      location.reload();
+                    }, 2000);
+                  },
+                });
+              </script>
+         </div>
+      </div>
+   </div>
+</div>
+
+<div class="container dt-prl-30">
+   <div class="row">
+      <h2 class="col-12 col-sm-12 section-title lazyload-element">{{ section.settings.section_title_3 }}</h2>     
+      {% if section.settings.enable_card_3_1 %}
+       <div class="col-12 col-sm-3 lazyload-element">
+         <div class="card-2 card hoverable">
+            {% if section.settings.image_3_1 != blank %}
+              <div class="card-image card-img-size">
+                <a href="{{ section.settings.card_url_3_1 }}">                  
+                  	<img src="{{ section.settings.image_3_1 | img_url:'grande' }}" alt="" />                  
+                </a>
+               </div>
+            {% endif %}
+            <div class="card-content" style="min-height: 85px;">
+               <h2 class="card-title">{{ section.settings.card_title_3_1 }} </h2>
+               {% if section.settings.card_text_3_1 != blank %}
+                  <div class="item-info">
+                   {{ section.settings.card_text_3_1 }}
+                  </div>
+               {% endif %}
+            </div>
+            <a class="card-action setCookie" target="_blank" style="display:none;" href="{{ section.settings.card_url_3_1 }}" rel="32" onclick="downloads.openFile('{{ section.settings.card_url_3_1 }}', 1); return false;" title="{{ section.settings.card_title_3_1 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+            <a class="card-action createCookie" id="downloadKeyModalBtn" href="javascript:void(0)" onclick="saveCookie()" data-toggle="modal" data-target="#myModal" title="{{ section.settings.card_title_3_1 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+         </div>
+       </div>
+      {% endif %}
+      
+      {% if section.settings.enable_card_3_2 %}
+       <div class="col-12 col-sm-3 lazyload-element">
+         <div class="card-2 card hoverable">
+            {% if section.settings.image_3_2 != blank %}
+              <div class="card-image card-img-size">
+                <a href="{{ section.settings.card_url_3_2 }}">                  
+                  	<img src="{{ section.settings.image_3_2 | img_url:'grande' }}" alt="" />                  
+                </a>
+               </div>
+            {% endif %}
+            <div class="card-content" style="min-height: 85px;">
+               <h2 class="card-title">{{ section.settings.card_title_3_2 }} </h2>
+               {% if section.settings.card_text_3_2 != blank %}
+                  <div class="item-info">
+                   {{ section.settings.card_text_3_2 }}
+                  </div>
+               {% endif %}
+            </div>
+            <a class="card-action setCookie" target="_blank" style="display:none;" href="{{ section.settings.card_url_3_2 }}" rel="54" onclick="downloads.openFile('{{ section.settings.card_url_3_2 }}', 1); return false;" title="{{ section.settings.card_title_3_2 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+            <a class="card-action createCookie" id="downloadKeyModalBtn" href="javascript:void(0)" onclick="saveCookie()" data-toggle="modal" data-target="#myModal" title="{{ section.settings.card_title_3_1 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+         </div>
+       </div>
+      {% endif %}
+      
+      {% if section.settings.enable_card_3_3 %}
+       <div class="col-12 col-sm-3 lazyload-element">
+         <div class="card-2 card hoverable">
+            {% if section.settings.image_3_3 != blank %}
+              <div class="card-image card-img-size">
+                <a href="{{ section.settings.card_url_3_3 }}">                  
+                  	<img src="{{ section.settings.image_3_3 | img_url:'grande' }}" alt="" />                  
+                </a>
+               </div>
+            {% endif %}
+            <div class="card-content" style="min-height: 85px;">
+               <h2 class="card-title">{{ section.settings.card_title_3_3 }} </h2>
+               {% if section.settings.card_text_3_3 != blank %}
+                  <div class="item-info">
+                   {{ section.settings.card_text_3_3 }}
+                  </div>
+               {% endif %}
+            </div>
+            <a class="card-action setCookie" target="_blank" style="display:none;" href="{{ section.settings.card_url_3_3 }}" rel="52" onclick="downloads.openFile('{{ section.settings.card_url_3_3 }}', 1); return false;" title="{{ section.settings.card_title_3_3 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+            <a class="card-action createCookie" id="downloadKeyModalBtn" href="javascript:void(0)" onclick="saveCookie()" data-toggle="modal" data-target="#myModal" title="{{ section.settings.card_title_3_1 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+         </div>
+       </div>
+      {% endif %}
+      
+      {% if section.settings.enable_card_3_4 %}
+       <div class="col-12 col-sm-3 lazyload-element">
+         <div class="card-2 card hoverable">
+            {% if section.settings.image_3_4 != blank %}
+              <div class="card-image card-img-size">
+                <a href="{{ section.settings.card_url_3_4 }}">                  
+                  	<img src="{{ section.settings.image_3_4 | img_url:'grande' }}" alt="" />                  
+                </a>
+               </div>
+            {% endif %}
+            <div class="card-content" style="min-height: 85px;">
+               <h2 class="card-title">{{ section.settings.card_title_3_4 }} </h2>
+               {% if section.settings.card_text_3_4 != blank %}
+                  <div class="item-info">
+                   {{ section.settings.card_text_3_4 }}
+                  </div>
+               {% endif %}
+            </div>
+            <a class="card-action setCookie" target="_blank" style="display:none;" href="{{ section.settings.card_url_3_4 }}" rel="53" onclick="downloads.openFile('{{ section.settings.card_url_3_4 }}', 1); return false;" title="{{ section.settings.card_title_3_4 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+            <a class="card-action createCookie" id="downloadKeyModalBtn" href="javascript:void(0)" onclick="saveCookie()" data-toggle="modal" data-target="#myModal" title="{{ section.settings.card_title_3_1 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+         </div>
+       </div>
+      {% endif %}
+      
+      {% if section.settings.enable_card_3_5 %}
+       <div class="col-12 col-sm-3 lazyload-element">
+         <div class="card-2 card hoverable">
+            {% if section.settings.image_3_5 != blank %}
+              <div class="card-image card-img-size">
+                <a href="{{ section.settings.card_url_3_5 }}">                  
+                  	<img src="{{ section.settings.image_3_5 | img_url:'grande' }}" alt="" />                  
+                </a>
+               </div>
+            {% endif %}
+            <div class="card-content" style="min-height: 85px;">
+               <h2 class="card-title">{{ section.settings.card_title_3_5 }} </h2>
+               {% if section.settings.card_text_3_5 != blank %}
+                  <div class="item-info">
+                   {{ section.settings.card_text_3_5 }}
+                  </div>
+               {% endif %}
+            </div>
+            <a class="card-action setCookie" target="_blank" style="display:none;" href="{{ section.settings.card_url_3_5 }}" rel="31" onclick="downloads.openFile('{{ section.settings.card_url_3_5 }}', 1); return false;" title="{{ section.settings.card_title_3_5 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+            <a class="card-action createCookie" id="downloadKeyModalBtn" href="javascript:void(0)" onclick="saveCookie()" data-toggle="modal" data-target="#myModal" title="{{ section.settings.card_title_3_1 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+         </div>
+       </div>
+      {% endif %}
+      
+      {% if section.settings.enable_card_3_6 %}
+       <div class="col-12 col-sm-3 lazyload-element">
+         <div class="card-2 card hoverable">
+            {% if section.settings.image_3_6 != blank %}
+              <div class="card-image card-img-size">
+                <a href="{{ section.settings.card_url_3_6 }}">                  
+                  	<img src="{{ section.settings.image_3_6 | img_url:'grande' }}" alt="" />                  
+                </a>
+               </div>
+            {% endif %}
+            <div class="card-content" style="min-height: 85px;">
+               <h2 class="card-title">{{ section.settings.card_title_3_6 }} </h2>
+               {% if section.settings.card_text_3_6 != blank %}
+                  <div class="item-info">
+                   {{ section.settings.card_text_3_6 }}
+                  </div>
+               {% endif %}
+            </div>
+            <a class="card-action setCookie" target="_blank" style="display:none;" href="{{ section.settings.card_url_3_6 }}" rel="33" onclick="downloads.openFile('{{ section.settings.card_url_3_6 }}', 1); return false;" title="{{ section.settings.card_title_3_6 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+            <a class="card-action createCookie" id="downloadKeyModalBtn" href="javascript:void(0)" onclick="saveCookie()" data-toggle="modal" data-target="#myModal" title="{{ section.settings.card_title_3_1 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+         </div>
+       </div>
+      {% endif %}
+      
+      {% if section.settings.enable_card_3_7 %}
+       <div class="col-12 col-sm-3 lazyload-element">
+         <div class="card-2 card hoverable">
+            {% if section.settings.image_3_7 != blank %}
+              <div class="card-image card-img-size">
+                <a href="{{ section.settings.card_url_3_7 }}">                  
+                  	<img src="{{ section.settings.image_3_7 | img_url:'grande' }}" alt="" />                  
+                </a>
+               </div>
+            {% endif %}
+            <div class="card-content" style="min-height: 85px;">
+               <h2 class="card-title">{{ section.settings.card_title_3_7 }} </h2>
+               {% if section.settings.card_text_3_7 != blank %}
+                  <div class="item-info">
+                   {{ section.settings.card_text_3_7 }}
+                  </div>
+               {% endif %}
+            </div>
+            <a class="card-action setCookie" target="_blank" style="display:none;" href="{{ section.settings.card_url_3_7 }}" rel="9" onclick="downloads.openFile('{{ section.settings.card_url_3_7 }}', 1); return false;" title="{{ section.settings.card_title_3_7 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+            <a class="card-action createCookie" id="downloadKeyModalBtn" href="javascript:void(0)" onclick="saveCookie()" data-toggle="modal" data-target="#myModal" title="{{ section.settings.card_title_3_1 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+         </div>
+       </div>
+      {% endif %}
+      
+      {% if section.settings.enable_card_3_8 %}
+       <div class="col-12 col-sm-3 lazyload-element">
+         <div class="card-2 card hoverable">
+            {% if section.settings.image_3_8 != blank %}
+              <div class="card-image card-img-size">
+                <a href="{{ section.settings.card_url_3_8 }}">                  
+                  	<img src="{{ section.settings.image_3_8 | img_url:'grande' }}" alt="" />                  
+                </a>
+               </div>
+            {% endif %}
+            <div class="card-content" style="min-height: 85px;">
+               <h2 class="card-title">{{ section.settings.card_title_3_8 }} </h2>
+               {% if section.settings.card_text_3_8 != blank %}
+                  <div class="item-info">
+                   {{ section.settings.card_text_3_8 }}
+                  </div>
+               {% endif %}
+            </div>
+            <a class="card-action setCookie" target="_blank" style="display:none;" href="{{ section.settings.card_url_3_8 }}" rel="28" onclick="downloads.openFile('{{ section.settings.card_url_3_8 }}', 1); return false;" title="{{ section.settings.card_title_3_8 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+            <a class="card-action createCookie" id="downloadKeyModalBtn" href="javascript:void(0)" onclick="saveCookie()" data-toggle="modal" data-target="#myModal" title="{{ section.settings.card_title_3_1 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+         </div>
+       </div>
+      {% endif %}
+      
+      {% if section.settings.enable_card_3_9 %}
+       <div class="col-12 col-sm-3 lazyload-element">
+         <div class="card-2 card hoverable">
+            <{% if section.settings.image_3_9 != blank %}
+              <div class="card-image card-img-size">
+                <a href="{{ section.settings.card_url_3_9 }}">                  
+                  	<img src="{{ section.settings.image_3_9 | img_url:'grande' }}" alt="" />                  
+                </a>
+               </div>
+            {% endif %}
+            <div class="card-content" style="min-height: 85px;">
+               <h2 class="card-title">{{ section.settings.card_title_3_9 }} </h2>
+               {% if section.settings.card_text_3_9 != blank %}
+                  <div class="item-info">
+                   {{ section.settings.card_text_3_9 }}
+                  </div>
+               {% endif %}
+            </div>
+            <a class="card-action setCookie" target="_blank" style="display:none;" href="{{ section.settings.card_url_3_9 }}" rel="27" onclick="downloads.openFile('{{ section.settings.card_url_3_9 }}', 1); return false;" title="{{ section.settings.card_title_3_9 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+            <a class="card-action createCookie" id="downloadKeyModalBtn" href="javascript:void(0)" onclick="saveCookie()" data-toggle="modal" data-target="#myModal" title="{{ section.settings.card_title_3_1 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+         </div>
+       </div>
+      {% endif %}
+      
+      {% if section.settings.enable_card_3_10 %}
+       <div class="col-12 col-sm-3 lazyload-element">
+         <div class="card-2 card hoverable">
+            {% if section.settings.image_3_10 != blank %}
+              <div class="card-image card-img-size">
+                <a href="{{ section.settings.card_url_3_10 }}">                  
+                  	<img src="{{ section.settings.image_3_10 | img_url:'grande' }}" alt="" />                  
+                </a>
+               </div>
+            {% endif %}
+            <div class="card-content" style="min-height: 85px;">
+               <h2 class="card-title">{{ section.settings.card_title_3_10 }} </h2>
+               {% if section.settings.card_text_3_10 != blank %}
+                  <div class="item-info">
+                   {{ section.settings.card_text_3_10 }}
+                  </div>
+               {% endif %}
+            </div>
+            <a class="card-action setCookie" target="_blank" style="display:none;" href="{{ section.settings.card_url_3_10 }}" rel="27" onclick="downloads.openFile('{{ section.settings.card_url_3_10 }}', 1); return false;" title="{{ section.settings.card_title_3_10}}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+            <a class="card-action createCookie" id="downloadKeyModalBtn" href="javascript:void(0)" onclick="saveCookie()" data-toggle="modal" data-target="#myModal" title="{{ section.settings.card_title_3_1 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+         </div>
+       </div>
+      {% endif %}
+      
+      {% if section.settings.enable_card_3_11 %}
+       <div class="col-12 col-sm-3 lazyload-element">
+         <div class="card-2 card hoverable">
+            {% if section.settings.image_3_11 != blank %}
+              <div class="card-image card-img-size">
+                <a href="{{ section.settings.card_url_3_11 }}">                  
+                  	<img src="{{ section.settings.image_3_11 | img_url:'grande' }}" alt="" />                  
+                </a>
+               </div>
+            {% endif %}
+            <div class="card-content" style="min-height: 85px;">
+               <h2 class="card-title">{{ section.settings.card_title_3_11 }} </h2>
+               {% if section.settings.card_text_3_11 != blank %}
+                  <div class="item-info">
+                   {{ section.settings.card_text_3_11 }}
+                  </div>
+               {% endif %}
+            </div>
+            <a class="card-action setCookie" target="_blank" style="display:none;" href="{{ section.settings.card_url_3_11 }}" rel="27" onclick="downloads.openFile('{{ section.settings.card_url_3_11 }}', 1); return false;" title="{{ section.settings.card_title_3_11 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+            <a class="card-action createCookie" id="downloadKeyModalBtn" href="javascript:void(0)" onclick="saveCookie()" data-toggle="modal" data-target="#myModal" title="{{ section.settings.card_title_3_1 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+         </div>
+       </div>
+      {% endif %}
+      
+      {% if section.settings.enable_card_3_12 %}
+       <div class="col-12 col-sm-3 lazyload-element">
+         <div class="card-2 card hoverable">
+            {% if section.settings.image_3_12 != blank %}
+              <div class="card-image card-img-size">
+                <a href="{{ section.settings.card_url_3_12 }}">                  
+                  	<img src="{{ section.settings.image_3_12 | img_url:'grande' }}" alt="" />                  
+                </a>
+               </div>
+            {% endif %}
+            <div class="card-content" style="min-height: 85px;">
+               <h2 class="card-title">{{ section.settings.card_title_3_12 }} </h2>
+               {% if section.settings.card_text_3_12 != blank %}
+                  <div class="item-info">
+                   {{ section.settings.card_text_3_12 }}
+                  </div>
+               {% endif %}
+            </div>
+            <a class="card-action setCookie" target="_blank" style="display:none;" href="{{ section.settings.card_url_3_12 }}" rel="27" onclick="downloads.openFile('{{ section.settings.card_url_3_12 }}', 1); return false;" title="{{ section.settings.card_title_3_12 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+            <a class="card-action createCookie" id="downloadKeyModalBtn" href="javascript:void(0)" onclick="saveCookie()" data-toggle="modal" data-target="#myModal" title="{{ section.settings.card_title_3_1 }}">
+               <p class="action font-bold">Download <em>→</em></p>
+            </a>
+         </div>
+       </div>
+      {% endif %}
+   </div>
+</div>
+
+<script>
+function setCookie(cname,cvalue,exdays) {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  let expires = "expires=" + d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+function checkCookie() {
+  let user = getCookie("username");
+  if (user != "") {
+    $('.createCookie').css("display", "none");
+    $('.setCookie').css("display", "block"); 
+  } 
+}
+
+function saveCookie() {
+  let user = getCookie("username");
+  if (user != "") {
+    $('.createCookie').css("display", "none");
+    $('.setCookie').css("display", "block"); 
+  } else {
+     //user = prompt("Do you want to Download this File?","Yes");
+     user = confirm("Do you want to Download this File?", "Yes");
+     if (user != "" && user != null) {
+       setCookie("username", user, 365);       
+       $('.createCookie').css("display", "block");
+       $('.setCookie').css("display", "none");
+     } else {
+       $('#myModal').css('opacity', '0'); 
+       location.reload();
+     }
+  }
+}
+</script> 
+
+{% schema %}
+  {
+    "name": "Technical Guide Page",
+    "settings": [    
+      {
+        "type": "text",
+        "id": "section_title_3",
+        "label": "Section title"
+      },
+      {
+        "type": "header",
+        "content": "Card #1"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_card_3_1",
+        "label": "Show Card",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "image_3_1",
+        "label": "Image"
+      }, 
+      {
+        "type": "text",
+        "id": "card_title_3_1",
+        "label": "Card Title"
+      },
+      {
+        "type": "richtext",
+        "id": "card_text_3_1",
+        "label": "Card text"
+      },
+      {
+        "type": "url",
+        "id": "card_url_3_1",
+        "label": "Card download url"
+      },
+      {
+        "type": "header",
+        "content": "Card #2"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_card_3_2",
+        "label": "Show Card",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "image_3_2",
+        "label": "Image"
+      }, 
+      {
+        "type": "text",
+        "id": "card_title_3_2",
+        "label": "Card Title"
+      },
+      {
+        "type": "text",
+        "id": "card_text_3_2",
+        "label": "Card text"
+      },
+      {
+        "type": "url",
+        "id": "card_url_3_2",
+        "label": "Card download url"
+      },
+      {
+        "type": "header",
+        "content": "Card #3"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_card_3_3",
+        "label": "Show Card",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "image_3_3",
+        "label": "Image"
+      }, 
+      {
+        "type": "text",
+        "id": "card_title_3_3",
+        "label": "Card Title"
+      },
+      {
+        "type": "text",
+        "id": "card_text_3_3",
+        "label": "Card text"
+      },
+      {
+        "type": "url",
+        "id": "card_url_3_3",
+        "label": "Card download url"
+      },
+      {
+        "type": "header",
+        "content": "Card #4"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_card_3_4",
+        "label": "Show Card",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "image_3_4",
+        "label": "Image"
+      }, 
+      {
+        "type": "text",
+        "id": "card_title_3_4",
+        "label": "Card Title"
+      },
+      {
+        "type": "text",
+        "id": "card_text_3_4",
+        "label": "Card text"
+      },
+      {
+        "type": "url",
+        "id": "card_url_3_4",
+        "label": "Card download url"
+      },
+      {
+        "type": "header",
+        "content": "Card #5"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_card_3_5",
+        "label": "Show Card",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "image_3_5",
+        "label": "Image"
+      }, 
+      {
+        "type": "text",
+        "id": "card_title_3_5",
+        "label": "Card Title"
+      },
+      {
+        "type": "text",
+        "id": "card_text_3_5",
+        "label": "Card text"
+      },
+      {
+        "type": "url",
+        "id": "card_url_3_5",
+        "label": "Card download url"
+      },
+      {
+        "type": "header",
+        "content": "Card #6"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_card_3_6",
+        "label": "Show Card",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "image_3_6",
+        "label": "Image"
+      }, 
+      {
+        "type": "text",
+        "id": "card_title_3_6",
+        "label": "Card Title"
+      },
+      {
+        "type": "text",
+        "id": "card_text_3_6",
+        "label": "Card text"
+      },
+      {
+        "type": "url",
+        "id": "card_url_3_6",
+        "label": "Card download url"
+      },
+      {
+        "type": "header",
+        "content": "Card #7"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_card_3_7",
+        "label": "Show Card",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "image_3_7",
+        "label": "Image"
+      }, 
+      {
+        "type": "text",
+        "id": "card_title_3_7",
+        "label": "Card Title"
+      },
+      {
+        "type": "text",
+        "id": "card_text_3_7",
+        "label": "Card text"
+      },
+      {
+        "type": "url",
+        "id": "card_url_3_7",
+        "label": "Card download url"
+      },
+      {
+        "type": "header",
+        "content": "Card #8"
+      },      
+      {
+        "type": "checkbox",
+        "id": "enable_card_3_8",
+        "label": "Show Card",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "image_3_8",
+        "label": "Image"
+      }, 
+      {
+        "type": "text",
+        "id": "card_title_3_8",
+        "label": "Card Title"
+      },
+      {
+        "type": "text",
+        "id": "card_text_3_8",
+        "label": "Card text"
+      },
+      {
+        "type": "url",
+        "id": "card_url_3_8",
+        "label": "Card download url"
+      },
+      {
+        "type": "header",
+        "content": "Card #9"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_card_3_9",
+        "label": "Show Card",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "image_3_9",
+        "label": "Image"
+      }, 
+      {
+        "type": "text",
+        "id": "card_title_3_9",
+        "label": "Card Title"
+      },
+      {
+        "type": "text",
+        "id": "card_text_3_9",
+        "label": "Card text"
+      },
+      {
+        "type": "url",
+        "id": "card_url_3_9",
+        "label": "Card download url"
+      },
+      {
+        "type": "header",
+        "content": "Card #10"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_card_3_10",
+        "label": "Show Card",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "image_3_10",
+        "label": "Image"
+      }, 
+      {
+        "type": "text",
+        "id": "card_title_3_10",
+        "label": "Card Title"
+      },
+      {
+        "type": "text",
+        "id": "card_text_3_10",
+        "label": "Card text"
+      },
+      {
+        "type": "url",
+        "id": "card_url_3_10",
+        "label": "Card download url"
+      },
+      {
+        "type": "header",
+        "content": "Card #11"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_card_3_11",
+        "label": "Show Card",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "image_3_11",
+        "label": "Image"
+      }, 
+      {
+        "type": "text",
+        "id": "card_title_3_11",
+        "label": "Card Title"
+      },
+      {
+        "type": "text",
+        "id": "card_text_3_11",
+        "label": "Card text"
+      },
+      {
+        "type": "url",
+        "id": "card_url_3_11",
+        "label": "Card download url"
+      },
+      {
+        "type": "header",
+        "content": "Card #12"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_card_3_12",
+        "label": "Show Card",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "image_3_12",
+        "label": "Image"
+      }, 
+      {
+        "type": "text",
+        "id": "card_title_3_12",
+        "label": "Card Title"
+      },
+      {
+        "type": "text",
+        "id": "card_text_3_12",
+        "label": "Card text"
+      },
+      {
+        "type": "url",
+        "id": "card_url_3_12",
+        "label": "Card download url"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

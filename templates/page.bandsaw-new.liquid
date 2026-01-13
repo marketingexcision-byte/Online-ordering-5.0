@@ -1,0 +1,80 @@
+<section class="hero-banner simple-lazyload">
+      <div class="breadcrumbs-wrapper">
+         <div class="breadcrumbs container dt-prl-30">
+            <div class="row">
+              <div class="col-md-12 lazyload-element">
+                 <div class="w-btn-wrapper">
+                    <a class="w-btn icon_atleft" href="{{ shop.url }}"><span class="w-btn-label font-bold"><em>←</em>Back to Home</span></a>
+                 </div>
+               </div>
+              {% comment %}
+               <ul class="col-md-12 s12">
+                  <li class="home">
+                     <a href="/" title="Go to Home Page">Home</a>
+                     <span>| </span>
+                  </li>
+                  <li class="cms_page">
+                     <strong class="font-bold"> Bandsaw Blades</strong>
+                  </li>
+               </ul>
+              {% endcomment %}
+            </div>
+         </div>
+      </div>
+      <div class="container dt-prl-30">
+         <div class="row ">
+            <div class="col-md-7 lazyload-element">
+               <div class="placeholder">
+                  {% section 'bandshaw-page-header' %}                 
+               </div>
+            </div>
+           <div class="col-md-1"></div>
+           <div class="col-md-4 d-flex align-items-end lazyload-element">
+             <button id="blade-finder-toggle">
+               Try our blade selector!
+             </button>
+           </div>
+         </div>
+      </div>
+</section>
+
+
+<noscript>You need to enable JavaScript to run this app.</noscript>
+<div class="simple-lazyload">
+  <div id="blade-finder-root" class="lazyload-element"></div>
+</div>
+<script defer src="{{ "bandsaw-selector-app.js" | asset_url }}"></script>
+
+
+<div class="grid simple-lazyload">
+   <div class="grid-item large--two-thirds push--large--one-sixth">
+      {% comment %}
+      <h1>{{ page.title }}</h1>
+      {% endcomment %}
+      <div class="rte lazyload-element">
+         {{ page.content }}
+        
+         {% section 'bandshaw-section' %}
+         {% section 'bandshaw-section-info' %}
+        
+      </div>
+  </div>
+</div>
+<style>
+   div#shopify-section-bandshaw-section {
+   /*margin-left: 49px;*/
+   }
+
+   button#blade-finder-toggle {
+    margin-top: 5px;
+    margin-bottom: 20px;
+    background-color: #e0592a;
+    min-height: 40px;
+    text-transform: capitalize;
+    color: #fff;
+    transition: all .3s ease-in-out;
+    border-radius: 999px;
+    border: none;
+    padding: 0 15px;
+   }
+</style>

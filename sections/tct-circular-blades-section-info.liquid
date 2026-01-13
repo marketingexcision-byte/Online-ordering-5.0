@@ -1,0 +1,308 @@
+<div class="container small simple-lazyload">
+   {% if section.settings.enable_section_info %}
+   <div class="bandshaw_info lazyload-element">
+      <div class="bandshaw_inner_wrap" style="background:{{ section.settings.wrapper_bg }}; margin-top:{{ section.settings.wrapper_margin }}; margin-bottom:{{ section.settings.wrapper_margin }}; padding: {{ section.settings.wrapper_padding }};">
+          {% for block in section.blocks %}
+                <div class="page-info-section" style="margin-top: {{ block.settings.sec_margin_top }}; margin-bottom: {{ block.settings.sec_margin_bottom }}">  
+                  {% if block.settings.title != blank %} 
+                     <h2 style="font-size: {{ block.settings.title_font_size }}px; color: {{ block.settings.title_color }}; text-align: {{ block.settings.title_align }}; padding-top: {{ block.settings.title_padding }}; padding-bottom: {{ block.settings.title_padding }}; {% if block.settings.enable_title_icon %} {% else %} background: none; padding-left:0;{% endif %}">
+                       {{ block.settings.title }}
+                     </h2>
+                  {% endif %} 
+                  {% if block.settings.info != blank %}
+                     <div style="font-size: {{ block.settings.info_font_size }}px; color: {{ block.settings.info_color }}; text-align: {{ block.settings.info_align }}; padding-top: {{ block.settings.info_padding }}; padding-bottom: {{ block.settings.info_padding }};">
+                       {{ block.settings.info }}
+                     </div>
+                  {% endif %}
+                  {% if block.settings.btn_url != blank %}
+                    <div class="btn__wrap" style="text-align: {{ block.settings.btn_align }}; margin-top:10px; margin-bottom:10px;"> 
+                       <a href="{{ block.settings.btn_url }}" class="btn view-all" style="font-size: {{ block.settings.btn_font_size }}px; background: {{ block.settings.btn_bg_color }}; color: {{ block.settings.btn_color }}; text-align: {{ block.settings.btn_align }};">
+                         {{ block.settings.btn_caption }}
+                       </a>
+                    </div>
+                  {% endif %}
+                  {% if block.settings.image != blank %}
+                  <div class="img_wrap" style="text-align: {{ block.settings.img_align }};">
+                     <img src="{{ block.settings.image | img_url: '' }}" alt="" style="padding-top: {{ block.settings.img_padding }}; padding-bottom: {{ block.settings.img_padding }};">
+                  </div>
+                  {% endif %}
+               </div>
+          {% endfor %}        
+      </div>
+   </div>
+   {% endif %}
+</div>
+
+<style>
+  .page-info-section img {
+      max-width: 100%;
+  }
+  .page-info-section .btn__wrap a:hover {
+      color: #000 !important; 
+  }
+</style>
+
+{% schema %} 
+  {
+    "name": "Page Info",
+    "max_blocks": 10,
+    "settings": [
+       {
+          "type": "checkbox",
+          "id": "enable_section_info",
+          "label": "Show Info Sections",
+          "default": false
+       },
+       {
+          "type": "color",
+          "id": "wrapper_bg",
+          "label": "Background",
+          "default": "#EBEBEB"
+       },
+       {
+          "type": "text",
+          "id": "wrapper_padding",
+          "label": "Padding",          
+          "default": "40px",
+          "info": "Padding add with in 'px'"
+       },
+       {
+          "type": "text",
+          "id": "wrapper_margin",
+          "label": "Margin top & bottom",          
+          "default": "0px",
+          "info": "Margin add with in 'px'"
+       }
+     ],
+     "blocks": [
+       {
+         "type": "info-section",
+         "name": "Info Section",
+         "settings": [
+            {
+              "type": "header",
+              "content": "Title"
+            },
+            {
+              "type": "text",
+              "id": "title",
+              "label": "Title"
+            }, 
+            {
+              "type": "checkbox",
+              "id": "enable_title_icon",
+              "label": "Show Icon",
+              "default": true
+            },
+            {
+              "type": "select",
+              "id": "title_align",
+              "label": "Title Alignment",
+              "options":[
+                 {
+                    "value": "left",
+                    "label": "Left"
+                 },
+                 {
+                    "value": "center",
+                    "label": "Center"
+                 },
+                 {
+                    "value": "right",
+                    "label": "Right"
+                 }
+              ]
+            },
+            {
+              "type": "range",
+              "id": "title_font_size",
+              "min": 10,
+              "max": 100,
+              "step": 1,
+              "unit": "px",
+              "label": "Font Size",
+              "default": 30
+            },
+            {
+              "type": "color",
+              "id": "title_color",
+              "label": "Color",
+              "default": "#197bbd"
+            },
+            {
+              "type": "text",
+              "id": "title_padding",
+              "label": "Padding Top & Bottom",          
+              "default": "0px",
+              "info": "Padding add with in 'px'"
+            },
+            {
+              "type": "header",
+              "content": "Info"
+            },
+            {
+              "type": "textarea",
+              "id": "info",
+              "label": "Content"
+            },
+            {
+              "type": "select",
+              "id": "info_align",
+              "label": "Text Alignment",
+              "options":[
+                 {
+                    "value": "left",
+                    "label": "Left"
+                 },
+                 {
+                    "value": "center",
+                    "label": "Center"
+                 },
+                 {
+                    "value": "right",
+                    "label": "Right"
+                 }
+              ]
+            },
+            {
+              "type": "range",
+              "id": "info_font_size",
+              "min": 10,
+              "max": 100,
+              "step": 1,
+              "unit": "px",
+              "label": "Font Size",
+              "default": 16
+            },
+            {
+              "type": "color",
+              "id": "info_color",
+              "label": "Color",
+              "default": "#212529"
+            },
+            {
+              "type": "text",
+              "id": "info_padding",
+              "label": "Padding Top & Bottom",          
+              "default": "0px",
+              "info": "Padding add with in 'px'"
+            },
+            {
+              "type": "header",
+              "content": "Button"
+            },
+            {
+              "type": "text",
+              "id": "btn_caption",
+              "label": "Button Caption"
+            }, 
+            {
+              "type": "url",
+              "id": "btn_url",
+              "label": "Button Url"
+            },
+            {
+              "type": "range",
+              "id": "btn_font_size",
+              "min": 10,
+              "max": 100,
+              "step": 1,
+              "unit": "px",
+              "label": "Font Size",
+              "default": 16
+            },
+            {
+              "type": "color",
+              "id": "btn_color",
+              "label": "Color",
+              "default": "#ffffff"
+            },
+            {
+              "type": "color",
+              "id": "btn_bg_color",
+              "label": "Background Color",
+              "default": "#ed6806"
+            },
+            {
+              "type": "select",
+              "id": "btn_align",
+              "label": "Button Alignment",
+              "options":[
+                 {
+                    "value": "left",
+                    "label": "Left"
+                 },
+                 {
+                    "value": "center",
+                    "label": "Center"
+                 },
+                 {
+                    "value": "right",
+                    "label": "Right"
+                 }
+              ]
+            },
+            {
+              "type": "header",
+              "content": "Image"
+            },
+            {
+              "type": "image_picker",
+              "id": "image",
+              "label": "Image"
+            },
+            {
+              "type": "select",
+              "id": "img_align",
+              "label": "Image Alignment",
+              "options":[
+                 {
+                    "value": "left",
+                    "label": "Left"
+                 },
+                 {
+                    "value": "center",
+                    "label": "Center"
+                 },
+                 {
+                    "value": "right",
+                    "label": "Right"
+                 }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "img_padding",
+              "label": "Padding Top & Bottom",          
+              "default": "0px",
+              "info": "Padding add with in 'px'"
+            },
+            {
+              "type": "header",
+              "content": "Block Margin"
+            },
+            {
+              "type": "text",
+              "id": "sec_margin_top",
+              "label": "Block Margin Top",          
+              "default": "0px",
+              "info": "Margin add with in 'px'"
+            },
+            {
+              "type": "text",
+              "id": "sec_margin_bottom",
+              "label": "Block Margin bottom",          
+              "default": "0px",
+              "info": "Margin add with in 'px'"
+            }
+         ]
+       }
+     ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %} 

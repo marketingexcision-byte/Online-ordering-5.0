@@ -1,0 +1,117 @@
+/* assets/tokens.css */
+@layer tokens {
+  :root {
+    /* Brand colors */
+    --color-primary-blue: #0069a7;
+    --color-primary-orange: #e0592a;
+
+    --color-secondary-bronze: #f88d2b;
+    --color-secondary-steel: #3995e6;
+    --color-secondary-iron: #666666;
+    --color-secondary-grey: #e1e1e1;
+    --color-secondary-grey-light: #f1f1f1;
+    --color-secondary-chromium: #110954;
+
+    --color-tertiary-marine: #0a4875;
+    --color-tertiary-gold: #f6b419;
+    --color-surface: #ffffff;
+
+    /* Layout */
+    --container-max-width: 1200px;
+
+    /* Typography families (update names to match your actual @font-face) */
+    --font-base: "Humanist777BT", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    --font-bold: "Humanist777BT-Bold", var(--font-base);
+    --font-black: "Humanist777BT-Black", var(--font-base);
+
+    /* Type sizes (desktop endpoints) */
+    --size-h1: 78px;
+    --size-h2: 48px;
+    --size-h3: 30px;
+    --size-h4: 24px;
+    --size-p1: 18px;
+    --size-ps: 16px;
+
+    /* Responsive clamps (optional, feel free to keep fixed sizes) */
+    --fs-h1: clamp(42px, 8vw, var(--size-h1));
+    --fs-h2: clamp(32px, 5vw, var(--size-h2));
+    --fs-h3: clamp(22px, 3.5vw, var(--size-h3));
+    --fs-h4: clamp(20px, 2.8vw, var(--size-h4));
+    --fs-p1: clamp(16px, 2vw, var(--size-p1));
+    --fs-ps: clamp(14px, 1.8vw, var(--size-ps));
+
+    /* Line-height & spacing scale */
+    --lh-tight: 1.1;
+    --lh-normal: 1.4;
+    --lh-relaxed: 1.6;
+
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 42px;
+    --space-8: 60px;
+    --space-9: 84px;
+  }
+}
+
+/* assets/typography.css */
+@layer base {
+  html { font-family: var(--font-base); }
+}
+
+@layer components {
+  .text-h1 { font-family: var(--font-black); font-size: var(--fs-h1); line-height: var(--lh-tight); }
+  .text-h2 { font-family: var(--font-bold);  font-size: var(--fs-h2); line-height: var(--lh-tight); }
+  .text-h3 { font-family: var(--font-bold);  font-size: var(--fs-h3); line-height: var(--lh-tight); }
+  .text-h4 { font-family: var(--font-bold);  font-size: var(--fs-h4); line-height: var(--lh-normal); }
+  .text-p1 { font-family: var(--font-base);  font-size: var(--fs-p1); line-height: var(--lh-relaxed); }
+  .text-ps { font-family: var(--font-base);  font-size: var(--fs-ps); line-height: var(--lh-relaxed); }
+}
+
+/* Light utilities for quick overrides */
+@layer utilities {
+  /* Size nudges */
+  .u-text-xs { font-size: 0.85em; }
+  .u-text-sm { font-size: 0.925em; }
+  .u-text-md { font-size: 1em; }
+  .u-text-lg { font-size: 1.125em; }
+  .u-text-xl { font-size: 1.25em; }
+
+  /* Font-family overrides */
+  .u-font-base  { font-family: var(--font-base); }
+  .u-font-bold  { font-family: var(--font-bold); }
+  .u-font-black { font-family: var(--font-black); }
+
+  /* Weight helpers (if your font files have these) */
+  .u-fw-400 { font-weight: 400; }
+  .u-fw-700 { font-weight: 700; }
+  .u-fw-900 { font-weight: 900; }
+
+  /* Color helpers */
+  .u-text-primary   { color: var(--color-primary-blue); }
+  .u-text-accent    { color: var(--color-primary-orange); }
+  .u-text-iron      { color: var(--color-secondary-iron); }
+  .u-text-inverse   { color: white; }
+}
+
+@layer tokens {
+  :root {
+    /* Radii */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 15px;
+    --radius-pill: 9999px;
+
+    /* Borders */
+    --border-width-thin: 1px;
+    --border-width: 2px;
+
+    /* Shadows (very subtle) */
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 2px 6px rgba(0,0,0,0.08);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+  }
+}

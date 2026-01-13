@@ -1,0 +1,113 @@
+<section class="hero-banner ">
+  <div class="breadcrumbs-wrapper">
+     <div class="breadcrumbs container">
+        <div class="row">
+           <ul class="col s12">
+              <li class="home">
+                 <a href="/" title="Go to Home Page">Home</a>
+                 <span>| </span>
+              </li>
+              <li class="cms_page">
+                 <strong>Contact Us</strong>
+              </li>
+           </ul>
+        </div>
+     </div>
+  </div>
+   <div class="container">
+      <div class="row ">
+         <div class="col-sm-7">
+            <div class="placeholder">
+               <h1>Contact Us</h1>
+               <p>Send us your enquiry and we’ll respond as soon as possible.</p>
+            </div>
+         </div> 
+<!--          <div class="col-sm-4  animated fadeIn">
+            <div class="card card-panel white contact-card hoverable">
+               <div class="inner-wrapper">
+                  <p class="sub-heading">Do You Have Any Questions?</p>
+                  <h4>Give Us a Call</h4>
+                  <a href="tel:+1800633448">1800 633 448</a>
+               </div>
+            </div>
+         </div> -->
+      </div>
+   </div>
+</section>
+
+ 
+<div class="container content">
+   <div class="row">
+      <div class="col-sm-12">
+         <div class="card card-panel z-depth-5 contact-details">
+            <div class="col-sm-6">
+               <section class="inner-wrapper">
+                  <h2>Contact Info</h2>
+                  <p><strong>Free call (Australia Only): <a href="tel:+1800633448">1800 633 448</a></strong></p>
+                  <ul>
+                     <li><i class="fa fa-phone-square" aria-hidden="true"></i><a href="tel:+61355514555">+61 (03) 5551 4555</a></li>
+                     <li><i class="fa fa-envelope" aria-hidden="true"></i><a href="tel:+61355711944">+61 (03) 5571 1944</a></li>
+                     <li><i class="fa fa-fax" aria-hidden="true"></i> PO Box 807, Hamilton VIC 3300</li>
+                  </ul>
+                  <a><strong>Follow Us</strong></a>
+                  <a href="https://www.linkedin.com/company/excision/" target="_blank"><strong><i class="fa fa-linkedin-square" aria-hidden="true"></i></strong></a>
+                  <a href="https://www.facebook.com/pages/biz/Excision-Australia-1156286404422217/" target="_blank"><strong><i class="fa fa-facebook-official" aria-hidden="true"></i></strong></a>
+               </section>
+               <img src="https://www.excision.com.au/media/wysiwyg/images/excision-map.png " alt="Excision Map Location">
+            </div>
+            <div class="col-sm-6">
+               <div class="contact-form-wrapper">
+                  <h2>Send Us Your Enquiry</h2>
+
+
+                  <div>
+                    {% form 'contact' %}
+
+                      {% if form.posted_successfully? %}
+                        <p class="note form-success">
+                          {{ 'contact.form.post_success' | t }}
+                        </p>
+                      {% endif %}
+
+                      {% include 'form-errors-custom' %}
+
+<div id="contactFormWrapper" class="input-wrapper">
+  <label for="contactFormName" class="hidden-label">{{ 'contact.form.name' | t }}</label>
+  <input type="text" id="contactFormName" name="contact[{{ 'contact.form.name' | t }}]" placeholder="{{ 'contact.form.name' | t }}" value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}">
+</div>
+
+<div id="contactFormWrapper" class="input-wrapper">
+  <label for="contactFormEmail" class="hidden-label">{{ 'contact.form.email' | t }}</label>
+  <input type="email" id="contactFormEmail" name="contact[email]" placeholder="{{ 'contact.form.email' | t }}" autocorrect="off" autocapitalize="off" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}">
+</div>
+
+<div id="contactFormWrapper" class="input-wrapper">
+  <label for="contactFormPhone" class="hidden-label">{{ 'contact.form.phone' | t }}</label>
+  <input type="tel" id="contactFormPhone" name="contact[{{ 'contact.form.phone' | t }}]" placeholder="{{ 'contact.form.phone' | t }}" value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}">
+</div>
+
+<div id="contactFormWrapper" class="input-wrapper">
+  <label for="contactFormMessage" class="hidden-label">{{ 'contact.form.message' | t }}</label>
+  <textarea rows="10" id="contactFormMessage" name="contact[{{ 'contact.form.message' | t }}]" placeholder="{{ 'contact.form.message' | t }}">{% if form.body %}{{ form.body }}{% endif %}</textarea>
+</div>
+
+                        <input type="submit" class="btn right" value="{{ 'contact.form.send' | t }}">
+                      </div>
+
+<style>
+div#contactFormWrapper input[type=text] {
+  background-color: #f0f0f0; /* Replace with your desired gray color */
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+}
+</style>
+                 
+                    {% endform %}
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

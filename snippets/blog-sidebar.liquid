@@ -1,0 +1,82 @@
+{% if article.tags contains 'Topic_Bandsaw Blades' or article.tags contains 'Topic_Bandsaw Machines' %}
+  <p><img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Mockup.png?v=1707901527" alt=""></p>
+  <div class="blog-sd-form">
+    <h3>Running into issues with your Bandsaws?</h3>
+    <p>Download your copy of our Bandsawing Guide.</p>
+    <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
+    <script>
+      hbspt.forms.create({
+        region: "na1",
+        portalId: "2595431",
+        formId: "3e06093a-5252-4089-9cdd-49deff973fb2"
+      });
+    </script>
+  </div>
+{% endif %}
+
+{% if article.tags contains 'Topic_Coolant'
+  or article.tags contains 'Topic_Synthetic Coolant'
+  or article.tags contains 'Topic_Soluble Oils'
+  or article.tags contains 'Topic_Machining'
+%}
+  <div
+    style="
+      background-image: url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/V7_Plus_-_4_Flute_7faebc26-dada-4363-a62e-d30279eff483.png?v=1738809168);
+      background-size: cover;
+        min-height: 500px;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    "
+    class="blog-sd-form"
+  >
+    <div>
+      <h3>Have you tried YG-1 Tooling?</h3>
+      <p>YG-1 is the No.1 manufacturer in the world for Endmills and Taps.</p>
+    </div>
+    <a style="background-color: #e0592a; color: white;" class="btn" href="https://excision.com.au/pages/yg-1-tooling">Explore YG-1 Tooling</a>
+  </div>
+{% endif %}
+
+<style>
+     input, input.hs-button{
+      border-radius: 10px;
+    }
+    .article__sidebar img {
+        max-width: 100%;
+        width: 55%;
+        margin: 0 0 -150px 25px;
+    }
+    .blog-sd-form {
+      background: #DE5A28;
+      color: #fff;
+      border-radius: 10px;
+      padding: 150px 30px 0px 30px;
+  }
+</style>
+{% comment %}
+  <h3 class="h4">{{ 'blogs.sidebar.recent_articles' | t }}</h3>
+  {% for article in blog.articles limit:6 %}
+    <p>
+      <a href="{{ article.url }}">{{ article.title }}</a>
+      <br>
+      <time pubdate datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}">
+        <em class="text-light">{{ article.published_at | date: format: 'date' }}</em>
+      </time>
+    </p>
+  {% endfor %}
+
+  {% if blog.all_tags.size > 0 %}
+    <h4>{{ 'blogs.sidebar.categories' | t }}</h4>
+    <ul>
+      {% for tag in blog.all_tags %}
+        {% if current_tags contains tag %}
+        <li>{{ tag }}</li>
+        {% else %}
+        <li>{{ tag | link_to_tag: tag }}</li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endcomment %}

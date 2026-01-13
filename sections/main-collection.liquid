@@ -1,0 +1,411 @@
+{%- if collection.metafields.custom.header_banner.value != blank -%}
+  <style>
+    .template-collection .breadcrumb {
+      background: url({{ collection.metafields.custom.header_banner | file_url }});
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+      position: relative;
+    }
+  </style>
+{%- endif -%}
+
+{%- if collection.handle != 'ebox' -%}
+<nav class="breadcrumb simple-lazyload" role="navigation" aria-label="breadcrumbs">
+  {%- if collection.metafields.custom.header_banner.value != blank -%}
+    <div class="header-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(30,29,34,0.4);"></div>
+  {%- endif -%}
+  <div class="breadcrumbs container dt-prl-30">
+    <div class="row" style="display:flex;align-items:flex-start;">
+      <div class="col-md-7 lazyload-element">
+        {%- if collection.metafields.custom.parent_collection.value != blank -%}
+          <div class="w-btn-wrapper lazyload-element">
+            <a class="w-btn icon_atleft" href="{{ collection.metafields.custom.parent_collection }}" data-url="{{ collection.metafields.custom.parent_collection }}">
+              <span class="w-btn-label font-bold"><em>←</em> Back</span>
+            </a>
+          </div>
+        {%- endif -%}
+        <h1>{{ collection.title }}</h1>
+        {%- if collection.metafields.custom.collection_info.value != blank -%}
+          <div class="rte collection-banner__description">{{ collection.metafields.custom.collection_info.value }}</div>
+        {%- endif -%}
+
+        {% assign work_material_array = collection.metafields.custom.work_material | remove: '[' | remove: ']' | remove: '"' | split: ',' %}
+        {%- if work_material_array contains 'P' or work_material_array contains 'P No' or work_material_array contains 'M' or work_material_array contains 'M No' or work_material_array contains 'K' or work_material_array contains 'K No' or work_material_array contains 'N' or work_material_array contains 'N No' or work_material_array contains 'S' or work_material_array contains 'S No' or work_material_array contains 'H' or work_material_array contains 'H No' -%}
+          <div class="collection-icon" style="display:flex;gap:10px;margin-top:30px;">
+            {% for m in work_material_array %}
+              {% case m %}
+                {% when 'P' %}{% assign color = '#0069a7' %}
+                {% when 'P No' %}{% assign color = '#e8e8e8' %}
+                {% when 'M' %}{% assign color = '#f6b519' %}
+                {% when 'M No' %}{% assign color = '#e8e8e8' %}
+                {% when 'K' %}{% assign color = '#e0592a' %}
+                {% when 'K No' %}{% assign color = '#e8e8e8' %}
+                {% when 'N' %}{% assign color = '#109954' %}
+                {% when 'N No' %}{% assign color = '#e8e8e8' %}
+                {% when 'S' %}{% assign color = '#f88d2b' %}
+                {% when 'S No' %}{% assign color = '#e8e8e8' %}
+                {% when 'H' %}{% assign color = '#666666' %}
+                {% when 'H No' %}{% assign color = '#e8e8e8' %}
+                {% else %}{% assign color = '#000000' %}
+              {% endcase %}
+              <div class="Graph-Icon" style="background:{{ color }};" data-debug-m="{{ m }}" data-debug-color="{{ color }}">
+                <p>{{ m | split: ' ' | first }}</p>
+              </div>
+            {% endfor %}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</nav>
+{%- endif -%}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var link = document.querySelector('.w-btn-wrapper a[data-url]');
+    if (!link) return;
+    fetch(link.getAttribute('data-url'))
+      .then(res => res.text())
+      .then(html => {
+        var doc   = new DOMParser().parseFromString(html, 'text/html');
+        var title = doc.querySelector('title');
+        var clean = title ? title.innerText.split('–')[0].trim() : 'Page';
+        link.querySelector('.w-btn-label').innerHTML = '<em>←</em> Back to ' + clean;
+      })
+      .catch(err => console.error('Error fetching page title:', err));
+  });
+</script>
+
+{%- comment -%} In-stock toggle logic & counts (actual stock only) {%- endcomment -%}
+{% assign show_in_stock = false %}
+
+{%- assign availability_on = false -%}
+{%- for f in collection.filters -%}
+  {%- if f.param_name == 'filter.v.availability' and f.active_values.size > 0 -%}
+    {%- assign availability_on = true -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- if availability_on or request.query_string contains 'stock=1' -%}
+  {%- assign show_in_stock = true -%}
+{%- endif -%}
+
+{%- comment -%} Count products with any tracked variant qty > 0 {%- endcomment -%}
+{% assign real_in_stock_count = 0 %}
+{% for p in collection.products %}
+  {% assign has_real_stock = false %}
+  {% for v in p.variants %}
+    {% if v.inventory_management and v.inventory_quantity > 0 %}
+      {% assign has_real_stock = true %}{% break %}
+    {% endif %}
+  {% endfor %}
+  {% if has_real_stock %}
+    {% assign real_in_stock_count = real_in_stock_count | plus: 1 %}
+  {% endif %}
+{% endfor %}
+
+
+
+
+{% if collection.all_tags.size > 0 and section.settings.enable_sidebar %}{% assign has_sidebar = true %}{% else %}{% assign has_sidebar = false %}{% endif %}
+
+<div id="CollectionSection" class="container dt-prl-30 simple-lazyload" data-section-id="{{ section.id }}" data-section-type="collection-template">
+
+  <!-- Existing filters UI -->
+  <div class="filters">
+    <div class="filtersCont"><span id="show-filters">Filters</span><div class="selectedFiltersCont"></div></div>
+
+<div class="productCountCont" style="display:flex;align-items:center;gap:20px;">
+  {% if collection.metafields.custom.list_view_default !=blank %}
+  <div class="toggle-wrapper">
+    <img class="toggle-icon grid-icon" src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Grid.png?v=1751506867">
+    <label class="toggle">
+      <input type="checkbox" id="viewToggle">
+      <span class="slider"></span>
+    </label>
+    <img class="toggle-icon list-icon" src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_List.png?v=1751506867">
+  </div>
+{% endif %}
+
+  {%- comment -%} Build base querystring without stock/availability/page {%- endcomment -%}
+  {% assign base_qs = '' %}
+  {% assign first = true %}
+  {% for pair in request.params %}
+    {% assign k = pair[0] %}
+    {% assign v = pair[1] %}
+    {% unless k == 'stock' or k == 'filter.v.availability' or k == 'page' %}
+      {% if first %}
+        {% assign base_qs = k | append: '=' | append: v %}
+        {% assign first = false %}
+      {% else %}
+        {% assign base_qs = base_qs | append: '&' | append: k | append: '=' | append: v %}
+      {% endif %}
+    {% endunless %}
+  {% endfor %}
+
+  <div class="collection-stock-toggle" style="display:inline-flex;gap:10px;align-items:center;">
+    <a
+      href="{{ request.path }}{% if base_qs != '' %}?{{ base_qs }}{% endif %}"
+      class="toggle-pill {% unless show_in_stock %}is-active{% endunless %}">All</a>
+
+    <a
+      href="{{ request.path }}?{% if base_qs != '' %}{{ base_qs }}&{% endif %}stock=1&filter.v.availability=1"
+      class="toggle-pill {% if show_in_stock %}is-active{% endif %}"><div class="ex-card-badge" data-status="green">
+  In stock
+</div></a>
+  </div>
+
+  <span class="total-products-count">
+{% if show_in_stock %}{{ real_in_stock_count }}{% else %}{{ collection.products_count }}{% endif %}
+  Products</span>
+</div>
+
+
+  </div>
+
+  <!-- Optional header content -->
+  {%- if collection.description != blank 
+      or collection.metafields.custom.collection_h2 != blank 
+      or collection.metafields.custom.collection_video != blank 
+      or collection.metafields.custom.collection_image != blank -%}
+    <div class="grid collection-header__description">
+      <div class="grid-item {% if collection.metafields.custom.collection_image == blank %}medium--one-whole large--one-whole{% else %}medium--one-half large--one-half{% endif %} chd_info lazyload-element">
+        {% if collection.metafields.custom.collection_h2 != blank %}
+          <h2 class="collection--title h2">{{ collection.metafields.custom.collection_h2 }}</h2>
+        {% endif %}
+        <div class="rte">{{ collection.description }}</div>
+      </div>
+      <div class="grid-item medium--one-half large--one-half large--text-center chd_img lazyload-element">
+        {% if collection.metafields.custom.collection_video != blank %}
+          <video width="100%" controls>
+            <source src="{{ collection.metafields.custom.collection_video | file_url }}" type="video/mp4">
+          </video>
+        {% elsif collection.metafields.custom.collection_image != blank %}
+          <img src="{{ collection.metafields.custom.collection_image | file_url }}" alt="{{ collection.title | escape }}">
+        {% endif %}
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+
+{% paginate collection.products by 24 %}
+  {% include 'advanced-tag-loop' %}
+
+  <div id="CollectionSection" class="container dt-prl-30 simple-lazyload" data-section-id="{{ section.id }}" data-section-type="collection-template">
+
+    <!-- Grid Wrapper -->
+    <div id="product-grid-view">
+      <div id="collectionGrid" class="grid grid-border {% unless collection.description or collection.metafields.custom.collection_h2.value or collection.metafields.custom.collection_video.value or collection.metafields.custom.collection_image.value %}mt-30{% endunless %}">
+
+        {%- if has_sidebar -%}
+          <aside class="sidebar grid-item large--one-fifth collection-filters lazyload-element" id="collectionFilters">
+            {% include 'collection-sidebar' %}
+          </aside>
+        {%- endif -%}
+
+        <div class="grid-item{% if has_sidebar %} large--four-fifths grid-border--left{% endif %} collection_content lazyload-element">
+
+          {% if collection.description %}
+            <header class="section-header lazyload-element">
+              <h2 class="section-header--title h1">{{ collection.title }}</h2>
+              <div class="rte rte--header">{{ collection.description }}</div>
+            </header>
+          {% else %}
+            <header class="section-header lazyload-element">
+              <h2 class="section-header--title section-header--left h1">{{ collection.title }}</h2>
+              <div class="section-header--right">
+                {% include 'collection-sorting' %}
+                {% include 'collection-views' %}
+                {% include 'toggle-filters' %}
+              </div>
+            </header>
+          {% endif %}
+
+          <div class="grid-uniform products-collection">
+
+            {% case section.settings.grid %}
+              {% when '2' %}{% assign grid_item_width = 'medium--one-half large--one-half' %}{% assign image_size = '540x600' %}{% assign width = '540' %}{% assign height = '600' %}
+              {% when '3' %}{% assign grid_item_width = 'small--one-half medium--one-third large--one-third' %}{% assign image_size = '345x550' %}{% assign width = '345' %}{% assign height = '550' %}
+              {% when '4' %}{% assign grid_item_width = 'small--one-half medium--one-quarter large--one-quarter' %}{% assign image_size = '250x' %}{% assign width = '250' %}{% assign height = '225' %}
+              {% when '5' %}{% assign grid_item_width = 'small--one-half medium--one-fifth large--one-fifth' %}{% assign image_size = '195x' %}{% assign width = '195' %}{% assign height = '125' %}
+            {% endcase %}
+
+            {% assign selectr_handles = 'coolants,soluble-oils,neat-oils,other-metal-working-fluids,tct-bandsaw-blades,other,bread-cutting,vegetable-harvesting,meat,timber-plastic,metals,high-speed-steel,high-speed-steel-cobalt,other-coldsaw-blades,blank-hss-blades,blank-hss-cobalt-blades,gf-blades,holesaw-sets,safety-hole-cutters,accessories-holesaws,tct-frp-series-holesaws,tct-short-series-holesaws,fine-toothed-holesaws,coarse-toothed-holesaws,tct-dry-cut-blades,tct-alu-blades,cermet-tipped-blades,other-tct-circular-blades,rqx-rail-core-drills,rail-core-drills' | split: ',' %}
+            {% if selectr_handles contains collection.handle %}
+              {{ 'bootstrap-v3.1.1.min.css' | asset_url | stylesheet_tag }}
+              {{ 'selectr.js' | asset_url | script_tag }}
+              <script>$(document).ready(()=>$('select.dtm').selectr());</script>
+            {% endif %}
+
+            <div class="grid grid--uniform">
+              {% assign total = collection.products_count %}
+              {% if total < 10 %}{% assign ad1 = 3 %}{% assign ad2 = 6 %}{% assign ad3 = 10 %}
+              {% elsif total < 20 %}{% assign ad1 = 5 %}{% assign ad2 = 11 %}{% assign ad3 = total %}
+              {% else %}{% assign ad1 = 7 %}{% assign ad2 = 16 %}{% assign ad3 = 20 %}{% endif %}
+
+              {% assign counter = 0 %}
+              {% comment %} Render only items that truly have stock; show message only if none rendered {% endcomment %}
+{% assign rendered = 0 %}
+
+{% for product in collection.products %}
+  {% if show_in_stock %}
+    {% assign has_real_stock = false %}
+    {% for v in product.variants %}
+      {% if v.inventory_management and v.inventory_quantity > 0 %}
+        {% assign has_real_stock = true %}{% break %}
+      {% endif %}
+    {% endfor %}
+    {% unless has_real_stock %}
+      {% continue %}
+    {% endunless %}
+  {% endif %}
+
+  {% include 'product-grid-item' with product %}
+  {% assign rendered = rendered | plus: 1 %}
+{% endfor %}
+
+{% if rendered == 0 %}
+  <div class="grid-item">
+    <p>{{ 'collections.general.no_matches' | t }}</p>
+  </div>
+{% endif %}
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>  <!-- /#collectionGrid -->
+  </div>    <!-- /#product-grid-view -->
+
+  <!-- List Wrapper -->
+  <div id="product-list-view" class="hidden overflow-x-auto">
+    {%- assign default_filters = collection.metafields.custom.list_default_filters.value | split: ',' -%}
+    {% include 'collection-list-table' %}
+  </div>
+
+  {% if paginate.pages > 1 %}
+    <div class="grid-item pagination-border-top simple-lazyload">
+      <div class="grid">
+        <div class="grid-item{% if has_sidebar %} large--one-whole{% endif %} lazyload-element">
+          <div class="text-center" style="margin-bottom: 60px;">{% include 'pagination-custom' %}</div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+{% endpaginate %}
+
+
+<!-- View toggle script -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const grid = document.getElementById('product-grid-view');
+  const list = document.getElementById('product-list-view');
+  const toggle = document.getElementById('viewToggle');
+
+  function applyMode(mode) {
+    grid.classList.toggle('hidden', mode === 'list');
+    list.classList.toggle('hidden', mode === 'grid');
+    if (toggle) toggle.checked = (mode === 'list');
+  }
+
+  const defaultList = {{ collection.metafields.custom.list_view_default.value | default: false | json }};
+  applyMode(defaultList ? 'list' : 'grid');
+
+  if (toggle) {
+    toggle.addEventListener('change', () => {
+      applyMode(toggle.checked ? 'list' : 'grid');
+    });
+  }
+});
+</script>
+
+<!-- In-stock toggle script -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var box = document.getElementById('stockOnly');
+  if (!box) return;
+
+  box.addEventListener('change', function () {
+    var url = new URL(window.location.href);
+    var p   = url.searchParams;
+
+    // reset pagination to avoid empty pages
+    p.delete('page');
+
+    if (this.checked) {
+      // Native OS2.0 availability filter + simple fallback flag
+      p.set('filter.v.availability', '1');
+      p.set('stock', '1');
+    } else {
+      p.delete('filter.v.availability');
+      p.delete('stock');
+    }
+
+    url.search = p.toString();
+    window.location = url.toString();
+  });
+});
+</script>
+
+{% include 'product-filter-drawer' %}
+
+{%- if request.path == '/collections/soluble-oils' -%}
+  <div class="product-additional container dt-prl-30 lazyload-element">{% render '90 Day Coolant Guarantee' %}</div>
+{%- endif -%}
+{%- if collection.metafields.custom.extra_info.value != blank -%}
+  <div class="container dt-prl-30 simple-lazyload loaded"><div class="collection-extra-info"><div class="extra-info-wrapper" style="margin-top:60px;">{{ collection.metafields.custom.extra_info }}</div></div></div>
+{%- endif -%}
+
+<style>
+  @media (min-width: 767px) {
+  .grid--uniform {
+  gap: 50px;
+  }
+  }
+
+  
+  .grid--uniform { display: flex; flex-wrap: wrap; }
+  div.collection-ad { background-size: cover!important; background-position: center; min-height:100%; border-radius:15px; padding:20px 30px 40px; display:flex; flex-direction:column; justify-content:space-between; }
+  .Graph-Icon { width:40px;height:40px;font-family:'Humanist777BT-Bold';font-size:22px;display:flex;align-items:center;justify-content:center;border-radius:5px;line-height:0; }
+  .Graph-Icon p { margin:0; }
+  .template-collection .breadcrumb { min-height:500px;align-items:center;margin-bottom:20px; }
+  .header-overlay { pointer-events: none; }
+  .pagination-border-top { position: relative; z-index: 10; }
+  
+</style>
+
+{% render 'product-card-scripts' %}
+
+{% schema %}
+{
+  "name": "Collection",
+  "settings": [
+        { "type": "select", "id": "grid", "label": "Products per row", "default": "5",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" },
+        { "value": "5", "label": "5" }
+      ]
+    },
+    { "type": "select", "id": "rows", "label": "Rows per page", "default": "8",
+      "options": [
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" },
+        { "value": "5", "label": "5" },
+        { "value": "6", "label": "6" },
+        { "value": "7", "label": "7" },
+        { "value": "8", "label": "8" }
+      ]
+    },    {"type":"radio","id":"collection_sidebar_filters","label":"Sidebar product filters","options":[{"value":"tags","label":"By tag"},{"value":"groups","label":"By group"}],"info":"Learn how to set up filter groups."},
+    {"type":"checkbox","id":"product_show_compare_at_price","label":"Show compare at price","default":false},
+    {"type":"checkbox","id":"product_show_saved_amount","label":"Show saved amount","default":true},
+    {"type":"checkbox","id":"product_reviews_enable","label":"Enable product reviews"},
+    {"type":"checkbox","id":"enable_sidebar","label":"Enable sidebar","default":true}
+  ],
+  "blocks": [{"type":"promo","name":"Promo","limit":2,"settings":[{"type":"image_picker","id":"image","label":"Image"},{"type":"range","id":"position","label":"Show in position","min":1,"max":10,"step":1,"default":1},{"type":"richtext","id":"title","label":"Heading"},{"type":"richtext","id":"content","label":"Text"},{"type":"select","id":"text_position","label":"Content position","options":[{"value":"left","label":"Left"},{"value":"center","label":"Center"},{"value":"right","label":"Right"}]}]}]
+}
+{% endschema %}

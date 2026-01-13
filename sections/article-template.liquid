@@ -1,0 +1,813 @@
+<style>
+    .lazyload-element {
+      opacity: 0; /* Start hidden */
+      transition-property: opacity;
+  }
+
+  .lazyload-element.animate {
+      animation-name: fadeInUp;
+      animation-duration: 0.75s;
+      animation-delay: 0.4s;
+      animation-fill-mode: forwards; /* Keeps the final state */
+  }
+  .simple-lazyload {
+      opacity: 0;
+      transition: opacity 0.15s ease-in-out;
+  }
+
+  .simple-lazyload.loaded {
+      opacity: 1;
+  }
+
+  /* Optional: a placeholder style to ensure elements are not shown until fully loaded */
+  .simple-lazyload {
+      visibility: hidden;
+  }
+
+  .simple-lazyload.loaded {
+      visibility: visible;
+  }
+</style>
+
+<script>
+  window.addEventListener('load', function () {
+    const lazyloadElements = document.querySelectorAll('.simple-lazyload');
+
+    lazyloadElements.forEach((element) => {
+      if (element.tagName === 'IMG') {
+        // Check if the image is already loaded
+        if (element.complete) {
+          // Add a slight delay to ensure CSS transition applies smoothly
+          setTimeout(() => {
+            element.classList.add('loaded');
+          }, 100); // Adjust delay as needed
+        } else {
+          element.addEventListener('load', () => {
+            // Add a slight delay to ensure CSS transition applies smoothly
+            setTimeout(() => {
+              element.classList.add('loaded');
+            }, 100); // Adjust delay as needed
+          });
+        }
+      } else {
+        // Non-image elements
+        setTimeout(() => {
+          element.classList.add('loaded');
+        }, 100); // Adjust delay as needed
+      }
+    });
+  });
+  window.addEventListener('load', function () {
+    const lazyloadElements = document.querySelectorAll('.lazyload-element');
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate');
+            observer.unobserve(entry.target); // Stop observing after animation
+          }
+        });
+      },
+      {
+        root: null, // Use the viewport as the root
+        rootMargin: '0px 0px 400px 0px', // Load elements 400px before they enter the viewport
+        threshold: 0, // Trigger as soon as any part of the element is in view
+      }
+    );
+
+    lazyloadElements.forEach((element) => {
+      observer.observe(element);
+    });
+  });
+</script>
+{% assign number_of_comments = article.comments_count %}
+{% if comment and comment.created_at %}
+  {% assign number_of_comments = article.comments_count | plus: 1 %}
+{% endif %}
+{% comment %}{% include 'breadcrumb' %} {% endcomment %}
+<section
+  class="hero-banner article_bg simple-lazyload"
+  style="background-image: url('{{ article.image.src | img_url: '1024x1024' }}'); position: relative;"
+>
+  <div
+    class="overlay"
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(30,29,34,0.60);"
+  ></div>
+  <div class="container simple-lazyload">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="hero-wrapper">
+          <div class="w-btn-wrapper lazyload-element">
+            <a class="w-btn icon_atleft" href="/blogs/blog"
+              ><span class="w-btn-label font-bold"><em>←</em> Back to Blog</span></a
+            >
+          </div>
+
+          {% comment %}
+            <div class="breadcrumbs-wrapper">
+               <div class="breadcrumbs container">
+                  <div class="row">
+                     <ul class="col-sm-12">
+                        <li class="home">
+                           <a href="/" title="Go to Home Page">Home</a>
+                           <span>| </span>
+                        </li>
+                        <li>
+                           <a href="/blogs/blog" title="Go to Home Page">Blog</a>
+                           <span>| </span>
+                        </li>
+                        <li class="cms_page">
+                           <strong>{{ article.title }}</strong>
+                        </li>
+                     </ul>
+                  </div>
+               </div>
+            </div>
+          {% endcomment %}
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="placeholder lazyload-element">
+                <h1>{{ article.title }}</h1>
+
+                {% if article.excerpt.size > 0 %}
+                  <div class="article-excerpt lazyload-element">{{ article.excerpt }}</div>
+                {% endif %}
+
+                {% comment %}
+                  {% if article.metafields.global.author %}
+                     <span class="article_author">By {{ article.metafields.global.author }} </span><br>
+                  {% else %}
+                     <span class="article_author">By {{ article.author }} </span><br>
+                  {% endif %}
+                  <span class="article_date">Published <time pubdate datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}">{{ article.published_at | date: format: 'date' }}</time></span>
+                {% endcomment %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <!-- Empty div -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="grid grid-border">
+  <div class="grid article-body lazyload-element">
+    <header class="section-header"></header>
+
+    <div class="article__meta">
+      {% comment %}
+        {% if article.metafields.global.author %}
+          <span class="article_author font-bold">By {{ article.metafields.global.author }} </span><br>
+        {% else %}
+          <span class="article_author font-bold">By {{ article.author }} </span><br>
+        {% endif %}
+      {% endcomment %}
+
+      <div class="article_author_meta">
+        {%- if article.metafields.global.author.value != blank -%}
+          <a href="/pages/{{ article.metafields.global.author | handle }}">
+            <img
+              class="article_img"
+              src="{{ article.metafields.global.author | handle | file_url | split: "?" | first }}.jpg"
+              alt="{{ article.metafields.global.author }}"
+            >
+          </a>
+          <a href="/pages/{{ article.metafields.global.author | handle }}">
+            <span class="article_author font-bold">{{ article.metafields.global.author }} </span>
+          </a>
+        {%- endif -%}
+      </div>
+      {%- assign published_ts = article.published_at | date: '%s' -%}
+      {%- assign updated_ts = article.updated_at | date: '%s' -%}
+      {%- assign time_diff = updated_ts | minus: published_ts -%}
+
+      <span class="article_date font-bold">
+        Published:
+        <time pubdate datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}">
+          {{ article.published_at | date: format: 'date' }}
+        </time>
+      </span>
+
+      {%- if time_diff > 604800 -%}
+        <span
+          class="article_date"
+          style="background: #f1f1f1; padding: 10px 15px; border-radius: 25px; font-family: 'Humanist777BT'; font-weight: 400;"
+        >
+          Updated: {{ article.updated_at | date: '%B %d, %Y' }}
+        </span>
+      {%- endif -%}
+    </div>
+    <span class="ar_line"></span>
+    <div class="section-header--left">
+      {% comment %}
+      {% endcomment %}
+    </div>
+
+    <div class="article__content">
+      <div class="rte lazyload-element">
+        {% if article.metafields.custom.youtube_url %}
+          <div class="plyr__video-embed" id="player">
+            <iframe
+              src="{{ article.metafields.custom.youtube_url }}origin=https://yourdomain.com&modestbranding=1&playsinline=1"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
+
+          <script src="https://cdn.plyr.io/3.6.8/plyr.js"></script>
+          <script>
+            const player = new Plyr('#player', {
+              controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'], // Customize Plyr controls
+              settings: [], // Remove the settings menu
+              youtube: {
+                noCookie: true, // Use YouTube's no-cookie domain
+                playsinline: true, // Ensure the video plays inline on mobile
+              },
+            });
+          </script>
+        {% endif %}
+
+        {% liquid
+          assign target_html = article.metafields.custom.insert_before_html | default: ''
+          assign related_list = article.metafields.custom.related_products.value
+        %}
+
+        {% capture related_html %}
+  {% render 'related-products-for-article', products: related_list, heading: 'You Might Also Like' %}
+{% endcapture %}
+
+        {% if target_html != blank and article.content contains target_html and related_list != blank %}
+          {% capture _inj %}{{ related_html }}{{ target_html }}{% endcapture %}
+          {{ article.content | replace_first: target_html, _inj }}
+        {% else %}
+          {{ article.content }}
+          {% if related_list != blank %}
+            {{ related_html }}
+          {% endif %}
+        {% endif %}
+
+        <p class="single-article-meta"></p>
+      </div>
+      {% if section.settings.social_sharing_blog %}
+        <hr class="hr--clear">
+        <h2 class="h3">{{ 'blogs.article.share_this_post' | t }}</h2>
+        {% include 'social-sharing' %}
+        <hr>
+      {% endif %}
+
+      {% comment %}
+        <ul>
+           {% if blog.comments_enabled? %}
+           <li>
+              <a href="#comments">
+              {{ 'blogs.comments.with_count' | t: count: number_of_comments }}
+              </a>
+           </li>
+           {% endif %}
+           {% include 'tags-article' %}
+        </ul>
+      {% endcomment %}
+
+      {% if section.settings.pagination_enable %}
+        {% if blog.next_article or blog.previous_article %}
+          <hr>
+          <p class="clearfix">
+            {% if blog.previous_article %}
+              <span class="left">
+                {{ 'blogs.article.older_post' | t | prepend: '← ' | link_to: blog.previous_article }}
+              </span>
+            {% endif %}
+            {% if blog.next_article %}
+              <span class="right">
+                {{ 'blogs.article.newer_post' | t | append: ' →' | link_to: blog.next_article }}
+              </span>
+            {% endif %}
+          </p>
+        {% endif %}
+      {% endif %}
+    </div>
+
+    {% if section.settings.sidebar_enable %}
+      <div class="article__sidebar lazyload-element">
+        <aside class="sidebar article__sidebar-inner lazyload-element">
+          {% include 'blog-sidebar' %}
+        </aside>
+      </div>
+    {% endif %}
+    <hr>
+  </div>
+
+  {% assign number_of_products = 9 %}
+  {% assign related_product_handles = '' %}
+
+  {% if article.tags.size > 0 %}
+    {% for tag in article.tags %}
+      {% if tag contains 'Handle:' %}
+        {% assign product_handle = tag | replace: 'Handle:', '' | strip %}
+        {% assign related_product = all_products[product_handle] %}
+        {% if related_product %}
+          {% assign related_product_handles = related_product_handles | append: product_handle | append: ',' %}
+        {% endif %}
+      {% endif %}
+      {% assign handle_count = related_product_handles | split: ',' | size %}
+      {% if handle_count >= number_of_products %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% assign related_product_handles = related_product_handles | split: ',' | uniq %}
+
+  {% if related_product_handles.size > 0 %}
+    <style>
+      @media only screen and (max-width: 932px){
+        .small--one-half {min-width: 50%;}
+        table {
+          max-width: fit-content;
+        }
+      }
+      @media only screen and (min-width 768px) {
+        .container {
+          max-width: 900px !important;
+        }
+      }
+      .grid-uniform.products-collection {
+        /* margin: 10px 0px !important;
+        overscroll-behavior: auto;
+        padding: 0px 0px 10px 0px;
+        margin-right: 20px;
+        scroll-snap-type: x mandatory;
+        margin-left: 10px !important;*/
+      }
+      .grid-uniform.products-collection {
+        /* margin: 0px;
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        white-space: nowrap;
+        scroll-behaviour: smooth;*/
+      }
+      .scroll-container {
+        position: relative; /* Ensure scrollbar and content are positioned relative to this container */
+      }
+    </style>
+
+    <div class="related_product_section container dt-prl-30">
+      <h2 class="related_product_heading">You Might Also Like</h2>
+      <div class="grid-uniform products-collection rlp_regular">
+        {% for handle in related_product_handles limit: number_of_products %}
+          {% assign related_product = all_products[handle] %}
+          {% if related_product %}
+            {% include 'product-grid-item', product: related_product %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="related-article__outer-wrapper">
+    <div class="container_ra single-product-page-blog-posts">
+      <div class="sppbp__inner lazyload-element">
+        <h2 class="related_article_heading">Related Articles</h2>
+        <div class="grid-uniform_none blog-items regular slider">
+          {% assign currentHandle = article.handle %}
+          {% assign articlesFound = 0 %}
+          {% for article in blogs['learning-centre'].articles %}
+            {% unless article.handle == currentHandle %}
+              <div class="grid-item medium--one-half large--one-third sp-blog-items">
+                <div class="rte blog-content-wrapper lazyload-element">
+                  {% if article.image %}
+                    {% assign image_alt = article.title | escape %}
+                    {%- assign image = article.image -%}
+                    <a href="{{ article.url }}" alt="{{ image_alt }}">
+                      {%- assign width = 350 -%}
+                      {%- assign height = 600 -%}
+                      {%- include 'image-logic' with width: width, height: height -%}
+                      {%- assign img_url = article.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+                      <div
+                        class="lazyload__image-wrapper"
+                        data-image-id="{{ image.id }}"
+                        style="max-width: {{ max_width }}px"
+                      >
+                        <div
+                          class="lazyload__image-wrapper no-js"
+                          style="padding-top:{{ 1 | divided_by: article.image.aspect_ratio | times: 100}}%;"
+                        >
+                          <img
+                            class="lazyload js article__image"
+                            src="{{ article.image | img_url: '300x' }}"
+                            data-src="{{ img_url }}"
+                            data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                            data-aspectratio="{{ article.image.aspect_ratio }}"
+                            data-sizes="auto"
+                            alt="{{ image_alt }}"
+                          >
+                        </div>
+                      </div>
+                      <noscript>
+                        <img
+                          src="{{ image | img_url: '580x' }}"
+                          srcset="{{ image | img_url: '580x' }} 1x, {{ image | img_url: '580x', scale: 2 }} 2x"
+                          alt="{{ image.alt }}"
+                          style="opacity:1;"
+                        >
+                      </noscript>
+                    </a>
+                  {% endif %}
+                  <div class="article-info">
+                    {% comment %}
+                      <p class="text-dark article-meta">
+                         {% capture author %}<span class="article_author">{{ article.author }}</span>{% endcapture %}
+                         {% capture date %}<span class="article_date"><time pubdate datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}">{{ article.published_at | date: format: 'date' }}</time></span>{% endcapture %}
+                         {{ 'blogs.article.author_on_date_html' | t: author: author, date: date }}
+
+                         {% if article.metafields.global.author %}
+                         <span class="article_author">By {{ article.metafields.global.author }} </span>
+                         {% else %}
+                         <span class="article_author">By {{ article.author }} </span>
+                         {% endif %}
+                         <span class="article_date font-bold"><time pubdate datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}">{{ article.published_at | date: format: 'date' }}</time></span>
+                      </p>
+                    {% endcomment %}
+                    <a href="{{ article.url }}">
+                      <h3>{{ article.title }}</h3>
+                      <p class="article-excerpt">{{ article.content | strip_html | truncatewords: 22 }}</p>
+                    </a>
+                    <div class="article_divider"></div>
+                    <span class="article_date"
+                      ><a href="{{ article.url }}"
+                        ><time pubdate datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}">
+                          {{- article.published_at | date: format: 'date' -}}
+                        </time></a
+                      ></span
+                    >
+                    <div class="article_author_meta">
+                      {%- if article.metafields.global.author.value != blank -%}
+                        <a href="/pages/{{ article.metafields.global.author | handle }}">
+                          <img
+                            class="article_img"
+                            src="{{ article.metafields.global.author | handle | file_url | split: "?" | first }}.jpg"
+                            alt="{{ article.metafields.global.author }}"
+                          >
+                        </a>
+                        <a href="/pages/{{ article.metafields.global.author | handle }}">
+                          <span class="article_author font-bold">{{ article.metafields.global.author }} </span>
+                        </a>
+                      {%- endif -%}
+                    </div>
+                    {%- if article.metafields.custom.type.value != blank -%}
+                      <p class="article_type_items">
+                        {% assign article_type = article.metafields.custom.type.value %}
+                        {%- for a_type in article_type -%}
+                          <span class="article_type at_{{ a_type | handle }}">{{ a_type }}</span>
+                        {%- endfor -%}
+                      </p>
+                    {%- endif -%}
+                    {% comment %}
+                      {% if article.excerpt.size > 0 %}
+                      <p class="article-excerpt">{{ article.excerpt }}</p>
+                      {% else %}
+                      <p class="article-excerpt">{{ article.content | strip_html | truncatewords: 25 }}</p>
+                      {% endif %}
+                      <p class="article-excerpt">{{ article.content | strip_html | truncatewords: 22 }}</p>
+                      <div class="read__more-btn-wrapper"><a class="read__more" href="{{ article.url }}">{{ 'blogs.article.read_more' | t }} <span style="font-family: monospace;">→</span></a></div>
+                    {% endcomment %}
+                  </div>
+                </div>
+              </div>
+              {% assign articlesFound = articlesFound | plus: 1 %}
+              {% if articlesFound == 9 %}{% break %}{% endif %}
+            {% endunless %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {%- if article.tags.size > 0 and article.tags contains 'blog-product' -%}
+    <div class="article_related_product related_product_section">
+      <h2 class="h4">{{ 'products.general.related_products' | t }}</h2>
+      <div class="grid-uniform products-collection">
+        {% for product in collections['blog-products'].products limit: 3 %}
+          {% if product.tags contains 'meat-bandsaw-blade' and article.tags contains 'meat-bandsaw-blade' %}
+            {% include 'article-products-by-tag' %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  {%- endif -%}
+
+  <style>
+        @media (min-width: 768px) {
+        .col-md-6 {
+          padding-left: 30px;
+        }
+        }
+        .ytp-embed:not(.ad-showing) .ytp-gradient-top {
+       transform: rotate(180deg);
+       top: 398px;
+    }
+        button.accordion h3 {
+          margin: 0;
+        }
+        button.accordion {
+          margin: 0px !important;
+        }
+        div.accordion-container {
+          border-bottom: 2px solid #f1f1f1;
+        }
+        div.accordion-wrapper {
+          border-top: 2px solid #f1f1f1;
+        }
+        .panel {
+          padding: 0px;
+        }
+        div.panel p {
+          margin: 28px 0px 0px 0px !important;
+        }
+        button:focus {
+          outline: none;
+        }
+        .accordion-container-inner {
+      background-color: white;
+      color: black !important;
+      cursor: pointer;
+      padding: 28px 0px 28px;
+      width: 100%;
+      text-align: left;
+      border: none;
+      outline: none;
+      margin-bottom: 0px;
+    }
+     .accordion-container-inner h3 {
+          margin-bottom: 0px !important;
+        }
+
+    /* Add a background color to the button on hover */
+    .accordion:hover {
+      background-color: white;
+      opacity: 90%;
+    }
+
+    /* Style the accordion panel */
+      .panel {
+        display: none; /* Initially hidden */
+        overflow: hidden;
+        transition: max-height 0.3s ease; /* Smooth transition */
+      }
+
+      .panel.active {
+        display: block; /* Show the panel */
+        max-height: 500px; /* Adjust to your desired maximum height */
+      }
+
+    /* Style the chevron icons */
+    .chevron {
+      float: right;
+    }
+
+    .upside-down {
+      transform: rotate(180deg);
+    }
+
+    span.guide_tag {
+      margin-left: 40px;
+      padding: 5px 15px;
+      border-radius: 20px;
+      background: #e0592a;
+      color: white;
+    }
+  </style>
+
+  <script>
+    // Add event listeners to toggle panel visibility and icon class on click
+    var accordionHeaders = document.querySelectorAll('.accordion-container-inner h3');
+    accordionHeaders.forEach(function (accordionHeader) {
+      accordionHeader.addEventListener('click', function () {
+        var panel = this.nextElementSibling;
+        // Toggle panel visibility by changing its display property
+        if (panel.style.display === 'block') {
+          panel.style.display = 'none';
+          // Toggle chevron icon class to normal when panel is hidden
+          this.querySelector('.chevron').classList.remove('upside-down');
+        } else {
+          panel.style.display = 'block';
+          // Toggle chevron icon class to upside down when panel is displayed
+          this.querySelector('.chevron').classList.add('upside-down');
+        }
+      });
+    });
+  </script>
+
+  {% if blog.comments_enabled? %}
+    <hr>
+    <div class="section-header">
+      <h2 class="h3 section-header--left">{{ 'blogs.comments.with_count' | t: count: number_of_comments }}</h2>
+      <div class="section-header--right">
+        <a href="#write-comment">{{ 'blogs.comments.title' | t }} &rsaquo;</a>
+      </div>
+    </div>
+    {% paginate article.comments by 5 %}
+      <div id="comments">
+        {% if comment and comment.created_at %}
+          <p class="note form-success">
+            {% if blog.moderated? %}
+              {{ 'blogs.comments.success_moderated' | t }}
+            {% else %}
+              {{ 'blogs.comments.success' | t }}
+            {% endif %}
+          </p>
+        {% endif %}
+        {% if number_of_comments > 0 %}
+          <ul>
+            {% if comment and comment.created_at %}
+              <li id="{{ comment.id }}" class="comment first{% if article.comments_count == 0 %} last{% endif %}">
+                {% include 'comment' %}
+              </li>
+            {% endif %}
+            {% for comment in article.comments %}
+              <li
+                id="{{ comment.id }}"
+                class="comment{% unless number_of_comments > article.comments_count %}{% if forloop.first %} first{% endif %}{% endunless %}{% if forloop.last %} last {% endif %}"
+              >
+                {% include 'comment' %}
+              </li>
+            {% endfor %}
+          </ul>
+          <hr>
+          {% if paginate.pages > 1 %}
+            <div class="text-center">
+              {% include 'pagination-custom' %}
+            </div>
+          {% endif %}
+        {% endif %}
+        <div id="write-comment">
+          {% form 'new_comment', article %}
+            {% comment %}<h2 class="h1">{{ 'blogs.comments.title' | t }}</h2>{% endcomment %}
+            {% include 'form-errors-custom' %}
+            <div class="grid">
+              <div class="grid-item ">
+                <label for="comment-author" class="visible-label">{{ 'blogs.comments.name' | t }}</label>
+                <input
+                  {% if form.errors contains 'author' %}
+                    class="error"
+                  {% endif %}
+                  type="text"
+                  name="comment[author]"
+                  placeholder=""
+                  id="comment-author"
+                  value="{{ form.author }}"
+                  required
+                >
+
+                <label for="comment-phone" class="visible-label">{{ 'Mobile Phone Number' }}</label>
+                <input type="text" name="comment[phone]" placeholder="" id="comment-phone" value="{{ form.phone }}">
+
+                <label for="comment-email" class="visible-label">{{ 'blogs.comments.email' | t }}</label>
+                <input
+                  {% if form.errors contains 'email' %}
+                    class="error"
+                  {% endif %}
+                  type="email"
+                  name="comment[email]"
+                  placeholder=""
+                  id="comment-email"
+                  value="{{ form.email }}"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  required
+                >
+
+                <label for="comment-company" class="visible-label">{{ 'Company Name' }}</label>
+                <input
+                  type="text"
+                  name="comment[company]"
+                  placeholder=""
+                  id="comment-company"
+                  value="{{ form.company }}"
+                >
+              </div>
+              <div class="grid-item">
+                <label for="comment-body" class="visible-label">{{ 'blogs.comments.message' | t }}</label>
+                <textarea
+                  {% if form.errors contains 'body' %}
+                    class="error"
+                  {% endif %}
+                  name="comment[body]"
+                  id="comment-body"
+                  placeholder=""
+                  required
+                >{{ form.body }}</textarea>
+              </div>
+            </div>
+            {% if blog.moderated? %}
+              <p class="text-light">
+                <em>{{ 'blogs.comments.moderated' | t }}</em>
+              </p>
+            {% endif %}
+            <input type="submit" class="btn" value="{{ 'blogs.comments.post' | t }}">
+          {% endform %}
+        </div>
+      </div>
+    {% endpaginate %}
+  {% endif %}
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.5.9/slick.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.5.9/slick-theme.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('.regular').slick({
+      dots: false,
+      arrows: true,
+      infinite: false,
+      slidesToShow: 3,
+      slidesToScroll: 1,
+      nextArrow: '<i class="fa fa-angle-right slick-next"></i>',
+      prevArrow: '<i class="fa fa-angle-left slick-prev"></i>',
+      responsive: [
+        {
+          breakpoint: 1024,
+          settings: {
+            slidesToShow: 2,
+            slidesToScroll: 2,
+            dots: true,
+            arrows: false,
+          },
+        },
+        {
+          breakpoint: 600,
+          settings: {
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            dots: true,
+            arrows: false,
+          },
+        },
+      ],
+    });
+  });
+</script>
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "{{ article.url | prepend: shop.url }}"
+    },
+    "headline": "{{ article.title | escape }}",
+    "description": "{{ article.excerpt | escape }}",
+    "image": "{{ article.image | img_url: 'large' | prepend: shop.url }}",
+    "author": {
+      "@type": "Author",
+      "name": "{{ article.metafields.global.author | default: 'Default Author' | escape }}",
+      "url": "{{ shop.url | append: '/pages/authors-' | append: article.metafields.global.author | default: 'default-author' | replace: ' ', '-' | escape }}"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "{{ shop.name }}",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "{{ shop.logo | img_url: 'large' | prepend: shop.url }}"
+      }
+    },
+    "datePublished": "{{ article.published_at | date: '%Y-%m-%dT%H:%M:%S%:z' }}",
+    "dateModified": "{{ article.updated_at | date: '%Y-%m-%dT%H:%M:%S%:z' }}"
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Article pages",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Article Sidebar"
+    },
+    {
+      "type": "checkbox",
+      "id": "sidebar_enable",
+      "label": "Sidebar Enable"
+    },
+    {
+      "type": "checkbox",
+      "id": "social_sharing_blog",
+      "label": "Show social sharing buttons",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "pagination_enable",
+      "label": "Pagination Enable"
+    }
+  ]
+}
+{% endschema %}

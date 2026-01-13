@@ -1,0 +1,148 @@
+{% if page.handle  == 'register' %}
+  <script>
+   window.location.replace("https://www.myexcision.com.au/register");
+  </script>
+{% endif %}
+{% comment %} {% include 'breadcrumb' %} {% endcomment %}
+<nav class="breadcrumb simple-lazyload" role="navigation" aria-label="breadcrumbs">
+   <div class="breadcrumbs container dt-prl-30">
+                 {% if page.metafields.custom.parent_page != blank %}
+              <div class="w-btn-wrapper lazyload-element">
+                <a
+                  class="w-btn icon_atleft"
+                  href="{{ page.metafields.custom.parent_page }}"
+                  data-url="{{ page.metafields.custom.parent_page }}"
+                >
+                  <span class="w-btn-label font-bold"><em>←</em> Back to ---</span>
+                </a>
+              </div>
+                   {% else %}
+                          <div class="w-btn-wrapper lazyload-element">
+         <a class="w-btn icon_atleft" href="{{ shop.url }}"><span class="w-btn-label font-bold"><em>←</em> Back to Home</span></a>
+       </div> 
+            {% endif %}
+
+   </div> 
+  <div class="container dt-prl-30">
+        <div class="row ">
+           <div class="col-md-7 lazyload-element">
+              <div class="placeholder">
+                 <h1>{{ page.title }}</h1>
+              </div>
+           </div>          
+        </div>
+     </div>
+</nav>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const link = document.querySelector('.w-btn-wrapper a[data-url]');
+    if (link) {
+      const url = link.getAttribute('data-url');
+      fetch(url)
+        .then(response => response.text())
+        .then(html => {
+          // Parse the HTML to extract the title
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const fullTitle = doc.querySelector('title') ? doc.querySelector('title').innerText : 'Page';
+          
+          // Split the title by the delimiter "–" and take the first part
+          const cleanTitle = fullTitle.split('–')[0].trim();
+
+          // Update the link text
+          link.querySelector('.w-btn-label').innerHTML = `<em>←</em> Back to ${cleanTitle}`;
+        })
+        .catch(error => {
+          console.error('Error fetching page title:', error);
+        });
+    }
+  });
+  </script>
+
+
+<div class="container simple-lazyload">
+  <div class="grid">
+    <div class="grid-item large--two-thirds push--large--one-sixth">
+      {% comment %}<h1>{{ page.title }}</h1>{% endcomment %}
+      <div class="rte lazyload-element">
+        {{ page.content }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add this to your Shopify page.liquid template where you want the HubSpot form -->
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/v2.js"></script>
+
+{% comment %}
+Check if the current URL matches the specific page
+{% endcomment %}
+{% if request.path == '/pages/request-for-quote' %}
+  
+    <div class="grfq-form-wrapper simple-lazyload">
+        <script>
+            // jQuery ready function to ensure DOM is fully loaded
+            jQuery(document).ready(function($) {
+                // Remove existing content in .grfq-form-wrapper
+                $('.grfq-form-wrapper').empty();
+
+                // Function to retrieve cart data and prepare product list
+                function getCartData() {
+                    var productList = [];
+                    $('.grfq-product-item').each(function() {
+                        var imageUrl = $(this).find('.grfq-product-image').attr('src');
+                        if (imageUrl.startsWith('//')) {
+                            imageUrl = 'https:' + imageUrl;
+                        }
+
+                        var product = {
+                            id: $(this).attr('id'),
+                            image: imageUrl,
+                            title: '<a target="_blank" href="' + $(this).find('.grfq-product-title a').attr('href') + '">' + $(this).find('.grfq-product-title a').text() + '</a>',
+                            variant: $(this).find('.grfq-variant-title span').text(),
+                            sku: $(this).find('.grfq-product-sku span').text(),
+                            quantity: $(this).find('.grfq-item-quantity-input').val()
+                        };
+                        productList.push(product);
+                    });
+                    return JSON.stringify(productList);
+                }
+
+                // Create HubSpot form dynamically
+                hbspt.forms.create({
+                    portalId: "2595431",
+                    formId: "40149631-403b-45b0-897c-3c1d08fa1a32",
+                    target: '.grfq-form-wrapper',
+                    onFormReady: function($form) {
+                        // Function to check if product_data field is present and set its value
+                        function setProductData() {
+                            var productDataField = $form.find('input[name="product_data"]');
+                            if (productDataField.length > 0) {
+                                var cartData = getCartData();
+                                productDataField.val(cartData);
+                                console.log('Product data set:', cartData);
+                            } else {
+                                console.log('Product data field not found');
+                            }
+                        }
+
+                        // Call setProductData once the form is ready
+                        setProductData();
+
+                        // Set product data to hidden input before form submission
+                        $form.on('submit', function() {
+                            setProductData();
+                        });
+                    }
+                });
+            });
+        </script>
+    </div>
+{% else %}
+    <div class="grfq-form-wrapper simple-lazyload">
+        <!-- Your original form content goes here -->
+    </div>
+{% endif %}

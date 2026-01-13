@@ -1,0 +1,249 @@
+<ul class="site-nav font-bold" id="AccessibleNav">
+  {% comment %}
+  {% unless linklists[section.settings.menu].links.first.url == routes.root_url %}
+  <li class="large--hide">
+    <a href="{{ routes.root_url }}">{{ 'general.breadcrumbs.home' | t }}</a>
+  </li>
+  {% endunless %}
+  {% endcomment %}
+  {% for link in linklists[section.settings.menu].links %}
+    {% if link.links != blank %}
+      {% assign parent_index = forloop.index %}
+      <li
+        class="site-nav--has-dropdown {% if link.active %}site-nav--active{% endif %} "
+        aria-haspopup="true">
+        <a
+          href="{{ link.url }}"
+          class="site-nav--link"
+          data-meganav-type="parent"
+          aria-controls="MenuParent-{{ parent_index }}"
+          aria-expanded="false"
+          {% unless request.page_type == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless%}>
+            {{ link.title | escape }}
+            <span class="icon icon-arrow-down" aria-hidden="true"></span>
+        </a>
+        <ul
+          id="MenuParent__{{ link.title | handle }}{% comment %}MenuParent-{{ parent_index }}{% endcomment %}"
+          class="site-nav--dropdown {% if link.levels == 2 %}site-nav--has-grandchildren{% endif %}"
+          data-meganav-dropdown>
+          {% for childlink in link.links %}
+            {% if childlink.links != blank %}
+            {% assign child_index = forloop.index %}
+              <li
+                class="site-nav--has-dropdown site-nav--has-dropdown-grandchild {% if childlink.active %}site-nav--active{% endif %}"
+                aria-haspopup="true">
+                <a
+                  href="{{ childlink.url }}"
+                  class="site-nav--link"
+                  aria-controls="MenuChildren-{{ parent_index }}-{{ child_index }}"
+                  data-meganav-type="parent"
+                  {% unless request.page_type == 'index' %}{% if childlink.active %}aria-current="page"{% endif %}{% endunless%}
+                  tabindex="-1">
+                    {{ childlink.title | escape }}
+                    <span class="icon icon-arrow-down" aria-hidden="true"></span>
+                </a>
+                <ul
+                  id="MenuChildren-{{ parent_index }}-{{ child_index }}"
+                  class="site-nav--dropdown-grandchild"
+                  data-meganav-dropdown>
+                  {% for grandchildlink in childlink.links %}
+                    <li{% if grandchildlink.active %} class="site-nav--active"{% endif %}>
+                      <a
+                        href="{{ grandchildlink.url }}"
+                        class="site-nav--link {{ grandchildlink.title | handle }}__nav-link"
+                        data-meganav-type="child"
+                        {% unless request.page_type == 'index' %}{% if grandchildlink.active %}aria-current="page"{% endif %}{% endunless %}
+                        tabindex="-1">
+                          {{ grandchildlink.title | escape }}
+                        </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </li>
+            {% else %}
+              <li{% if childlink.active %} class="site-nav--active"{% endif %}>
+                <a
+                  href="{{ childlink.url }}"
+                  class="site-nav--link {{ childlink.title | handle }}__nav-link"
+                  data-meganav-type="child"
+                  {% if childlink.active %}aria-current="page"{% endif %}
+                  tabindex="-1">
+                    {{ childlink.title | escape }}
+                </a>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </li>
+    {% else %}
+      <li{% if link.active %} class="site-nav--active"{% endif %}>
+        <a
+          href="{{ link.url }}"
+          class="site-nav--link {{ link.title | handle }}"
+          data-meganav-type="child"
+          {% unless request.page_type == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless%}>
+            {{ link.title | escape }}
+        </a>
+      </li>
+    {% endif %}
+  {% endfor %}
+  {% comment %}
+  {% if shop.customer_accounts_enabled %}
+    {% if customer %}
+      <li class="customer-navlink large--hide"><a href="{{ routes.account_url }}">{{ 'layout.customer.view_account' | t }}</a></li>
+      <li class="customer-navlink large--hide">{{ 'layout.customer.log_out' | t | customer_logout_link }}</li>
+    {% else %}
+      <li class="customer-navlink large--hide">{{ 'layout.customer.sign_in' | t | customer_login_link }}</li>
+      <li class="customer-navlink large--hide">{{ 'layout.customer.create_account' | t | customer_register_link }}</li>
+    {% endif %}
+  {% endif %}
+  {% endcomment %}
+</ul>
+
+
+
+<style>
+@media only screen and (min-width:992px){
+    ul#MenuParent__products li {
+        padding-left: 30px;
+    }
+    /*ul#MenuParent__products li:nth-child(4) {
+        height: 37px; 
+    } 
+    ul#MenuParent__products li:nth-child(5) {
+        float: left;
+        top: -1px;
+        position: absolute;
+        left: 100%;
+        background: white;
+        width: 260px;
+        border-left: 1px solid #B0B0B0;
+        padding-left: 30px;
+        height: 50px; 
+    }  
+    ul#MenuParent__products li:nth-child(6) {
+        float: left;
+        top: 40px;
+        position: absolute;
+        left: 100%;
+        background: white;
+        width: 260px;
+        border-left: 1px solid #B0B0B0;
+        padding-left: 30px; 
+    }  
+    ul#MenuParent__products li:nth-child(7) {
+        float: left;
+        top: 80px;
+        position: absolute;
+        left: 100%;
+        background: white;
+        width: 260px;
+        border-left: 1px solid #B0B0B0;
+        padding-left: 30px; 
+    }  
+    ul#MenuParent__products li:nth-child(8) {
+        float: left;
+        top: 120px;
+        position: absolute;
+        left: 100%;
+        background: white;
+        width: 260px;
+        border-left: 1px solid #B0B0B0;
+        padding-left: 30px; 
+    }  
+    ul#MenuParent__products li:nth-child(9) {
+        float: left;
+        top: -1px;
+        position: absolute;
+        left: 210%;
+        background: white;
+        width: 250px;
+        border-left: 1px solid #B0B0B0;
+        padding-left: 30px;
+        height: 50px; 
+    }  
+    ul#MenuParent__products li:nth-child(10) {
+        float: left;
+        top: 40px;
+        position: absolute;
+        left: 210%;
+        background: white;
+        width: 250px;
+        border-left: 1px solid #B0B0B0;
+        padding-left: 30px;
+    }
+    ul#MenuParent__products li:nth-child(11) {
+        float: left;
+        top: 80px;
+        position: absolute;
+        left: 210%;
+        background: white;
+        width: 250px;
+        border-left: 1px solid #B0B0B0;
+        padding-left: 30px; 
+    } 
+    ul#MenuParent__products li:nth-child(12) {
+        float: left;
+        top: 120px;
+        position: absolute;
+        left: 210%;
+        background: white;
+        width: 250px;
+        border-left: 1px solid #B0B0B0;
+        padding-left: 30px; 
+    }*/
+    ul#MenuParent__products li a.site-nav--link:before {
+        position: absolute;
+        content: " ";
+        left: 15px;
+        background-repeat: no-repeat;
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        background-position: center;
+        background-size: contain;
+        margin-right: 20px;
+        margin-bottom: -5px;
+    }
+    ul#MenuParent__products li:nth-child(1) a.site-nav--link:before {
+        background-image: url({{ collections.bandsaw-blades | img_url: 'medium' }});
+    }
+    ul#MenuParent__products li:nth-child(2) a.site-nav--link:before {
+        background-image: url({{ collections.coldsaw-blades | img_url: 'medium' }});
+    }
+    ul#MenuParent__products li:nth-child(3) a.site-nav--link:before {
+        background-image: url({{ collections.tct-circular-blades | img_url: 'medium' }});
+    }
+    ul#MenuParent__products li:nth-child(4) a.site-nav--link:before {
+        background-image: url({{ collections.soluble-oils | img_url: 'medium' }});
+    } 
+    ul#MenuParent__products li:nth-child(5) a.site-nav--link:before {
+        background-image: url({{ collections.magnetic-based-drills | img_url: 'medium' }});
+    }
+    ul#MenuParent__products li:nth-child(6) a.site-nav--link:before {
+        background-image: url({{ collections.core-drills-accessories | img_url: 'medium' }});
+    }
+    ul#MenuParent__products li:nth-child(7) a.site-nav--link:before {
+        background-image: url({{ collections.holesaws-accessories | img_url: 'medium' }});
+    }
+    ul#MenuParent__products li:nth-child(8) a.site-nav--link:before {
+        background-image: url({{ collections.punch-dies | img_url: 'medium' }});
+    }
+    ul#MenuParent__products li:nth-child(9) a.site-nav--link:before {
+        background-image: url({{ collections.metal-cutting-machines | img_url: 'medium' }});
+    }
+    ul#MenuParent__products li:nth-child(10) a.site-nav--link:before {
+        background-image: url({{ collections.metal-preparing-machines | img_url: 'medium' }});
+    }
+    ul#MenuParent__products li:nth-child(11) a.site-nav--link:before {
+        background-image: url({{ collections.machine-tooling | img_url: 'medium' }}); 
+        /*background-image: url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/dust-and-fume-control.png?v=1597641564);*/
+    }
+    ul#MenuParent__products li:nth-child(12) a.site-nav--link:before {
+        background-image: url({{ collections.industrial-clamps | img_url: 'medium' }});
+    }
+    ul#MenuParent__products li:nth-child(13) a.site-nav--link:before {
+        background-image: url({{ collections.material-handling | img_url: 'medium' }});
+    }
+  }
+</style>

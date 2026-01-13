@@ -1,0 +1,172 @@
+<style>
+      .icon-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        max-height: 120px; /* Limits the height */
+      }
+      .icon-container img {
+        width: 40px; /* consistent size */
+        height: 40px;
+      }
+          .product-container {
+            margin-top: 20px;
+          }
+          .product-item {
+            margin-bottom: 20px;
+          }
+        .grid-item.small--one-half.medium--one-third.large--one-third {
+          margin-bottom: 20px;
+        }
+    button.add-to-compare {
+          padding: 10px 15px;
+          border-radius: 25px;
+          border: 2px solid black;
+          background: white;
+          line-height: 1;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          margin-bottom: 20px;
+    transition: all 0.2s ease;
+  }
+
+  .add-to-compare.is-added {
+    background: black;
+    color: white;
+    border: 2px solid black;
+  }
+        div.product-comparison {
+          padding: 20px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      font-family: 'Humanist777BT';
+      font-weight: 400;
+        }
+        a.view-compare {
+      color: black;
+      border-bottom: 2px solid;
+        }
+  button:hover {
+    opacity: 85% !important;
+  }
+  .add-to-compare img {
+  transition: transform 0.3s ease;
+}
+.add-to-compare:hover img {
+  transform: rotate(90deg);
+}
+.add-to-compare.is-added:hover img {
+  transform: none; /* Don’t rotate when it says "Remove" */
+}
+.add-to-compare {
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+.compare-text {
+  transition: opacity 0.2s ease;
+  display: inline-block;
+}
+.add-to-compare.is-added .compare-text,
+.add-to-compare:not(.is-added) .compare-text {
+  opacity: 1;
+}
+</style>
+
+<script>
+(function () {
+  const maxCompareItems = 3;
+  let warningShown = false;
+
+  function getCompareList() {
+    return JSON.parse(localStorage.getItem("compareList")) || [];
+  }
+
+  function setCompareList(list) {
+    localStorage.setItem("compareList", JSON.stringify(list));
+  }
+
+function updateButtonState(btn) {
+  const handle = btn.dataset.handle;
+  const textSpan = btn.querySelector(".compare-text");
+  const img = btn.querySelector("img");
+  const compareList = getCompareList();
+
+  if (!textSpan || !img) return;
+
+  if (compareList.includes(handle)) {
+    textSpan.textContent = "Remove";
+    btn.classList.add("is-added");
+    img.src = "https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_White_Minus.png?v=1748577113";
+  } else {
+    textSpan.textContent = "Compare";
+    btn.classList.remove("is-added");
+    img.src = "https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Black_Plus_Thin.png?v=1748498027";
+  }
+}
+
+
+  function attachCompareLogic(btn) {
+    if (btn.classList.contains("compare-init")) return;
+
+    updateButtonState(btn);
+
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+
+      const handle = btn.dataset.handle;
+      let compareList = getCompareList();
+
+      if (compareList.includes(handle)) {
+        compareList = compareList.filter((item) => item !== handle);
+      } else {
+        if (compareList.length >= maxCompareItems) {
+          if (!warningShown) {
+            alert("You can only compare up to 3 products.");
+            warningShown = true;
+          }
+          return;
+        }
+        compareList.push(handle);
+      }
+
+      setCompareList(compareList);
+      updateButtonState(btn);
+    });
+
+    btn.classList.add("compare-init");
+  }
+
+  function observeLazyContent() {
+    const observer = new MutationObserver(() => {
+      document.querySelectorAll(".add-to-compare").forEach(attachCompareLogic);
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  function setupViewCompare() {
+    document.body.addEventListener("click", function (e) {
+      const viewBtn = e.target.closest(".view-compare");
+      if (!viewBtn) return;
+
+      e.preventDefault();
+      const handles = getCompareList();
+      if (handles.length === 0) {
+        alert("No products selected.");
+        return;
+      }
+      window.location.href = `/pages/compare?handles=${handles.join(",")}`;
+    });
+  }
+
+  // Init everything
+  observeLazyContent();
+  setupViewCompare();
+})();
+</script>

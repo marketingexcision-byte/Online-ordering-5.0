@@ -1,0 +1,203 @@
+{% comment %}<section class="hero-banner ">
+  <div class="breadcrumbs-wrapper">
+      <div class="breadcrumbs container dt-prl-30">
+         <div class="row">
+           <div class="col-md-12">
+                 <div class="w-btn-wrapper">
+                    <a class="w-btn icon_atleft" href="{{ shop.url }}"><span class="w-btn-label font-bold"><em>←</em> Back to Home</span></a>
+                 </div>
+               </div>             
+            <ul class="col-12 s12">
+               <li class="home">
+                  <a href="/" title="Go to Home Page">Home</a>
+                  <span>| </span>
+               </li>
+               <li class="cms_page">
+                  <strong class="font-bold">Contact Us</strong>
+               </li>
+            </ul>           
+         </div>
+      </div>
+   </div>
+  
+   <div class="container dt-prl-30">
+      <div class="row ">
+         <div class="col-md-7">
+            <div class="placeholder">
+               <h1>Contact Us</h1>
+               <p>Send us your enquiry and we’ll respond as soon as possible.</p>
+            </div>
+         </div>
+        <div class="col-md-1"></div>        
+          <div class="col-md-4  animated fadeIn">
+             <div class="card card-panel white contact-card hoverable">
+               <div class="inner-wrapper">
+                  <p class="sub-heading">Do You Have Any Questions?</p>
+                  <h4>Give Us a Call</h4>
+                  <a href="tel:+1800633448">1800 633 448</a>
+               </div>
+            </div>
+          </div>           
+      </div>
+   </div>
+</section>
+{% endcomment %}
+
+<div class="contact_us_outer_wrapper simple-lazyload">
+  <div class="container dt-prl-30 content">
+   <div class="row">
+      <div class="col-md-12">
+         <div class="row contact-details lazyload-element">
+            <div class="col-12 col-sm-6 left-main-div lazyload-element">
+               <section class="inner-wrapper">
+                  <h1>Get In Touch<br> With Our Team</h1>
+                  <p class="font-bold">Send us your enquiry and we'll respond as soon as possible. </p>
+                  <ul>
+                     <li><a href="tel:+61355514555">+61 (03) 5551 4555</a></li>
+                     <li><a href="mailto:info@excision.com.au">info@excision.com.au</a></li>
+                     <li>35 Peck Street, Hamilton VIC 3300</li>
+                  </ul>                 
+               </section>              
+            </div>
+            <div class="col-12 col-sm-6 lazyload-element">
+               <div class="contact-form-wrapper">
+                  <h2>Send Us Your Enquiry</h2>
+                   <div id="contactFormWrapper" class="hs_EnquiryForm">
+                       <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/v2.js"></script>
+                       <script>
+                          hbspt.forms.create({
+                            region: "na1",
+                            portalId: "2595431",
+                            formId: "816a42ad-39bc-48ac-8ecf-079489b1ae8a"
+                          });
+                       </script>
+                      <div class="contact_us_call font-bold"> <i class="fa fa-phone" aria-hidden="true"></i> Or Phone us on <a href="tel:+61355514555">+61 (03) 5551 4555</a></div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div style="max-width:100%;list-style:none; transition: none;overflow:hidden;width:NaNpx;height:400px;"><div id="google-maps-display" style="height:100%; width:100%;max-width:100%;"><iframe style="height:100%;width:100%;border:0;" frameborder="0" src="https://www.google.com/maps/embed/v1/place?q=Excision+Pty+Ltd,+Peck+Street,+Hamilton+VIC,+Australia&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"></iframe></div><a class="the-googlemap-enabler" rel="nofollow" href="https://kbj9qpmy.com/hrn" id="enable-map-data">Hosting Right Now</a><style>#google-maps-display img{max-height:none;max-width:none!important;background:none!important;}</style></div>
+</div>
+  
+
+{% comment %}
+<div class="container dt-prl-30 content">
+   <div class="row">
+      <div class="col-md-12">
+         <div class="card card-panel z-depth-5 contact-details">
+            <div class="col-sm-6 left-main-div">
+               <section class="inner-wrapper">
+                  <h2>Contact Info</h2>
+                  <p><strong class="font-bold">Free call (Australia Only): <a href="tel:+1800633448">1800 633 448</a></strong></p>
+                  <ul>
+                     <li><i class="fa fa-phone-square" aria-hidden="true"></i><a href="tel:+61355514555">+61 (03) 5551 4555</a></li>
+                     <li><i class="fa fa-envelope" aria-hidden="true"></i><a href="mailto:info@excision.com.au">info@excision.com.au</a></li>
+                     <li><i class="fa fa-fax" aria-hidden="true"></i> 35 Peck Street, Hamilton VIC 3300</li>
+                  </ul>
+                  <a><strong class="font-bold">Follow Us</strong></a>
+                  <a href="https://www.linkedin.com/company/excision/" target="_blank"><strong><i class="fa fa-linkedin-square" aria-hidden="true"></i></strong></a>
+                  <a href="https://www.facebook.com/pages/biz/Excision-Australia-1156286404422217/" target="_blank"><strong><i class="fa fa-facebook-official" aria-hidden="true"></i></strong></a>
+               </section>
+               <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/excision-map.png?v=1601959790" alt="Excision Map Location">
+            </div>
+            <div class="col-sm-6">
+               <div class="contact-form-wrapper">
+                  <h2>Send Us Your Enquiry</h2>
+                  <div>
+
+                     {% form 'contact' %}
+                     {% if form.posted_successfully? %}
+                     <p class="note form-success">
+                        {{ 'contact.form.post_success' | t }}
+                     </p>
+                     {% endif %}
+                     {% include 'form-errors-custom' %}
+                     <div id="contactFormWrapper">
+                        <div class="row">
+                           <div class="col-sm-6">
+                              <label for="contactFormFirstName">First Name*</label>
+                              <input required type="text" id="contactFormFirstName" name="contact[firstname]" />
+                           </div>
+                           <div class="col-sm-6">
+                              <label for="contactFormLastName">Last Name</label>
+                              <input type="text" id="contactFormLastName" name="contact[lastname]" />
+                           </div>
+                        </div>
+                        <div class="row">
+                           <div class="col-sm-6">
+                              <label for="contactFormPhone">Mobile Phone Number</label>
+                              <input type="tel" id="contactFormPhone" name="contact[phone]" />
+                           </div>
+                           <div class="col-sm-6">
+                              <label for="contactFormEmail">Email</label>
+                              <input required type="email" id="contactFormEmail" name="contact[email]" autocorrect="off" autocapitalize="off"autocorrect="off" autocapitalize="off" />
+                           </div>
+                        </div>
+                       
+                        <!--div class="row">
+                           <div class="col-sm-6">
+                              <label for="contactFormCity">City</label>
+                              <input type="text" id="contactFormCity" name="contact[city]" />
+                           </div>
+                           <div class="col-sm-6">
+                              <label for="contactFormCompanyName">Company Name</label>
+                              <input type="text" id="contactFormCompanyName" name="contact[cname]" />
+                           </div>
+                        </div-->
+                        
+                       
+                        <div class="row">
+                           <div class="col-sm-12">
+                              <label for="contactFormMessage">Message</label>
+                              <textarea required id="contactFormMessage" rows="5" name="contact[message]"></textarea>
+                           </div>
+                        </div>
+                        <div class="row">
+                           <input type="submit" class="btn right" value="{{ 'contact.form.send' | t }}">
+                        </div>
+                     </div>
+
+<style>
+  input {
+    border-radius: 10px;
+    background-color: #e8e8e8;
+    border-width: 0;
+  }
+  
+  input:focus {
+    background: #0069a7;
+  }
+  
+  body#contact-us.content.card-panel.inner-wrapper {
+    background: #e0592a;
+  }
+</style>
+
+                     
+                     {% endform %}
+
+
+
+                    
+                     <div id="contactFormWrapper" class="hs_EnquiryForm">
+                       <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/v2.js"></script>
+                       <script>
+                          hbspt.forms.create({
+                            region: "na1",
+                            portalId: "2595431",
+                            formId: "816a42ad-39bc-48ac-8ecf-079489b1ae8a"
+                          });
+                       </script>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+ {% endcomment %}
+

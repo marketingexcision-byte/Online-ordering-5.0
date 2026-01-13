@@ -1,0 +1,91 @@
+<div class="container small">
+  {%- assign grid_results = true -%}
+  <div data-section-id="{{ section.id }}" data-section-type="search-template">
+    <div class="grid">
+      <div class="grid-item">
+        {%- if search.performed -%}
+          {%- paginate search.results by 50 -%}
+            {%- if search.results_count == 0 -%}
+              <h1 class="h2 text-center">{{ 'general.search.no_results_html' | t: terms: search.terms }}</h1>
+              {%- include 'search-bar' -%}
+            {%- else -%}
+              {%- comment -%}
+                <h1 class="h2 text-center">{{ 'general.search.results_for_html' | t: terms: search.terms }}</h1>
+                {%- include 'search-bar' -%}
+                <hr class="hr--clear">
+              {%- endcomment -%}
+              {%- if grid_results == false -%}
+                {%- for item in search.results -%}
+                  {%- include 'search-result' -%}
+                {%- endfor -%}
+              {%- else -%}
+                {%- comment -%}
+                {% include 'search-sidebar' %}
+                {%- endcomment -%}
+                {%- assign result_type = search.results.first.object_type -%}  
+                <div class="filters">
+                    <div class="filtersCont">
+                      <span id="show-filters">Filters</span>
+                      <div class="selectedFiltersCont"></div>
+                    </div>
+                    <div class="productCountCont">
+                      <span class="total-products-count">{{ search.results_count }} {{ result_type }}{% if search.results_count > 1 %}s{% endif %} </span>
+                    </div>
+                  </div>
+              
+                <div class="grid-uniform products-collection">
+                  {%- for item in search.results -%}
+                    {%- assign grid_item_width = 'grid-item small--one-half medium--one-quarter large--one-quarter' -%}
+                    {%- include 'search-result-grid' -%}
+                  {%- endfor -%}
+                </div>
+              {%- endif -%}
+            {%- endif -%}
+            {%- if paginate.pages > 1 -%}
+              <div class="text-center">
+                {% include 'pagination-custom' %}
+              </div>
+            {%- endif -%}
+          {%- endpaginate -%}
+        {%- else -%}
+          {%- comment -%}
+            If search.performed is false, someone either accessed the page without the q parameter, or it was blank.
+          {%- endcomment -%}
+          <h1 class="text-center h2">{{ 'general.search.title' | t }}</h1>
+          {%- include 'search-bar' -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+{% include 'search-filter-drawer' %}
+
+<style>
+  .grid-item {
+    padding: 0px !important;
+  }
+  .container.small {
+    max-width: 1060px;
+    padding: 20px !important;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Search",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "product_show_compare_at_price",
+      "label": "Show compare at price",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "product_show_saved_amount",
+      "label": "Show saved amount",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

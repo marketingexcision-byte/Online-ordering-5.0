@@ -1,0 +1,130 @@
+<style>
+  .lazyload-element {
+    opacity: 0; /* Start hidden */
+    transition-property: opacity;
+}
+
+.lazyload-element.animate {
+    animation-name: fadeInUp;
+    animation-duration: 0.75s;
+    animation-delay: 0.4s;
+    animation-fill-mode: forwards; /* Keeps the final state */
+}
+.simple-lazyload {
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.simple-lazyload.loaded {
+    opacity: 1;
+}
+
+/* Optional: a placeholder style to ensure elements are not shown until fully loaded */
+.simple-lazyload {
+    visibility: hidden;
+}
+
+.simple-lazyload.loaded {
+    visibility: visible;
+}
+</style>
+  
+  <script>
+window.addEventListener("load", function() {
+    const lazyloadElements = document.querySelectorAll('.simple-lazyload');
+
+    lazyloadElements.forEach(element => {
+        if (element.tagName === 'IMG') {
+            // Check if the image is already loaded
+            if (element.complete) {
+                // Add a slight delay to ensure CSS transition applies smoothly
+                setTimeout(() => {
+                    element.classList.add('loaded');
+                }, 100); // Adjust delay as needed
+            } else {
+                element.addEventListener('load', () => {
+                    // Add a slight delay to ensure CSS transition applies smoothly
+                    setTimeout(() => {
+                        element.classList.add('loaded');
+                    }, 100); // Adjust delay as needed
+                });
+            }
+        } else {
+            // Non-image elements
+            setTimeout(() => {
+                element.classList.add('loaded');
+            }, 100); // Adjust delay as needed
+        }
+    });
+});
+window.addEventListener("load", function() {
+    const lazyloadElements = document.querySelectorAll('.lazyload-element');
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate');
+                observer.unobserve(entry.target); // Stop observing after animation
+            }
+        });
+    }, {
+        root: null, // Use the viewport as the root
+        rootMargin: '0px 0px 400px 0px', // Load elements 400px before they enter the viewport
+        threshold: 0 // Trigger as soon as any part of the element is in view
+    });
+
+    lazyloadElements.forEach(element => {
+        observer.observe(element);
+    });
+});
+</script>
+<section class="hero-banner simple-lazyload">
+    <div class="breadcrumbs-wrapper">
+       <div class="breadcrumbs container dt-prl-30">
+          <div class="row">
+            <div class="col-md-12">
+                 <div class="w-btn-wrapper">
+                    <a class="w-btn icon_atleft" href="{{ shop.url }}"><span class="w-btn-label font-bold"><em>←</em> Back to Home</span></a>
+                 </div>
+               </div>
+              {% comment %}
+             <ul class="col-12 s12">
+                <li class="home">
+                   <a href="/" title="Go to Home Page">Home</a>
+                   <span>| </span>
+                </li>
+                <li class="cms_page">
+                   <strong class="font-bold"> Distributor Locator</strong>
+                </li>
+             </ul>
+            {% endcomment %}
+          </div>
+       </div>
+    </div>
+     <div class="container dt-prl-30">
+        <div class="row">
+           <div class="col-md-7">
+              <div class="placeholder lazyload-element">
+                 <h1>Distributor Finder</h1>
+                 <p>Enter your state and postcode to find a supplier near you</p>
+              </div>
+           </div> 
+          <div class="col-md-1"></div>         
+          <div class="col-md-4  animated fadeIn">
+               {% comment %}
+               <div class="card card-panel white contact-card hoverable">
+                 <div class="inner-wrapper">
+                    <p class="sub-heading">Do You Have Any Questions?</p>
+                    <h4>Give Us a Call</h4>
+                    <a href="tel:+1800633448">1800 633 448</a>
+                 </div>
+              </div>
+              {% endcomment %}
+           </div>           
+        </div>
+     </div>
+</section>
+
+
+
+[ndnapps-storelocator]

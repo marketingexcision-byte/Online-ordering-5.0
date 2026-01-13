@@ -1,0 +1,707 @@
+{% render 'wcp_discount' with product %}
+{%- comment -%}
+  We’ll default to first available, but a JS hydrator will overwrite DOM to the exact variant
+  based on data-variant-id + data-product-json set by the selector.
+{%- endcomment -%}
+{% assign current_variant = product.selected_or_first_available_variant | default: product.variants.first %}
+
+{% render 'wcp_variant' with current_variant %}
+
+{% assign temp_wcp_v_price = wcp_v_price %}
+{% assign temp_wcp_v_compare_at_price = wcp_v_compare_at_price %}
+{% unless grid_item_width %}
+  {% assign grid_item_width = 'large--one-quarter medium-down--one-half' %}
+{% endunless %}
+
+{% unless image_size %}
+  {% assign image_size = '600x600' %}
+{% endunless %}
+
+{% unless current_collection %}
+  {% assign current_collection = collection %}
+{% endunless %}
+
+{% assign on_sale = false %}
+{% if wcp_compare_at_price > wcp_price %}
+  {% assign on_sale = true %}
+{% endif %}
+
+<div class="grid-item {{ grid_item_width }}{% if on_sale %} on-sale{% endif %}">
+  <a
+    href="{{ product.url | within: current_collection }}"
+    class="product-grid-item"
+    data-variant-id="{{ current_variant.id }}"
+  >
+    <div class="product-grid-image">
+      <div class="product-grid-image--centered">
+        {% if product.tags contains 'New' %}
+          <span class="new-badge font-bold">New</span>
+        {% endif %}
+        {% if product.tags contains 'YG-1' %}
+          <div
+            class="yg-logo-wrapper"
+            style="position: absolute; top: 0; right: 0; z-index: 10; padding: 15px; background: #d52e30; border-radius: 0px 15px;"
+          >
+            <img
+              src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/YG_Logo_White.png?v=1748387180"
+              alt="YG-1 Logo"
+              class="yg-logo"
+              style="max-width: 50px; height: auto;"
+              width="50px"
+            >
+          </div>
+        {% endif %}
+
+        {% if product.featured_image %}
+          {% assign first_image = product.featured_image %}
+
+          {% if product.images.size > 1 %}
+            {% assign second_image = product.images[1] %}
+            <div class="product-image-wrapper">
+              <!-- First (Default) Image -->
+              <img
+                class="product-image front lazyload"
+                data-src="{{ first_image | img_url: '540x' }}"
+                data-widths="[125, 180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                data-sizes="auto"
+                alt="{{ first_image.alt | escape }}"
+              >
+
+              <!-- Second (Hover) Image -->
+              <img
+                class="product-image back lazyload"
+                data-src="{{ second_image | img_url: '540x' }}"
+                data-widths="[125, 180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                data-sizes="auto"
+                alt="{{ second_image.alt | escape }}"
+              >
+            </div>
+          {% else %}
+            <div class="product-image-wrapper" style="transition: none;">
+              <!-- Single Image (No Hover Effect) -->
+              <img
+                class="product-image single lazyload"
+                data-src="{{ first_image | img_url: '540x' }}"
+                data-widths="[125, 180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                data-sizes="auto"
+                alt="{{ first_image.alt | escape }}"
+              >
+            </div>
+          {% endif %}
+        {% else %}
+          <div>
+            <img
+              class="product-placeholder-image"
+              src=" https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Excision_Logo_2025.svg?v=1745463654"
+              alt="Excision"
+            >
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+ <p class="font-bold {% if product.metafields.custom.title.value != blank %} cpgs_title{% endif %}">
+  {{ product.title }}
+</p>
+
+ <div class="vqs-suitability" data-vqs-suitability-row hidden>
+  <p data-vqs-suitability>—</p>
+</div>
+
+{%- comment -%} Clean ops list for JS hydration {%- endcomment -%}
+{%- assign ops_human = '' -%}
+{%- for t in product.tags -%}
+  {%- assign tdown = t | downcase -%}
+  {%- assign prefix = tdown | slice: 0, 10 -%}
+  {%- if prefix == 'operation_' -%}
+    {%- assign nice = t | replace_first: 'Operation_', '' | replace: '_', ' ' -%}
+    {%- if ops_human != '' -%}{%- assign ops_human = ops_human | append: ', ' -%}{%- endif -%}
+    {%- assign ops_human = ops_human | append: nice -%}
+  {%- endif -%}
+{%- endfor -%}
+<span data-vqs-source="ops" data-ops="{{ ops_human | escape }}" style="display:none;"></span>
+
+
+    {%- comment -%} Clean ops list for JS hydration {%- endcomment -%}
+    {%- assign ops_human = '' -%}
+    {%- for t in product.tags -%}
+      {%- assign tdown = t | downcase -%}
+      {%- assign prefix = tdown | slice: 0, 10 -%}
+      {%- if prefix == 'operation_' -%}
+        {%- assign nice = t | replace_first: 'Operation_', '' | replace: '_', ' ' -%}
+        {%- if ops_human != '' -%}{%- assign ops_human = ops_human | append: ', ' -%}{%- endif -%}
+        {%- assign ops_human = ops_human | append: nice -%}
+      {%- endif -%}
+    {%- endfor -%}
+    <span data-vqs-source="ops" data-ops="{{ ops_human | escape }}" style="display:none;"></span>
+
+    <div class="product-item--price">
+      <span class="medium--left">
+        {%- assign v = current_variant -%}
+        {%- assign taxable = v.taxable | default: true -%}
+
+        {%- if v.price > 0 -%}
+          {%- assign inc = v.price -%}
+          {%- assign ex = v.price -%}
+          {%- if taxable -%}
+            {%- if shop.taxes_included -%}
+              {%- assign inc = v.price -%}
+              {%- assign ex = v.price | times: 10 | divided_by: 11 -%}
+            {%- else -%}
+              {%- assign ex = v.price -%}
+              {%- assign inc = v.price | times: 11 | divided_by: 10 -%}
+            {%- endif -%}
+          {%- endif -%}
+
+          <span class="ex-price ex-price--stack">
+            <strong class="ex-price__inc">
+              {{- inc | money -}}
+              <span class="inc-price__label">INC GST</span></strong
+            >
+            {%- if taxable -%}
+              <div class="ex-price__ex">
+                {{ ex | money }}
+                <span class="ex-price__label">EX GST</span>
+              </div>
+            {%- endif -%}
+          </span>
+        {%- else -%}
+          <span class="ex-price ex-price--stack from-price">
+            <strong class="ex-price__inc">Pricing available on request</strong>
+          </span>
+        {%- endif -%}
+      </span>
+
+      <style>
+                  .product-item--price small {
+                    font-size: 18px;
+                  }
+                  .product-item--price small:hover {
+                    color: black;
+                  }
+                  div.product-item--price {
+                    text-align: left;
+                  }
+                  .product-item--price span {
+                    display: flex;
+                    line-height: unset;
+                    flex-direction: column;
+                  }
+                  a:hover {
+                    color: unset;
+                  }
+                  /* default: no footprint */
+        .icon-container{
+          min-height: 0;
+          position: absolute;
+        }
+
+        /* show + space only when it actually has element children */
+        .icon-container:has(> *){
+          position: relative;
+        }
+
+        /* fallback for older browsers; may miss whitespace-only nodes */
+        .icon-container:empty{ display:none; }
+
+        .card-variants {
+          margin-bottom: 15px;
+        }
+
+        .card-variants-label {
+            font-size: 16px !important;
+            font-weight: 400 !important;
+            color: #666666;
+            margin-bottom: 7px !important;
+            text-align: start;
+        }
+
+        .card-variants-chips {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 9px;
+        }
+
+        .variant-chip {
+            padding: 8px 12px;
+            border: 2px solid #e8e8e8;
+            border-radius: 99px;
+            white-space: nowrap;
+            line-height: 1;
+            min-height: 40px;
+            align-content: center;
+        }
+
+        .variant-chip--more {
+            color: #666666;
+            border: 2px solid #f1f1f1;
+        }
+      </style>
+
+      {% if product.selected_or_first_available_variant.available
+        and product.selected_or_first_available_variant.unit_price_measurement
+      %}
+        {% render 'product-unit-price', variant: product.selected_or_first_available_variant %}
+      {% endif %}
+    </div>
+
+    {% render 'auto-discount-note', product: product %}
+
+    {%- comment -%} ==== VARIANT QUICK GLANCE (variant-scoped; DOM will be hydrated by JS) ==== {%- endcomment -%}
+    <div class="variant-quick-specs" data-vqs>
+      <div class="vqs-row">
+        <div class="vqs-col" data-vqs-sku>
+          <small>Product Code</small>
+          <div class="vqs-val" data-vqs__sku>—</div>
+        </div>
+
+        <div class="vqs-col" data-vqs-dia>
+          <small>Mill Diameter</small>
+          <div class="vqs-val" data-vqs__dia>—</div>
+        </div>
+
+        <div class="vqs-col" data-vqs-shank>
+          <small>Shank Diameter</small>
+          <div class="vqs-val" data-vqs__shank>—</div>
+        </div>
+
+        <div class="vqs-col" data-vqs-shanktype>
+          <small>Shank Type</small>
+          <div class="vqs-val" data-vqs__shanktype>—</div>
+        </div>
+
+        <div class="vqs-col" data-vqs-cr>
+          <small>Corner Radius</small>
+          <div class="vqs-val" data-vqs__cr>—</div>
+        </div>
+
+        <div class="vqs-col" data-vqs-loc>
+          <small>Length of Cut</small>
+          <div class="vqs-val" data-vqs__loc>—</div>
+        </div>
+
+        <div class="vqs-col" data-vqs-chamfer>
+          <small>Chamfer Angle</small>
+          <div class="vqs-val" data-vqs__chamfer>—</div>
+        </div>
+
+        <div class="vqs-col" data-vqs-flutes>
+          <small>Flutes</small>
+          <div class="vqs-val" data-vqs__flutes>—</div>
+        </div>
+
+        <div class="vqs-col vqs-ops" data-vqs-ops>
+          <small>Operation</small>
+          <div class="vqs-val" data-vqs__ops>—</div>
+        </div>
+
+        <div class="vqs-col" data-vqs-mats>
+          <small>Workpiece Materials</small>
+          <div class="vqs-val vqs-mats" data-vqs__mats></div>
+        </div>
+
+        <div class="vqs-col" data-vqs-stock>
+          <small>Stock</small>
+          <div class="vqs-val"><span class="ex-card-badge" data-vqs__stock data-status=""></span></div>
+        </div>
+      </div>
+    </div>
+
+    {%- comment -%} Per-variant payload for client hydration {%- endcomment -%}
+    <script type="application/json" class="vmap">
+      [
+        {%- for v in product.variants -%}
+        {
+          "id": {{ v.id }},
+          "sku": {{ v.sku | json }},
+          "price": {{ v.price | default: 0 }},
+          "compare": {{ v.compare_at_price | default: 0 }},
+          "available": {{ v.available | json }},
+          "inventory_management": {{ v.inventory_management | json }},
+          "inventory_quantity": {{ v.inventory_quantity | default: 0 }},
+          "inventory_policy": {{ v.inventory_policy | json }},
+          "incoming": {{ v.incoming | json }},
+          "next_incoming_date": {{ v.next_incoming_date | date: "%s" | default: 'null' }},
+          "options": [{% for o in v.options %}{{ o | json }}{% unless forloop.last %},{% endunless %}{% endfor %}],
+          "mf": {
+            "shank": {{ v.metafields.filter.shank_diameter_mm | default: v.metafields.filter['shank_diameter_mm'] | json }},
+            "loc":   {{ v.metafields.custom.length_of_cut_mm  | default: v.metafields.custom['length_of_cut_mm']  | json }}
+          }
+        }{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      ]
+    </script>
+
+    {% if section.settings.product_reviews_enable %}
+      <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+    {% endif %}
+  </a>
+
+ 
+
+  <div class="payment-buttons payment-buttons--medium form-payment-buttons">
+    {% assign first_avail = product.selected_or_first_available_variant | default: product.first_available_variant %}
+    {% assign _price_cents = first_avail.price | default: product.price | plus: 0 %}
+
+    {% if product.tags contains 'Custom Length' %}
+      <!-- Custom-length products must be configured on the PDP -->
+      <a href="{{ product.url }}" class="btn btn--wide btn--buyNow" style="background:#f88d2b;color:#fff;">
+        <span style="display:flex;align-items:center;gap:10px;"> Select your blade </span>
+      </a>
+
+    {% else %}
+      {% if _price_cents == 0 %}
+        <!-- $0.00 → send them to PDP to request a quote -->
+        <a href="{{ product.url }}" class="btn btn--wide btn--buyNow is-quote" style="background:#f88d2b;color:#fff;">
+          <span style="display:flex;align-items:center;gap:10px;"> Request Quote </span>
+        </a>
+      {% elsif first_avail %}
+        <!-- normal priced product → keep Add to Cart -->
+        <a
+          href="javascript:void(0);"
+          class="btn btn--wide btn--buyNow add-to-cart-btn"
+          data-variant-id="{{ first_avail.id }}"
+          style="background:#e0592a;color:#fff;"
+        >
+          <span style="display:flex;align-items:center;gap:10px;">
+            <i
+              class="fa fa-cart"
+              style="content:url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Asset_Cart-white.png?v=1730169426);height:17px;"
+            ></i>
+            Add to Cart
+          </span>
+        </a>
+      {% else %}
+        <button class="btn btn--wide" disabled>Sold out</button>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+<script>
+(function(){
+  function selectBy(t, sel){ return (t && t.querySelector(sel)) || null; }
+  function showRow(scope, key, text){
+    const row = selectBy(scope, `[data-vqs-${key}]`);
+    const cell = selectBy(scope, `[data-vqs__${key}]`);
+    if (!row || !cell) return;
+    if (text == null || String(text).trim() === '' || text === '—') {
+      row.hidden = true;
+      cell.textContent = '';
+    } else {
+      row.hidden = false;
+      cell.textContent = text;
+    }
+  }
+  function badgeTextForVariant(v, isYG1){
+    let status = 'grey', text = 'Quantity unavailable';
+    if (v.inventory_management){
+      const q = Number(v.inventory_quantity || 0);
+      if (q > 2){ status='green'; text='In stock'; }
+      else if (q > 0){ status='orange'; text='Low stock'; }
+      else{
+        if (v.incoming && v.next_incoming_date){ status='blue'; text='Restocking'; }
+        else if (v.inventory_policy === 'continue'){ status = isYG1 ? 'yellow' : 'red'; text = isYG1 ? '5 days' : 'Order in'; }
+        else { status='red'; text='No stock'; }
+      }
+    }
+    return {status, text};
+  }
+  function opsFromTags(tags){
+    const out = [];
+    (tags||[]).forEach(t=>{
+      if (typeof t !== 'string') return;
+      if (t.slice(0,10).toLowerCase() === 'operation_'){
+        out.push(t.replace(/^Operation_/, '').replace(/_/g, ' '));
+      }
+    });
+    return out.join(', ');
+  }
+  function chamferFromTags(tags){
+    const t = (tags||[]).find(x => typeof x==='string' && x.slice(0,14).toLowerCase()==='chamfer angle_');
+    if (!t) return '';
+    const raw = t.replace(/^Chamfer Angle_/i,'').trim();
+    if (raw==='') return '';
+    return raw + '°';
+  }
+  function shankTypeFromTags(tags){
+  if (!Array.isArray(tags)) return '';
+  for (const raw of tags){
+    if (typeof raw !== 'string') continue;
+    const m = raw.match(/^Shank Type_(.+)$/i);
+    if (m) return m[1].trim();
+  }
+  return '';
+}
+  function flutesFromTags(tags){
+  if (!Array.isArray(tags)) return '';
+  // Primary. "No. Flutes_*" (your canonical format)
+  for (const raw of tags){
+    if (typeof raw !== 'string') continue;
+    const m = raw.match(/^No\.?\s*Flutes_(.+)$/i);
+    if (m) return m[1].trim(); // e.g. "4", "3-5", "4 & 6"
+  }
+  // Fallbacks seen in the wild
+  for (const raw of tags){
+    if (typeof raw !== 'string') continue;
+    const m = raw.match(/^Flutes_(.+)$/i);
+    if (m) return m[1].trim();
+  }
+  return '';
+}
+
+  function matsFromVDI(p){
+    // p.vdi_good/excellent may be strings or arrays. Normalize here.
+    function parseList(val){
+      if (!val) return [];
+      if (Array.isArray(val)) return val.map(Number).filter(n=>!isNaN(n));
+      if (typeof val === 'string'){
+        return val.replace(/^\[|\]$/g,'').split(/[,|;]/).map(s=>parseFloat(s)).filter(n=>!isNaN(n));
+      }
+      return [];
+    }
+    const nums = [...parseList(p.vdi_good), ...parseList(p.vdi_excellent)];
+    const set = new Set();
+    nums.forEach(n=>{
+      if (n>=1 && n<=11) set.add('P');
+      else if (n>=12 && n<=14) set.add('M');
+      else if (n>=15 && n<=20) set.add('K');
+      else if (n>=21 && n<=30) set.add('N');
+      else if (n>=31 && n<=37) set.add('S');
+      else if (n>=38 && n<=41) set.add('H');
+    });
+    return Array.from(set);
+  }
+
+  function hydrateCard(root){
+    if (!root) return;
+    const scope = root.closest('.grid-item') || root;
+    // source of truth: product JSON + desired variant id
+    const dataJson = root.getAttribute('data-product-json');
+    let P = null;
+    try { P = dataJson ? JSON.parse(dataJson) : null; } catch(e){}
+    if (!P) return;
+
+    const vid = root.getAttribute('data-variant-id');
+    const V = (P.variants||[]).find(v => String(v.id) === String(vid)) || (P.variants||[])[0];
+    if (!V) return;
+
+    // Update displayed price for the chosen variant
+(function(){
+  const priceInc = selectBy(scope, '.ex-price__inc');
+  const priceEx  = selectBy(scope, '.ex-price__ex');
+  if (!priceInc) return;
+
+  // Use shop tax mode from Liquid
+  const taxesIncluded = {{ shop.taxes_included | json }};
+  // Assume taxable unless you also serialize V.taxable
+  const taxable = true;
+
+  let inc = V.price, ex = V.price;
+  if (taxable){
+    if (taxesIncluded){
+      inc = V.price;
+      ex  = Math.round(V.price * 10 / 11);
+    } else {
+      ex  = V.price;
+      inc = Math.round(V.price * 11 / 10);
+    }
+  }
+
+  const fmt = (cents) => (Number(cents||0)/100).toLocaleString(undefined,{style:'currency',currency:'AUD'});
+
+  // ex-price__inc looks like: "<strong>$$$<span class='inc-price__label'>INC GST</span></strong>"
+  // Safely set the text node before the span
+  const incLabel = priceInc.querySelector('.inc-price__label');
+  if (incLabel){
+    // If there’s a text node before the span, set it. else rebuild innerHTML.
+    const first = priceInc.firstChild;
+    if (first && first.nodeType === 3){
+      first.nodeValue = fmt(inc);
+    } else {
+      priceInc.innerHTML = `${fmt(inc)}<span class="inc-price__label">INC GST</span>`;
+    }
+  } else {
+    // Fallback. no nested span. just write the money
+    priceInc.textContent = fmt(inc);
+  }
+
+  if (priceEx){
+    const exLabel = priceEx.querySelector('.ex-price__label');
+    if (exLabel){
+      const first = priceEx.firstChild;
+      if (first && first.nodeType === 3){
+        first.nodeValue = fmt(ex) + ' ';
+      } else {
+        priceEx.innerHTML = `${fmt(ex)} <span class="ex-price__label">EX GST</span>`;
+      }
+    } else {
+      priceEx.textContent = fmt(ex);
+    }
+  }
+})();
+
+
+    // product-level flags
+    const isYG1 = (P.tags||[]).includes('YG-1');
+
+    // SKU
+    showRow(scope, 'sku', V.sku || '');
+
+    // Diameter
+    showRow(scope, 'dia', V.dia_mm ? (V.dia_mm + ' mm') : '');
+
+    // Shank: prefer MF, else option
+    const shank = (V.shank_diameter_mm_mf && String(V.shank_diameter_mm_mf).trim()!=='') ? V.shank_diameter_mm_mf : V.shank_diameter_mm_opt;
+    showRow(scope, 'shank', shank ? (shank + ' mm') : '');
+
+    // Shank Type from product tags
+showRow(scope, 'shanktype', shankTypeFromTags(P.tags));
+
+    // Corner radius
+    showRow(scope, 'cr', V.corner_radius_mm ? (V.corner_radius_mm + ' mm') : '');
+
+    // Length of cut
+    showRow(scope, 'loc', V.length_of_cut_mm ? (V.length_of_cut_mm + ' mm') : '');
+
+    // Chamfer angle + Flutes from tags
+    showRow(scope, 'chamfer', chamferFromTags(P.tags));
+    showRow(scope, 'flutes', flutesFromTags(P.tags));
+
+    // Operations
+    showRow(scope, 'ops', opsFromTags(P.tags));
+
+    // Materials
+    const mats = matsFromVDI(P);
+    const matsWrap = selectBy(scope, '[data-vqs__mats]');
+if (matsWrap){
+  matsWrap.innerHTML = '';
+  mats.forEach(m=>{
+    const s = document.createElement('span');
+    s.className = 'material material-' + m;
+    s.textContent = m;
+    matsWrap.appendChild(s);
+  });
+  // ensure visibility
+  matsWrap.style.display = mats.length ? '' : 'none';
+  const row = selectBy(scope, '[data-vqs-mats]');
+  if (row) row.hidden = mats.length === 0;
+}
+
+
+    // Stock badge
+    const badge = selectBy(scope, '[data-vqs__stock]');
+    if (badge){
+      const {status, text} = badgeTextForVariant(V, isYG1);
+      badge.textContent = text;
+      badge.setAttribute('data-status', status);
+    }
+
+    // --- Suitability line (inside hydrateCard where scope & root exist) ---
+(function(){
+  const row  = selectBy(scope, '[data-vqs-suitability-row]');
+  const cell = selectBy(scope, '[data-vqs-suitability]');
+  if (!row || !cell) return;
+
+  const suit = root.getAttribute('data-suitability') || '';
+  const opRaw = root.getAttribute('data-op-label') || '';
+  const mat   = root.getAttribute('data-material-label') || '';
+
+  let op = opRaw.replace(/^Operation_/, '').replace(/_/g, ' ').trim();
+
+  if (suit && mat){
+    cell.textContent = `${suit} for ${op} ${mat}`;
+    row.hidden = false;
+  } else {
+    row.hidden = true;
+  }
+})();
+
+
+    // Also fix the Add to Cart button variant id so it matches
+    const atc = (scope || document).querySelector('.add-to-cart-btn');
+    if (atc) atc.setAttribute('data-variant-id', String(V.id));
+  }
+
+  // hydrate when the grid tells us
+  document.addEventListener('es:hydrate-card', function(e){
+    const root = e.target && e.target.classList && e.target.classList.contains('product-grid-item') ? e.target : null;
+    if (root) hydrateCard(root);
+  });
+
+
+  // also hydrate on DOM ready for SSR fallbacks
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.product-grid-item[data-product-json]').forEach(hydrateCard);
+  });
+})();
+</script>
+
+<style>
+  /* Ensure the hover effect only applies to the image container */
+  .product-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    padding-top: 100%; /* Maintain aspect ratio */
+  }
+
+  .product-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: none !important;
+  }
+
+  /* Default image visible, second image hidden */
+  .product-image.front {
+    opacity: 1;
+    z-index: 2;
+  }
+
+  .product-image.back {
+    opacity: 0;
+    z-index: 100;
+    transform: scale(1.04);
+  }
+
+  /* Hide default image and show hover image on hover */
+  .product-grid-item:hover .product-image-wrapper .product-image.front {
+    opacity: 0 !important;
+  }
+
+  .product-grid-item:hover .product-image-wrapper .product-image.back {
+    opacity: 1 !important;
+    transform: scale(1);
+    transition: 0.3s ease !important;
+
+  }
+
+  /* Single image stays visible without hover effect */
+  .product-image.single {
+    opacity: 1;
+    z-index: 2;
+  }
+</style>
+
+<style>
+    .variant-quick-specs { margin-top: 8px; }
+    .vqs-row { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:10px 14px; }
+    @media(min-width:900px){ .vqs-row{ grid-template-columns: repeat(3,minmax(0,1fr)); } }
+    .vqs-col small{ display:block; color:#666; font-size:12px; margin-bottom:4px; }
+    .vqs-val{ font-size:14px; line-height:1.3; }
+    .vqs-compare{ color:#888; font-weight:400; margin-left:6px; }
+    .vqs-mats{ display:flex; gap:6px; align-items:center; }
+    .material { font-family: 'Humanist777BT-Bold'; border-radius: 5px; color: white; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; }
+    .material-P { background:#0069a7 }
+    .material-M { background:#f6b519 }
+    .material-K { background:#e0592a }
+    .material-N { background:#109954 }
+    .material-S { background:#f88d2b }
+    .material-H { background:#666666 }
+
+</style>

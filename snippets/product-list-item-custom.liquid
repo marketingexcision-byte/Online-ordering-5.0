@@ -1,0 +1,174 @@
+{% unless image_size %}
+  {%- assign image_size = '600x600' -%}
+{% endunless %}
+
+{% unless current_collection %}
+  {% assign current_collection = collection %}
+{% endunless %}
+
+{% assign on_sale = false %}
+{% if product.compare_at_price > product.price %}
+  {% assign on_sale = true %}
+{% endif %}
+
+{% assign sold_out = true %}
+{% if product.available  %}
+  {% assign sold_out = false %}
+{% endif %}
+
+<div class="grid-item-list{% if sold_out %} sold-out{% endif %}{% if on_sale %} on-sale{% endif %} list-products">
+  
+    <div class="grid">
+      <div class="grid-item large--one-fifth medium--one-third">
+        <a href="{{ product.url | within: current_collection }}" class="product-grid-item product-list-item">
+        <div class="product-list-image">
+          {% if sold_out %}
+            <div class="badge badge--sold-out"><span class="badge-label">{{ 'products.product.sold_out' | t }}</span></div>
+          {% endif %}
+          {% if product.featured_image %}
+          {%- assign img_url = product.featured_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+          <div class="lazyload__image-wrapper" style="padding-top:{{ 1 | divided_by: product.featured_image.aspect_ratio | times: 100}}%;">
+            <img id="{{ img_id }}"
+                class="lazyload js"
+                data-src="{{ img_url }}"
+                data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                data-aspectratio="{{ product.featured_image.aspect_ratio }}"
+                data-sizes="auto"
+                alt="{{ product.featured_image.alt | escape }}">
+
+          </div>
+          <noscript>
+          <img src="{{ product.featured_image | img_url: '580x' }}"
+              srcset="{{ product.featured_image | img_url: '580x' }} 1x, {{ product.featured_image | img_url: '580x', scale: 2 }} 2x"
+              alt="{{ product.featured_image.alt }}" style="opacity:1;">
+            </noscript>
+          {% else %}
+            {% capture current %}{% cycle 1, 2, 3, 4 %}{% endcapture %}
+            <img class="product-placeholder-image" src="{{ 'logo1.png' | file_url }}" alt="">
+            {% comment %} {{ 'product-' | append: current | placeholder_svg_tag: 'placeholder-svg' }} {% endcomment %}
+            {% endif %}
+        </div>
+      </a>
+      </div>
+      <div class="grid-item large--three-fifths medium--two-thirds">
+        <p class="h6"><a href="{{ product.url | within: current_collection }}" class="product-list-item-title">{{ product.title }}</a></p>
+        <div class="rte">
+          <p class="pl-desc-title"><strong>Description:</strong></p>
+          <p>{{ product.content | strip_html | truncatewords: 30 }}</p>
+        </div>
+      </div>
+      <div class="grid-item large--one-fifth medium--two-thirds">
+        <div class="text-center">
+          
+          {% if customer  %}
+          <div class="product-item--price">
+            <p class="h4 medium-down--left">
+              {% if on_sale %}
+                <span class="visually-hidden">{{ "products.general.sale_price" | t }}</span>
+              {% else %}
+                <span class="visually-hidden">{{ "products.general.regular_price" | t }}</span>
+              {% endif %}
+              {% include 'price' with product.price %}
+              {% if on_sale and section.settings.product_show_compare_at_price %}
+                <small>
+                  <s>
+                    <span class="visually-hidden">{{ "products.general.regular_price" | t }}</span>
+                    {% include 'price' with product.compare_at_price %}
+                  </s>
+                </small>
+              {% endif %}
+            </p>
+            {%- if product.selected_or_first_available_variant.available and product.selected_or_first_available_variant.unit_price_measurement -%}
+              {% include 'product-unit-price', variant: product.selected_or_first_available_variant %}
+            {%- endif -%}
+          </div>
+          {% if on_sale and section.settings.product_show_saved_amount %}
+            <div class="sale-tag medium-down--right{% if section.settings.product_reviews_enable %} has-reviews{% endif %}">
+              {% assign compare_price = product.compare_at_price %}
+              {% assign product_price = product.price %}
+              {% include 'price-sale' %}
+            </div>
+          {% endif %}
+          {% endif %}
+
+          {% if section.settings.product_reviews_enable %}
+            <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+          {% endif %}
+          
+          {% if customer  %}
+          <form method="post" action="/cart/add">
+            <input type="hidden" name="id" value="{{ product.variants.first.id }}" />
+            <input min="1" type="number" id="quantity" name="quantity" value="1"/>
+            <input type="submit" value="Add to cart" class="btn" />
+          </form>
+          {% endif %}
+          
+          <a class="btn rq_trigger_popup rq_trigger_popup-{{ product.id }} font-bold">Request Quote</a>
+
+          <div class="rq_hover_popup rq_hover_popup-{{ product.id }}">
+              <span class="helper"></span>
+              <div>
+                <div class="popupCloseButton popupCloseButton-{{ product.id }}"><span>&times;</span></div>
+                  <div class="product-page-form form-vertical">
+                   {% comment %}
+                   <h5>Request Quote</h5>
+                   {% endcomment %}
+                   {% form 'contact' %}
+                   {% if form.posted_successfully? %}
+                   <p class="note form-success">
+                      {{ 'contact.form.post_success' | t }}
+                   </p>
+                   {% endif %}
+                   {% include 'form-errors-custom' %}
+                   <div id="contactFormWrapper">
+                      <div class="row">
+                         <div class="col-12 col-md-6">
+                            <label for="contactFormName" class="hidden-label">{{ 'contact.form.name' | t }}</label>
+                            <input type="text" id="contactFormName" name="contact[{{ 'contact.form.name' | t }}]" placeholder="{{ 'contact.form.name' | t }}" value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}" required>
+                         </div>
+                         <div class="col-12 col-md-6">
+                            <label for="contactFormEmail" class="hidden-label">{{ 'contact.form.email' | t }}</label>
+                            <input type="email" id="contactFormEmail" name="contact[email]" placeholder="{{ 'contact.form.email' | t }}" autocorrect="off" autocapitalize="off" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}" required>
+                         </div>
+                         <div class="col-12 col-md-6">
+                            <label for="contactFormPhone" class="hidden-label">{{ 'contact.form.phone' | t }}</label>
+                            <input type="tel" id="contactFormPhone" name="contact[{{ 'contact.form.phone' | t }}]" placeholder="{{ 'contact.form.phone' | t }}" value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}">
+                         </div>
+                         <div class="col-12 col-md-6">
+                            <label for="contactFormQuantity" class="hidden-label-none contactFormQuantity">{{ 'Qty' }}</label>
+                            <input min="1" type="number" id="ContactFormQuantity" name="contact[Quantity]" placeholder="{{ 'Quantity' }}" value="1" />
+                         </div>
+                         <input type="hidden" class="hide" id="ContactFormProductName" name="contact[Product Name]" value="{{product.title}} -- {{ shop.url }}{{product.url}}">
+                         <div class="col-12 col-md-12">
+                            <label for="contactFormMessage" class="hidden-label">{{ 'contact.form.message' | t }}</label>
+                            <textarea rows="2" id="contactFormMessage" name="contact[{{ 'contact.form.message' | t }}]" placeholder="{{ 'contact.form.message' | t }}">{% if form.body %}{{ form.body }}{% endif %}</textarea>
+                         </div>
+                         <div class="col-12 col-md-12">
+                            <input type="submit" class="btn right" value="{{ 'Request a Quote' }}">
+                         </div>
+                      </div>
+                   </div>
+                   {% endform %}               
+                </div>
+              </div>
+           </div>
+          
+                   
+        </div>
+      </div>
+    </div>
+ </div>
+
+<script>
+$(window).load(function () {
+    $(".rq_trigger_popup-{{ product.id }}").click(function(){
+       $('.rq_hover_popup-{{ product.id }}').show();
+    });
+    $('.rq_hover_popup-{{ product.id }}').click(function(){
+        //$('.rq_hover_popup-{{ product.id }}').hide();
+    });
+    $('.popupCloseButton-{{ product.id }}').click(function(){
+        $('.rq_hover_popup-{{ product.id }}').hide();
+    });
+});
+</script>

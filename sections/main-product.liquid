@@ -1,0 +1,4725 @@
+{%- include 'wcp_discount' with product -%}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{% include 'wcp_variant' with current_variant %}
+{% include 'wcp_vd_table_change' with product %}
+{% include 'wcp_variant' with current_variant %}
+{% include 'wcp_vd_product' with product %}
+{% include 'wcp_variant' with current_variant %}
+{% assign temp_wcp_v_price = wcp_v_price %}
+{% assign temp_wcp_v_compare_at_price = wcp_v_compare_at_price %}
+<div
+  id="ProductSection"
+  class=" simple-lazyload"
+  data-section-id="{{ section.id }}"
+  data-section-type="product-template"
+  data-zoom-toggle="zoom-in"
+  data-zoom-enabled="{{ section.settings.product_image_zoom_enable }}"
+  data-related-enabled="{{ section.settings.product_related_enable }}"
+  data-promo-enabled="{{ section.settings.product_promo_enable }}"
+  data-social-sharing="{{ section.settings.social_sharing }}"
+  data-show-compare-at-price="{{ section.settings.product_show_compare_at_price }}"
+  data-stock="{{ section.settings.product_quantity_message }}"
+  data-incoming-transfer="{{ section.settings.product_incoming_message }}"
+  data-ajax-cart-method="{{ settings.ajax_cart_method }}">
+  <nav class="breadcrumb" role="navigation" aria-label="breadcrumbs">
+    <div class="breadcrumbs container dt-prl-30">
+      {% assign product_collection = product.collections.last %}
+      {% if product_collection %}
+        <div class="w-btn-wrapper lazyload-element">
+          <a class="w-btn icon_atleft" href="{{ product_collection.url }}"
+            ><span class="w-btn-label font-bold"><em>←</em> Back to {{ product_collection.title }}</span></a>
+        </div>
+      {% endif %}
+    </div>
+  </nav> 
+  {% comment %}{% include 'breadcrumb' %}{% endcomment %}
+  {% case section.settings.add_to_cart_button_size %}
+    {% when 'small' %}
+      {% assign btn_class = 'btn' %}
+    {% when 'medium' %}
+      {% assign btn_class = 'btn btn--wide' %}
+    {% when 'large' %}
+      {% assign btn_class = 'btn btn--full btn--large' %}
+  {% endcase %}
+  {% if section.settings.add_to_cart_button_size == 'large' %}
+    <style>
+
+      .selector-wrapper select, .product-variants select {
+      max-width: 100%;
+      }
+    </style>
+  {% endif %}
+  {% if section.settings.product_quantity_enable == false %}
+    <style>
+      .selector-wrapper select, .product-variants select {
+      margin-bottom: 13px;
+      }
+    </style>
+  {% endif %}
+  <div class="grid container dt-prl-30 mb-prl-0">
+    <div class="grid-item large--three-fifths mobile-product-top-meta lazyload-element">
+      {% if product.tags contains 'New' %}
+        <span class="new-badge font-bold">New</span>
+      {% endif %}
+      {% if product.tags contains 'Hot Deal' %}
+        <span class="hot-deal-badge font-bold">Hot Deal</span>
+      {% endif %}
+      <h1 class="h2">{{ product.title }}</h1>
+      {% if product.metafields.custom.title.value != blank %}
+      <span class="secondary--product_title ">{{ product.metafields.custom.title }}</span>
+    {% endif %}
+
+<!-- Start of Judge.me code --> 
+  <div class='jdgm-widget jdgm-preview-badge' data-id='{{ product.id }}'> 
+    {{ product.metafields.judgeme.badge }} 
+  </div> 
+<!-- End of Judge.me code -->
+
+
+      {% assign current_variant = product.selected_or_first_available_variant %}
+      <div>
+        {% assign variant = product.selected_or_first_available_variant %}
+        {% if customer %}{% endif %}
+          <ul class="inline-list product-meta" data-price>
+            <li>
+              <span id="productPrice-{{ section.id }}" class="mb-product__price">
+  {%- assign v = product.selected_or_first_available_variant -%}
+  {%- assign v_tax = v.taxable | default: true -%}
+  {%- assign inc_c = v.price -%}
+  {%- assign ex_c  = v.price -%}
+  {%- if v_tax -%}
+    {%- if shop.taxes_included -%}
+      {%- assign ex_c = v.price | times: 10 | divided_by: 11 -%}
+    {%- else -%}
+      {%- assign inc_c = v.price | times: 11 | divided_by: 10 -%}
+    {%- endif -%}
+  {%- endif -%}
+  <span class="ex-price ex-price--stack">
+    <strong class="ex-price__inc">
+      {{ inc_c | money }}<span class="inc-price__label">INC GST</span>
+    </strong>
+    {%- if v_tax -%}
+    <small class="ex-price__ex">
+      {{ ex_c | money }} <span class="ex-price__label">EX GST</span>
+    </small>
+    {%- endif -%}
+  </span>
+</span>
+
+              {% include 'product-unit-price', variant: variant %}
+            </li>
+            {% if wcp_compare_at_price_max > wcp_price and section.settings.product_show_saved_amount %}
+              <li>
+                <span id="comparePrice-{{ section.id }}" class="sale-tag large">
+                  {% assign compare_price = wcp_v_compare_at_price %}
+                  {% assign product_price = wcp_v_price %}
+                  {% include 'price-sale' %}
+                </span>
+              </li>
+            {% endif %}
+          </ul>
+        
+
+      </div>
+    </div>
+    <div class="grid-item large--two-fifths productImages {% if product.images.size > 1 %} productThumbImages{% endif %} lazyload-element">
+      <div class="grid">
+        <div class="grid-item large--eleven-twelfths text-center">
+          <div class="product-photo-container" id="productPhotoContainer-{{ section.id }}">
+            {%- if product.metafields.custom.promotion == true -%}
+              <span class="promotion_bedge"><em>This product is part of a promotion </em>!</span>
+            {%- endif -%}
+
+            {% if product.tags contains 'YG-1' %}
+              {% if product.featured_image %}
+              <div
+                class="yg-logo-wrapper"
+                style="position: absolute; top: 0; right: 0; z-index: 10; padding: 20px; background: #d52e30; border-radius: 0px 15px;"
+              >
+                <img
+                  src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/YG_Logo_White.png?v=1748387180"
+                  alt="YG-1 Logo"
+                  class="yg-logo"
+                  style="max-width: 70px; height: auto;"
+                >
+              </div>
+                {% endif %}
+            {% endif %}
+
+            <div class="productPhotoSlider thumbslider">
+              {% assign featured_image = product.selected_or_first_available_variant.featured_image
+                | default: product.featured_image
+              %}
+              {% for image in product.images %}
+                {%- capture img_wrapper_id -%}productPhotoWrapper-{{ section.id }}-{{ image.id }}{%- endcapture -%}
+                {%- assign max_width = 700 -%}
+                {%- assign max_height = 1024 -%}
+                {%- include 'image-logic' with width: max_width, height: max_height -%}
+                {%- assign img_url = image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+                <div
+                  id="{{ img_wrapper_id }}"
+                  class="lazyload__image-wrapper{% unless image == featured_image %} hide{% endunless %}"
+                  data-image-id="{{ image.id }}"
+                  style="max-width: {{ max_width }}px"
+                >
+                  <div
+                    class="no-js product__image-wrapper"
+                    style="padding-top:{{ 1 | divided_by: image.aspect_ratio | times: 100 }}%;"
+                  >
+                    <a
+                      href="{{ image | img_url: 'master' }}"
+                      data-fancybox="gallery"
+                      data-caption="{{ image.alt | escape }}"
+                    >
+                      <img
+                        id="{{ img_id }}"
+                        {% if forloop.first == true %}
+                          src="{{ featured_image | img_url: '300x300' }}"
+                        {% endif %}
+                        class="lazyload no-js lazypreload"
+                        data-src="{{ img_url }}"
+                        data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                        data-aspectratio="{{ image.aspect_ratio }}"
+                        data-sizes="auto"
+                        alt="{{ image.alt | escape }}"
+                        {% if section.settings.product_image_zoom_enable %}
+                          data-zoom="{{ image | img_url: '1024x1024', scale: 2 }}"
+                        {% endif %}
+                      >
+                    </a>
+                  </div>
+                </div>
+                {% if forloop.first == true %}
+                  {% comment %}
+                    <noscript>
+                      <img src="{{ image | img_url: '580x' }}"
+                        srcset="{{ image | img_url: '580x' }} 1x, {{ image | img_url: '580x', scale: 2 }} 2x"
+                        alt="{{ image.alt }}" style="opacity:1;">
+                    </noscript>
+                  {% endcomment %}
+                {% endif %}
+              {% endfor %}
+              {% assign wcp_v_price = temp_wcp_v_price %}
+              {% assign wcp_v_compare_at_price = temp_wcp_v_compare_at_price %}
+            </div>
+          </div>
+
+          <script>
+             document.addEventListener("DOMContentLoaded", function () {
+              Fancybox.bind("[data-fancybox='gallery']", {
+                infinite: true,
+                animationEffect: "zoom",
+              });
+            });
+          </script>
+
+          {% if product.images.size > 1 %}
+            <ul
+              class="product-photo-thumbs grid-uniform thumbslider product-photo-thumb-slider-nav"
+              id="productThumbs-{{ section.id }}"
+            >
+              {% for image in product.images %}
+                <li class="{% comment %}grid-item medium-down--one-quarter large--one-quarter{% endcomment %} thumb-item">
+                  <a
+                    href="{{ image.src | img_url: '1024x1024', scale: 2 }}"
+                    class="product-photo-thumb product-photo-thumb-{{ section.id }}"
+                    data-image-id="{{ image.id }}"
+                  >
+                    <img src="{{ image.src | img_url: 'compact' }}" alt="{{ image.alt | escape }}">
+                  </a>
+                </li>
+              {% endfor %}
+              {% assign wcp_v_price = temp_wcp_v_price %}
+              {% assign wcp_v_compare_at_price = temp_wcp_v_compare_at_price %}
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-item large--three-fifths {% if product.images.size == 0 %}push--center{% endif %} desktop-product-meta lazyload-element">
+      {% if product.tags contains 'New' %}
+        <span class="new-badge font-bold">New</span>
+      {% endif %}
+      {% if product.tags contains 'Hot Deal' %}
+        <span class="hot-deal-badge font-bold">Hot Deal</span>
+      {% endif %}
+      <h1 class="h2 productTitle" style="margin-bottom: 20px !important;">{{ product.title }}</h1>
+{% if product.metafields.custom.title.value != blank %}
+      <span class="secondary--product_title ">{{ product.metafields.custom.title }}</span>
+    {% endif %}
+
+    <!-- Start of Judge.me code --> 
+  <div class='jdgm-widget jdgm-preview-badge' data-id='{{ product.id }}'> 
+    {{ product.metafields.judgeme.badge }} 
+  </div> 
+<!-- End of Judge.me code -->
+
+
+
+<div>
+
+  {% assign variant = product.selected_or_first_available_variant %}
+
+{%- if product.metafields.custom.price_matrix and product.metafields.custom.price_matrix != blank -%}
+  <script type="application/json" id="ex-price-matrix-raw">
+{{ product.metafields.custom.price_matrix | strip }}
+  </script>
+{%- endif -%}
+
+
+<ul class="inline-list product-meta" data-price id="ex-price-row-{{ section.id }}">
+  <li>
+    <!-- VISIBLE PRICE GROUP -->
+
+
+{% assign _wp = wcp_v_price | default: 0 | plus: 0 %}
+{% assign default_zero = false %}
+{% if _wp == 0 %}
+  {% assign default_zero = true %}
+{% endif %}
+
+{%- comment -%}
+  Work out the initial price (cents) for the server-rendered variant.
+  Use your WCP price if it’s present; otherwise fall back to the variant price.
+{%- endcomment -%}
+{%- assign init_price_cents = _wp | default: product.selected_or_first_available_variant.price -%}
+
+<div id="ex-price-wrap-{{ section.id }}"
+     style="display:flex;align-items:center;"
+     {% unless product.tags contains 'Custom Length' %}
+       {% if init_price_cents == 0 %} data-ex-init-zero="1"{% endif %}
+     {% endunless %}
+>
+<span id="productPrice-{{ section.id }}" class="dt-product__price" style="font-size:28px!important;">
+  {%- assign v = product.selected_or_first_available_variant -%}
+  {%- assign v_tax = v.taxable | default: true -%}
+  {%- assign inc_c = v.price -%}
+  {%- assign ex_c  = v.price -%}
+  {%- if v_tax -%}
+    {%- if shop.taxes_included -%}
+      {%- assign ex_c = v.price | times: 10 | divided_by: 11 -%}
+    {%- else -%}
+      {%- assign inc_c = v.price | times: 11 | divided_by: 10 -%}
+    {%- endif -%}
+  {%- endif -%}
+  <span class="ex-price ex-price--stack">
+    <strong class="ex-price__inc">
+      {{ inc_c | money }}<span class="inc-price__label">INC GST</span>
+    </strong>
+    {%- if v_tax -%}
+    <small class="ex-price__ex">
+      {{ ex_c | money }} <span class="ex-price__label">EX GST</span>
+    </small>
+    {%- endif -%}
+  </span>
+</span>
+
+
+
+
+  {% unless product.tags contains 'Custom Length' %}
+  <span id="ex-price-request-{{ section.id }}" class="ex-price-request"
+        {% unless product.tags contains 'Custom Length' %}
+          {% if init_price_cents == 0 %}style="display:inline"{% else %}style="display:none"{% endif %}
+        {% endunless %}
+  >Price available on request</span>
+{% endunless %}
+</div>
+
+
+{% unless product.tags contains 'Custom Length' %}
+<style>
+  #ex-price-wrap-{{ section.id }}[data-ex-init-zero="1"] #productPrice-{{ section.id }},
+  #ex-price-wrap-{{ section.id }}[data-ex-init-zero="1"] .dt-product__price { display: none !important; }
+  #ex-price-wrap-{{ section.id }}[data-ex-init-zero="1"] .ex-gst-bubble { display: none !important; }
+</style>
+{% endunless %}
+
+
+
+    <!-- PLACEHOLDER GROUP (static) -->
+    <div id="ex-price-placeholder-{{ section.id }}" class="ex-price-placeholder" aria-live="polite">
+      <span class="ex-price-skeleton" aria-hidden="true"></span>
+      {% if product.tags contains 'Custom Length' %}
+      <span class="ex-price-warning">Confirm your blade specifications to see the price</span>
+      {% endif %}
+    </div>
+
+    {% include 'product-unit-price', variant: variant %}
+  </li>
+
+  {% if wcp_compare_at_price_max > wcp_price and section.settings.product_show_saved_amount %}
+    <li>
+      <span id="comparePrice-{{ section.id }}" class="sale-tag large">
+        {% assign compare_price = wcp_v_compare_at_price %}
+        {% assign product_price = wcp_v_price %}
+        {% include 'price-sale' %}
+      </span>
+    </li>
+  {% endif %}
+
+</ul>
+
+{% render 'auto-discount-note', product: product %}
+
+
+{% assign current_variant = product.selected_or_first_available_variant %}
+      <p style="color: #666666; font-size: 16px;">
+        Code: <span class="variant-sku" data-variant-sku>
+  {{ product.selected_or_first_available_variant.sku }}
+</span>
+      </p>
+
+      {%- render 'work-material-icons' -%}
+
+{%- comment -%} First 3 feature points with tick {%- endcomment -%}
+{%- if product.metafields.custom.feature_points != blank -%}
+  {%- assign feature_points = product.metafields.custom.feature_points.value -%}
+  <ul class="pfp-top3" role="list" aria-label="Top features">
+    <strong>Key Features</strong>
+    {%- for point in feature_points limit: 3 -%}
+      <li class="pfp-top3__item">
+        <svg class="pfp-top3__tick" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+          <circle cx="8" cy="8" r="8" fill="#109954"/>
+          <path d="M4 8.2l2.2 2.2L12 4.8" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>{{ point }}</span>
+      </li>
+    {%- endfor -%}
+  </ul>
+{%- endif -%}
+
+
+
+      {% if section.settings.product_vendor_enable %}
+        <p class="product-meta">{{ product.vendor }}</p>
+      {% endif %}
+
+  {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+    <div class="product__policies rte">
+      {%- if shop.taxes_included -%}{{ 'products.general.include_taxes' | t }}{%- endif -%}
+      {%- if shop.shipping_policy.body != blank -%}{{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}{%- endif -%}
+    </div>
+  {%- endif -%}
+  <hr id="variantBreak" class="hr--clear hr--small">
+
+  {% capture "form_class" -%}
+    addToCartForm{% if section.settings.enable_payment_button %} addToCartForm--payment-button{% endif %}
+  {%- endcapture -%}
+  {%- capture "form_id" -%}addToCartForm-{{ section.id }}{%- endcapture -%}
+
+{% form 'product', product, class: form_class, id: form_id, data-product-form: '' %}
+
+  <div class="ex-config-grid">
+    <!-- LEFT: the actual inputs (always visible) -->
+    <div class="ex-config-left">
+
+            {% if product.tags contains 'Custom Length' %}
+        <div class="length-wrapper">
+          <label for="length">Length (mm)</label>
+          <input id="length" type="number" name="properties[Length]" step="5" min="0" required>
+        </div>
+      {% endif %}
+
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const lengthParam = params.get('length');
+  const lengthInput = document.getElementById('length');
+
+  if (lengthParam && lengthInput) {
+    lengthInput.value = lengthParam;
+
+    // Trigger input/validation events so your other logic runs
+    lengthInput.dispatchEvent(new Event('input', { bubbles: true }));
+    lengthInput.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+});
+</script>
+
+{% unless product.has_only_default_variant %}
+  <!-- Button-style variant pickers -->
+  <div id="ex-variant-pickers-{{ section.id }}" class="ex-variant-pickers" data-section="{{ section.id }}">
+    {% for option in product.options_with_values %}
+      <fieldset class="ex-opt" data-option-index="{{ forloop.index0 }}">
+        <legend class="label">{{ option.name }}</legend>
+        <div class="ex-opt-grid">
+  {% assign opt_name = option.name | downcase %}
+
+  {% if opt_name contains 'tpi' or opt_name contains 'teeth' %}
+    {%- comment -%}
+      Hard-coded order for TPI values. 
+      Only those present in product.options_with_values will render.
+    {%- endcomment -%}
+    {% assign tpi_order = '24,18,14,12/16,10/14,10,8/12,8/11,8,6/10,7/9,5/8,6,5/7,4/6,4/5,4,3/4,3,2/3,2,1.5/2,1.1/1.6,1.25,0.75/1.25' | split: ',' %}
+    {% assign rendered = '' %}
+
+
+    {% for raw in tpi_order %}
+      {% assign val = raw | strip %}
+      {% if option.values contains val %}
+        <button type="button" class="ex-opt-btn" data-value="{{ val | escape }}" aria-pressed="false">{{ val }}</button>
+        {% assign rendered = rendered | append: '|' | append: val | append: '|' %}
+      {% endif %}
+    {% endfor %}
+
+    {% for val in option.values %}
+      {% assign token = '|' | append: val | append: '|' %}
+      {% unless rendered contains token %}
+        <button type="button" class="ex-opt-btn" data-value="{{ val | escape }}" aria-pressed="false">{{ val }}</button>
+      {% endunless %}
+    {% endfor %}
+
+  {% else %}
+    {% assign seen = '' %}
+    {% for val in option.values %}
+      {% assign token = '|' | append: val | append: '|' %}
+      {% unless seen contains token %}
+        <button type="button" class="ex-opt-btn" data-value="{{ val | escape }}" aria-pressed="false">{{ val }}</button>
+        {% assign seen = seen | append: token %}
+      {% endunless %}
+    {% endfor %}
+  {% endif %}
+</div>
+
+      </fieldset>
+    {% endfor %}
+  </div>
+
+<!-- Keep a hidden select for form submission -->
+<select name="id" id="productSelect-{{ section.id }}" class="ex-visually-hidden" tabindex="-1" aria-hidden="true">
+  {% for v in product.variants %}
+    <option value="{{ v.id }}" data-sku="{{ v.sku }}" {% if v == product.selected_or_first_available_variant %}selected{% endif %}>
+      {{ v.title }}
+    </option>
+  {% endfor %}
+</select>
+
+
+{% else %}
+  <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+{% endunless %}
+
+{% unless product == empty %}
+  <script type="application/json" class="wcp_json wcp_json_{{ product.id }}" id="wcp_json_{{ product.id }}">
+    {% include 'wcp_product_json' with product %}
+  </script>
+{% endunless %}
+
+  <script>
+  (() => {
+    const wrap = document.querySelector('#ex-variant-pickers-{{ section.id }}');
+    if (!wrap) return;
+
+    // ---------- Variants (with hidden metafield) ----------
+    const variants = [
+      {% for v in product.variants %}
+        {
+          id: {{ v.id }},
+          sku: {{ v.sku | json }},
+          price: {{ v.price | json }},
+          compare_at_price: {{ v.compare_at_price | json }},
+          available: {{ v.available | json }},
+          featured_image: {{ v.featured_image | json }},
+          featured_media: {{ v.featured_media | json }},
+          o1: {{ v.option1 | json }},
+          o2: {{ v.option2 | json }},
+          o3: {{ v.option3 | json }},
+          taxable: {{ v.taxable | json }},
+          hidden: {{ v.metafields.custom.is_hidden | default: false | json }}
+        }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ];
+
+    // NEW: Hide service (.SVC) variants globally
+variants.forEach(v => {
+  if (/\.(svc)$/i.test(String(v.sku || ''))) v.hidden = true;
+});
+
+    const selectEl = document.getElementById('productSelect-{{ section.id }}');
+    const groups   = [...wrap.querySelectorAll('.ex-opt')];
+    const buttons  = [...wrap.querySelectorAll('.ex-opt-btn')];
+
+    // ---------- Hide buttons that only exist on hidden variants ----------
+    const visibleVals = { 0: new Set(), 1: new Set(), 2: new Set() };
+    variants.forEach(v => {
+      if (v.hidden) return;
+      if (v.o1) visibleVals[0].add(v.o1);
+      if (v.o2) visibleVals[1].add(v.o2);
+      if (v.o3) visibleVals[2].add(v.o3);
+    });
+    groups.forEach(group => {
+      const i = Number(group.dataset.optionIndex);
+      group.querySelectorAll('.ex-opt-btn').forEach(btn => {
+        const val = btn.dataset.value;
+        if (!visibleVals[i].has(val)) btn.style.display = 'none';
+      });
+    });
+
+    // ---------- Helpers ----------
+    function formatMoney(cents){
+      try{ if (Shopify && Shopify.formatMoney)
+        return Shopify.formatMoney(cents, "{{ shop.money_format | escape }}"); }catch(e){}
+      return new Intl.NumberFormat('en-AU',{style:'currency',currency:'AUD'}).format((cents||0)/100);
+    }
+
+    /// GST-aware renderer: writes the same markup the toggle expects
+const PRODUCT_TAXABLE = {{ product.taxable | json }};
+
+function renderGstPrice(node, cents, taxable, showLabel = true) {
+  const taxesIncluded = {{ shop.taxes_included | json }};
+  const raw = (cents|0);
+
+  let ex = raw, inc = raw;
+  if (taxable) {
+    if (taxesIncluded) { inc = raw; ex = Math.round(raw / 1.10); }
+    else { ex = raw; inc = Math.round(raw * 1.10); }
+  }
+
+  const moneyEx  = formatMoney(ex);
+  const moneyInc = formatMoney(inc);
+
+  // Persisted view mode
+  const mode = (localStorage.getItem('gst_mode') === 'ex') ? 'ex' : 'inc';
+  const defaultInc = (mode === 'inc');
+
+  // Optional inline label
+  let labelHTML = '';
+  if (showLabel && taxable) {
+    labelHTML = (mode === 'inc')
+      ? '<span class="inc-price__label">INC GST</span>'
+      : '<span class="ex-price__label">EX GST</span>';
+  }
+
+  const esc = s => String(s).replace(/"/g, '&quot;');
+  node.innerHTML =
+    `<strong class="js-gst-price"
+       data-taxable="${taxable ? 'true' : 'false'}"
+       data-money-ex="${esc(moneyEx)}"
+       data-money-inc="${esc(moneyInc)}"
+       data-default-inc="${defaultInc}">
+       ${ (mode === 'inc' && taxable) ? moneyInc : moneyEx }
+     </strong>${labelHTML}`;
+}
+
+
+  const IS_CUSTOM_LENGTH =
+    {% if product.tags contains 'Custom Length' %}true{% else %}false{% endif %};
+
+/* Build a WCP -> cents map from the app JSON if present */
+const WCP_PRICE_MAP = (() => {
+  try {
+    const el = document.getElementById('wcp_json_{{ product.id }}');
+    if (!el) return {};
+    const j = JSON.parse(el.textContent || '{}');
+    const arr = j?.variants || j?.wcp_variants || [];
+    const map = {};
+    arr.forEach(o => {
+      const id = String(o.id || o.variant_id || '');
+      // try common fields: price_cents, price, wcp_price_cents
+      let cents = Number(o.price_cents ?? o.wcp_price_cents ?? o.price ?? 0);
+      // If it looks like dollars, turn into cents
+      if (cents > 0 && cents < 1000 && String(cents).includes('.')) {
+        cents = Math.round(cents * 100);
+      }
+      if (id) map[id] = Math.max(0, Math.floor(cents));
+    });
+    return map;
+  } catch (e) { return {}; }
+})();
+
+/* Helper to get the effective price cents for a variant */
+function getEffectivePriceCents(variant){
+  const id = String(variant?.id || '');
+  const fromWcp = WCP_PRICE_MAP[id];
+  // fall back to Shopify price if WCP missing
+  return Number.isFinite(fromWcp) ? fromWcp : (Number(variant?.price) || 0);
+}
+
+function updatePriceUI(v){
+  // Only hand off to the price-matrix UI for true Custom Length products
+    const HAS_MATRIX = !!document.getElementById('ex-price-matrix-raw');
+  if (IS_CUSTOM_LENGTH && HAS_MATRIX) {
+  const compareEls = document.querySelectorAll('[id="comparePrice-{{ section.id }}"]');
+  compareEls.forEach(el => { el.style.display = 'none'; });
+
+  // Important: Do NOT toggle ATC/Quote here for custom-length.
+  // The custom-length pricing flow (exInit) manages the button state
+  // by disabling until a computed price is known.
+  return;
+}
+
+
+  
+
+  const priceEls   = document.querySelectorAll('[id="productPrice-{{ section.id }}"]');
+  const compareEls = document.querySelectorAll('[id="comparePrice-{{ section.id }}"]');
+  const priceWrap = document.getElementById('ex-price-wrap-{{ section.id }}');
+  const requestEl = document.getElementById('ex-price-request-{{ section.id }}');
+  const bubble    = document.getElementById('ex-gst-{{ section.id }}');
+
+  // *** use WCP price cents ***
+  const priceCents = getEffectivePriceCents(v);
+
+  // Main price (with label)
+priceEls.forEach(el => renderPriceLikeCard(el, priceCents, (v.taxable !== false)));
+
+function renderPriceLikeCard(node, cents, taxable){
+  const taxesIncluded = {{ shop.taxes_included | json }};
+  const raw = (cents|0);
+
+  let ex = raw, inc = raw;
+  if (taxable) {
+    if (taxesIncluded) { inc = raw; ex = Math.round(raw / 1.10); }
+    else { ex = raw; inc = Math.round(raw * 1.10); }
+  }
+
+  const moneyEx  = formatMoney(ex);
+  const moneyInc = formatMoney(inc);
+
+  node.innerHTML =
+    `<span class="ex-price ex-price--stack">
+       <strong class="ex-price__inc">
+         ${moneyInc}<span class="inc-price__label">INC GST</span>
+       </strong>
+       ${ taxable ? `
+         <small class="ex-price__ex">
+           ${moneyEx} <span class="ex-price__label">EX GST</span>
+         </small>` : `` }
+     </span>`;
+}
+
+
+// Compare-at (no label)
+compareEls.forEach(el => {
+  if ((v.compare_at_price|0) > priceCents) {
+    renderPriceLikeCard(el, v.compare_at_price, (v.taxable !== false));
+    el.style.display = '';
+  } else {
+    el.style.display = 'none';
+  }
+});
+
+  // Bubble + visibility
+if (bubble) {
+  const taxable = (v.taxable !== false);
+  bubble.dataset.taxable = taxable ? 'true' : 'false';
+  // we’re showing both; label chip not needed
+  bubble.textContent = 'INC & EX';
+}
+
+
+  const isZero = (priceCents || 0) === 0;
+
+  if (priceWrap) {
+    if (isZero) priceWrap.setAttribute('data-ex-init-zero', '1');
+    else        priceWrap.removeAttribute('data-ex-init-zero');
+  }
+
+  priceEls.forEach(el => { el.style.display = isZero ? 'none' : ''; });
+  if (requestEl) requestEl.style.display = isZero ? 'inline' : 'none';
+
+  if (bubble) {
+    const taxable = (v.taxable !== false);
+    bubble.style.display = (isZero || !taxable) ? 'none' : '';
+  }
+
+  // ✅ update ATC/Quote every variant render
+  if (window.__setAtcMode) window.__setAtcMode(isZero, v);
+}
+
+
+// Legacy hook — keep older calls happy.
+// We just rebroadcast the variant so the bottom listener runs the new syncer.
+window.updateImageUI = window.updateImageUI || function (v) {
+  try {
+    document.dispatchEvent(new CustomEvent('variant:changed', { detail: { variant: v } }));
+  } catch (_) {}
+};
+
+
+    function updateSkuUI(v){
+      const skuTargets = document.querySelectorAll('[data-variant-sku], .variant-sku');
+      const sku = v?.sku || '';
+      skuTargets.forEach(el => {
+        el.textContent = sku;
+        if (sku) el.setAttribute('data-base-sku', sku);
+      });
+    }
+
+    // ---------- Selection state ----------
+    const selectedVariant =
+      variants.find(v => String(v.id) === String(selectEl?.value) && !v.hidden) ||
+      variants.find(v => v.available && !v.hidden) || variants.find(v => !v.hidden) || {};
+
+    const state = { 0:selectedVariant.o1 || null, 1:selectedVariant.o2 || null, 2:selectedVariant.o3 || null };
+
+    function findVariant(s){
+      return (
+        variants.find(v =>
+          !v.hidden &&
+          v.available &&
+          (!s[0] || v.o1 === s[0]) &&
+          (!s[1] || v.o2 === s[1]) &&
+          (!s[2] || v.o3 === s[2])
+        ) ||
+        variants.find(v =>
+          !v.hidden &&
+          (!s[0] || v.o1 === s[0]) &&
+          (!s[1] || v.o2 === s[1]) &&
+          (!s[2] || v.o3 === s[2])
+        )
+      );
+    }
+
+    function valueIsAvailable(optIndex, value, s){
+      const probe = { ...s, [optIndex]: value };
+      return variants.some(v =>
+        !v.hidden &&
+        v.available &&
+        (!probe[0] || v.o1 === probe[0]) &&
+        (!probe[1] || v.o2 === probe[1]) &&
+        (!probe[2] || v.o3 === probe[2])
+      );
+    }
+
+    function applyVariant(v){
+  if (!v || !selectEl) return;
+
+  // update the hidden <select>
+  selectEl.value = String(v.id);
+  selectEl.dispatchEvent(new Event('change', { bubbles:true }));
+
+  // update UI
+  updateSkuUI(v);
+  updatePriceUI(v);
+
+
+  // keep URL ?variant=id in sync (no page reload)
+  try {
+    const u = new URL(location.href);
+    u.searchParams.set('variant', v.id);
+    history.replaceState(null, '', u.toString());
+  } catch(_) {}
+
+  // 🔔 broadcast with BOTH names (some code listens to :change, some to :changed)
+  const detail = { detail: { variant: v } };
+  try { document.dispatchEvent(new CustomEvent('variant:changed', detail)); } catch(_) {}
+  try { document.dispatchEvent(new CustomEvent('variant:change',  detail)); } catch(_) {}
+}
+
+
+    function render(){
+      groups.forEach(group => {
+        const i = Number(group.dataset.optionIndex);
+        group.querySelectorAll('.ex-opt-btn').forEach(btn => {
+          const val = btn.dataset.value;
+          const selected = state[i] === val;
+          const enabled  = valueIsAvailable(i, val, state);
+          btn.classList.toggle('is-selected', selected);
+          if (i === 0) {
+            btn.disabled = false;
+          } else {
+            btn.disabled = !enabled;
+          }
+          btn.classList.toggle('is-unavailable', !enabled);
+          btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
+        });
+      });
+
+      let v = findVariant(state);
+      if (!v) {
+  // First, try to keep the user's O1 choice.
+  if (state[0]) {
+    v =
+      variants.find(x => !x.hidden && x.available && x.o1 === state[0]) ||
+      variants.find(x => !x.hidden                 && x.o1 === state[0]);
+  }
+
+  // Then fall back to any visible/available variant.
+  if (!v) {
+    v = variants.find(x => x.available && !x.hidden) || variants.find(x => !x.hidden);
+  }
+
+  if (v) {
+    state[0] = v.o1; state[1] = v.o2; state[2] = v.o3;
+  }
+}
+applyVariant(v);
+
+    }
+
+    // clicks
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        const group = btn.closest('.ex-opt');
+        const i = Number(group.dataset.optionIndex);
+        const val = btn.dataset.value;
+        state[i] = val;
+        // When the first option changes, pick the first matching combination for that O1.
+// Prefer an available + visible variant; if none, fall back to any visible one.
+if (i === 0) {
+  let match =
+    variants.find(v => !v.hidden && v.available && v.o1 === state[0]) ||
+    variants.find(v => !v.hidden &&                 v.o1 === state[0]);
+
+  if (match) {
+    state[1] = match.o2 || null;
+    state[2] = match.o3 || null;
+  } else {
+    // No combos for this O1? Clear the others so resolver can find *something*.
+    state[1] = null;
+    state[2] = null;
+  }
+}
+
+        render();
+      });
+    });
+
+    // initial paint
+    render();
+  })();
+  </script>
+
+  <script>
+document.addEventListener('DOMContentLoaded', function () {
+  (function () {
+    // Map "Text" value -> array of chip codes
+    const WM_MAP = {
+      "YG1001": ["P05","K10"],
+      "YG3010": ["P10","K20"],
+      "YG3020": ["P20"],
+      "YG3030": ["P30","M20"],
+      "YG801":  ["P20"],
+      "YG100":  ["N20"],
+      "YG10":   ["N20"],
+      "YG211":  ["M15","S10"],
+      "YG213":  ["M30","S20"],
+      "YG214":  ["M40","S30"]
+    };
+
+    const root = document.getElementById('ex-variant-pickers-{{ section.id }}');
+    if (!root) return;
+
+    // Only decorate the option group whose legend text is exactly "Text"
+    function targetFieldsets() {
+  const keys = new Set(Object.keys(WM_MAP));
+  return Array.from(root.querySelectorAll('.ex-opt')).filter(fs =>
+    Array.from(fs.querySelectorAll('.ex-opt-btn'))
+      .some(b => keys.has((b.textContent || '').trim()))
+  );
+}
+
+
+    function decorateButton(btn) {
+      if (btn.dataset.wmDecorated === '1') return;
+      const label = (btn.textContent || '').trim();
+      const mats = WM_MAP[label];
+      if (!mats || !mats.length) return;
+
+      // Build chips
+      const group = document.createElement('span');
+      group.className = 'wm-chip-group';
+      for (const code of mats) {
+        const chip = document.createElement('span');
+        chip.className = 'work-mat__chip wm-chip';
+        chip.dataset.m = code.charAt(0).toUpperCase(); // P/M/K/N/S controls color
+        chip.textContent = code;                        // show "P05", etc.
+        group.appendChild(chip);
+      }
+
+      // Replace button label content with [chips] + label
+      btn.dataset.wmDecorated = '1';
+      const textSpan = document.createElement('span');
+      textSpan.className = 'wm-chip-text';
+      textSpan.textContent = ' ' + label;
+
+      btn.textContent = ''; // keep attributes intact
+      btn.appendChild(group);
+      btn.appendChild(textSpan);
+      btn.classList.add('has-wm-chips');
+    }
+
+    function scan(container) {
+      container.querySelectorAll('.ex-opt-btn').forEach(decorateButton);
+    }
+
+    // Initial pass for the "Text" fieldset(s)
+    targetFieldsets().forEach(scan);
+
+    // Guard for any dynamic re-renders (themes sometimes re-hydrate buttons)
+    const mo = new MutationObserver(() => {
+      targetFieldsets().forEach(scan);
+    });
+    mo.observe(root, { childList: true, subtree: true });
+  })();
+});
+</script>
+
+
+
+<script>
+(function () {
+  const root = document.querySelector('#ex-variant-pickers-{{ section.id }}');
+  if (!root) return;
+
+  // Default limit; you can override per fieldset with data-threshold="30"
+  const DEFAULT_LIMIT = 24;
+
+  // Set up each option group independently
+  [...root.querySelectorAll('.ex-opt')].forEach(setupGroup);
+
+  function setupGroup(group) {
+    const buttons = [...group.querySelectorAll('.ex-opt-btn')];
+    const limit = Number(group.getAttribute('data-threshold')) || DEFAULT_LIMIT;
+
+    if (buttons.length <= limit) return; // nothing to collapse
+
+    // Hide everything after the limit
+    buttons.forEach((b, i) => { if (i >= limit) b.classList.add('is-collapsed'); });
+
+    const hiddenCount = Math.max(0, buttons.length - limit);
+
+    // Toggle button
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'ex-opt-toggle';
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.textContent = `Show ${hiddenCount} more`;
+    group.appendChild(toggle);
+
+    // Expand/collapse
+    const setExpanded = (expand) => {
+      buttons.forEach((b, i) => {
+        if (i >= limit) b.classList.toggle('is-collapsed', !expand);
+      });
+      toggle.setAttribute('aria-expanded', String(expand));
+      toggle.textContent = expand ? 'Show less' : `Show ${hiddenCount} more`;
+      group.classList.toggle('is-expanded', expand);
+    };
+
+    toggle.addEventListener('click', () => {
+      const expand = toggle.getAttribute('aria-expanded') === 'false';
+      setExpanded(expand);
+    });
+
+    // If a hidden option is selected, auto-expand to keep it visible
+    group.addEventListener('click', (e) => {
+      const btn = e.target.closest('.ex-opt-btn');
+      if (!btn) return;
+      const idx = buttons.indexOf(btn);
+      if (idx >= limit && toggle.getAttribute('aria-expanded') === 'false') {
+        setExpanded(true);
+      }
+    });
+
+    // Also watch for programmatic selection changes (your render() toggles .is-selected)
+    const obs = new MutationObserver(() => {
+      const hasHiddenSelected = buttons.slice(limit).some(b => b.classList.contains('is-selected'));
+      if (hasHiddenSelected && toggle.getAttribute('aria-expanded') === 'false') {
+        setExpanded(true);
+      }
+    });
+    buttons.forEach(b => obs.observe(b, { attributes: true, attributeFilter: ['class'] }));
+  }
+})();
+</script>
+
+
+
+
+
+<style>
+.qty.qty-quantity {
+    margin-bottom: 20px;
+}
+</style>
+  
+{%- assign is_custom_len = false -%}
+{%- if product and product.tags and product.tags contains 'Custom Length' -%}
+  {%- assign is_custom_len = true -%}
+{%- endif -%}
+
+{%- assign cv = product.selected_or_first_available_variant -%}
+{%- assign oq_ref = cv.metafields.custom.order_quantity -%}
+{%- if oq_ref == blank -%}{%- assign oq_ref = product.metafields.custom.order_quantity -%}{%- endif -%}
+
+{%- assign _min = 0 -%}{%- assign _pack = 0 -%}
+{%- if oq_ref and oq_ref.value -%}
+  {%- assign _min  = oq_ref.value.min_order_qty | default: 0 | plus: 0 -%}  
+  {%- assign _pack = oq_ref.value.pack_qty      | default: 0 | plus: 0 -%}  
+{%- endif -%}
+
+{%- assign moq = 1 -%}{%- assign step = 1 -%}
+{%- if is_custom_len -%}
+  {%- assign moq = 1 -%}{%- assign step = 1 -%}
+{%- else -%}
+  {%- if _pack > 0 and _min > 0 -%}
+    {%- assign moq = _min -%}{%- assign step = _pack -%}
+  {%- elsif _pack > 0 -%}
+    {%- assign moq = _pack -%}{%- assign step = _pack -%}
+  {%- elsif _min > 0 -%}
+    {%- assign moq = _min -%}{%- assign step = 1 -%}
+  {%- endif -%}
+{%- endif -%}
+
+
+<div class="quantity_wrapper qty-wrap"
+     data-bypass-moq="{% if is_custom_len %}true{% else %}false{% endif %}">
+  <label for="quantity" class="quantity-selector quantity-selector-{{ section.id }}">{{ 'products.product.quantity' | t }}</label>
+  <input type="number"
+         id="quantity"
+         name="quantity"
+         value="{{ moq }}"
+         min="{{ moq }}"
+         step="{{ step }}"
+         class="quantity-selector"
+         inputmode="numeric"
+         pattern="[0-9]*">
+    
+    {% if product.tags contains 'Custom Length' %}
+      {% unless product.tags contains 'No Bulk Discounts' %}
+
+<!-- Buy tier radios (inline discount labels) -->
+<fieldset class="buy-tier" aria-label="Buy tier">
+  <div class="tier-grid">
+    <div class="tier">
+      <input type="radio" name="buy-tier-{{ section.id }}" id="t1-{{ section.id }}" value="1-4" checked>
+      <label class="tier-card" for="t1-{{ section.id }}">
+        <span class="tier-title">1–4</span>
+        <span class="tier-sub">No discount</span>
+      </label>
+    </div>
+
+    <div class="tier">
+      <input type="radio" name="buy-tier-{{ section.id }}" id="t2-{{ section.id }}" value="5-9">
+      <label class="tier-card" for="t2-{{ section.id }}">
+        <span class="tier-title">5–9</span>
+        <span class="tier-sub">10% discount</span>
+      </label>
+    </div>
+
+    <div class="tier">
+      <input type="radio" name="buy-tier-{{ section.id }}" id="t3-{{ section.id }}" value="10+">
+      <label class="tier-card" for="t3-{{ section.id }}">
+        <span class="tier-title">10+</span>
+        <span class="tier-sub">15% discount</span>
+      </label>
+    </div>
+  </div>
+</fieldset>
+
+{% endunless %}
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const wrap   = document.querySelector('.quantity_wrapper');
+  if (!wrap) return;
+
+  const qtyInput = wrap.querySelector('input[name="quantity"]');
+  const radios   = Array.from(wrap.querySelectorAll('input[name="buy-tier-{{ section.id }}"]'));
+  const labels   = radios.map(r => wrap.querySelector('label[for="' + r.id + '"]')).filter(Boolean);
+  const badge    = wrap.querySelector('#TierBadge-{{ section.id }}');
+
+  if (!qtyInput) return;
+
+  const setActive = (id) => labels.forEach(l => l.classList.toggle('is-active', l.getAttribute('for') === id));
+  const sanitizeQty = (val) => {
+    const n = parseInt(String(val).replace(/[^\d]/g,''),10);
+    return Number.isFinite(n) && n >= 1 ? n : 1;
+  };
+
+  // >>> BYPASS: if Custom Length, force normal behaviour (min=1, step=1)
+  const getRules = () => {
+    const bypass = wrap.getAttribute('data-bypass-moq') === 'true';
+    if (bypass) return { min: 1, step: 1 };
+    let min  = parseInt(qtyInput.getAttribute('min') || '1', 10);
+    let step = parseInt(qtyInput.getAttribute('step') || '1', 10);
+    return { min: Math.max(min,1), step: Math.max(step,1) };
+  };
+
+  const snap = (val, min, step) => {
+    val = Math.max(val, min);
+    if (step <= 1) return val;
+    const k = Math.ceil((val - min) / step);
+    return min + k * step;
+  };
+
+  const tierFor = (q) => {
+    if (q >= 10) return { id: 't3-{{ section.id }}', desc: '10% Discount' };
+    if (q >= 5)  return { id: 't2-{{ section.id }}', desc: '5% Discount' };
+    return { id: 't1-{{ section.id }}', desc: 'No Discount' };
+  };
+
+  const syncFromQty = () => {
+    const {min, step} = getRules();
+    const q = snap(sanitizeQty(qtyInput.value), min, step);
+    qtyInput.value = q;
+    const t = tierFor(q);
+    radios.forEach(r => r.checked = (r.id === t.id));
+    setActive(t.id);
+    if (badge) badge.textContent = t.desc;
+  };
+
+  const setQty = (q) => {
+    const {min, step} = getRules();
+    qtyInput.value = snap(sanitizeQty(q), min, step);
+    qtyInput.dispatchEvent(new Event('input', { bubbles: true }));
+    qtyInput.dispatchEvent(new Event('change', { bubbles: true }));
+    syncFromQty();
+  };
+
+  qtyInput.addEventListener('input',  syncFromQty);
+  qtyInput.addEventListener('change', syncFromQty);
+  qtyInput.addEventListener('blur',   syncFromQty);
+
+  // Tier clicks set target qtys of 1/5/10, and we only snap if not Custom Length
+  radios.forEach(r => {
+    r.addEventListener('change', (e) => {
+      if (!e.target.checked) return;
+      if (e.target.value === '1-4') setQty(1);
+      else if (e.target.value === '5-9') setQty(5);
+      else setQty(10);
+      setActive(e.target.id);
+    });
+  });
+
+  // Init
+  syncFromQty();
+});
+</script>
+
+
+
+{% endif %}
+  </div>
+
+{%- assign v = product.selected_or_first_available_variant -%}
+{%- assign qty = v.inventory_quantity | default: 0 -%}
+{%- assign lead_days = product.metafields.custom.lead_time_days | default: 2 -%}
+{%- assign cutoff_hour = shop.metafields.custom.dispatch_cutoff_hour | default: 14 -%}
+{%- assign addr = customer.default_address -%}
+
+{%- comment -%} A) Variants JSON with litres + flags {%- endcomment -%}
+<script type="application/json" id="ex-variant-data-{{ section.id }}">
+[
+{% for vv in product.variants %}
+  {%- assign L         = vv.metafields.custom.litres_per_unit | default: blank -%}
+  {%- assign is_open   = vv.metafields.custom.is_open         | default: false -%}
+  {%- assign is_hidden = vv.metafields.custom.is_hidden       | default: false -%}
+  {%- assign is_source = vv.metafields.custom.is_decant_source| default: false -%}
+  {%- assign is_coil   = vv.metafields.custom.is_coil         | default: false -%}
+  {%- assign is_blank  = vv.metafields.custom.is_blank_source | default: false -%}
+  {%- assign restock   = vv.metafields.custom.restock_date    | default: blank -%}
+  {
+    "id": {{ vv.id }},
+    "sku": {{ vv.sku | json }},
+    "available": {{ vv.available | json }},
+    "inventory_quantity": {{ vv.inventory_quantity | default: 0 }},
+    "inventory_management": {{ vv.inventory_management | json }},
+    "inventory_policy": {{ vv.inventory_policy | json }},
+    "incoming": {{ vv.incoming | json }},
+    "next_incoming_date": {{ vv.next_incoming_date | date: "%Y-%m-%d" | json }},
+    "litres_per_unit": {{ L | json }},
+    "is_open": {{ is_open | json }},
+    "is_hidden": {{ is_hidden | json }},
+    "is_decant_source": {{ is_source | json }},
+    "is_blank_source": {{ is_blank | json }},
+    "is_coil": {{ is_coil | json }},
+    "restock_date": {{ restock | json }},
+    "option1": {{ vv.option1 | json }},
+    "option2": {{ vv.option2 | json }},
+    "option3": {{ vv.option3 | json }}
+  }{% unless forloop.last %},{% endunless %}
+{% endfor %}
+]
+</script>
+
+
+{%- comment -%} B) Product flags from tags (case-insensitive) {%- endcomment -%}
+{%- assign tags_down = product.tags | join: ',' | downcase -%}
+<div id="ex-product-flags-{{ section.id }}"
+     data-is-coolant="{% if tags_down contains 'coolant' %}true{% else %}false{% endif %}"
+     data-is-coldsaw="{% if tags_down contains 'coldsaw blades' or tags_down contains 'coldsaw' %}true{% else %}false{% endif %}"
+     data-is-custom-length="{% if tags_down contains 'custom length' %}true{% else %}false{% endif %}">
+</div>
+
+
+{%- comment -%} C) Stock badge + warning + data for JS {%- endcomment -%}
+<div id="ex-stock-{{ section.id }}" class="ex-stock-wrap" aria-live="polite">
+  <div id="ex-stock-badge-{{ section.id }}" class="ex-stock-badge" data-status="grey">Loading stock…</div>
+  <div id="ex-qty-warning-{{ section.id }}" class="ex-qty-warning" hidden></div>
+
+  <div id="ex-stock-data-{{ section.id }}"
+       data-available="{{ v.available }}"
+       data-qty="{{ qty }}"
+       data-managed="{{ v.inventory_management }}"
+       data-policy="{{ v.inventory_policy }}"
+       data-incoming="{{ v.incoming }}"
+       data-next="{{ v.next_incoming_date | date: format: 'date' | escape }}">
+  </div>
+</div>
+
+<aftership-aedd class="aftership-container" app-platform="shopify" app-key="{{ shop.permanent_domain }}"
+app-name="aftership" product-id="{{ product.id }}"></aftership-aedd>
+<script> window._asProduct = {{ product | json }}</script>
+<script src="https://widgets.automizely.com/aftership-aedd-v2/index.iife.js"></script>
+
+<style>
+
+</style>
+
+
+<script type="application/json" id="ex-variant-fulfilment">
+[
+  {% for v in product.variants %}
+  {
+    "id": {{ v.id }},
+    "available": {{ v.available | json }},
+    "inventory_management": {{ v.inventory_management | json }},
+    "inventory_quantity": {{ v.inventory_quantity | default: 0 | json }},
+    "incoming": {{ v.incoming | json }},
+    "next_incoming_date": {{ v.next_incoming_date | date: "%Y-%m-%d" | json }}
+  }{% unless forloop.last %},{% endunless %}
+  {% endfor %}
+]
+</script>
+
+
+</div>
+</div>
+
+<script>
+(function(){
+  const sec = "{{ section.id }}";
+  const db = JSON.parse(document.getElementById(`ex-variant-data-${sec}`).textContent || "[]");
+  const dataEl  = document.getElementById(`ex-stock-data-${sec}`);
+  const badgeEl = document.getElementById(`ex-stock-badge-${sec}`);
+  const warnEl  = document.getElementById(`ex-qty-warning-${sec}`);
+  const flagsEl = document.getElementById(`ex-product-flags-{{ section.id }}`);
+  const IS_COOLANT = flagsEl?.getAttribute('data-is-coolant') === 'true';
+  const IS_COLDSAW = flagsEl?.getAttribute('data-is-coldsaw') === 'true';
+  const IS_CUSTOM_LENGTH = flagsEl?.getAttribute('data-is-custom-length') === 'true';
+  const lengthInput = document.getElementById('customLength') || document.getElementById('length');
+
+  const byId = id => db.find(v => String(v.id) === String(id));
+  const curVarId = () => document.querySelector('#{{ form_id }} [name="id"]')?.value;
+  const setBadge = (txt,status)=>{ badgeEl.textContent = txt; badgeEl.setAttribute('data-status', status); };
+
+  /* ---------- Coolants: litres pool (OPEN + decant sources) ---------- */
+  function totalSourceLitres(excludeId){
+    return db.reduce((sum, v) => {
+      if (String(v.id) === String(excludeId)) return sum;
+      if (!v.inventory_management) return sum;
+      if (v.is_open) {
+        const L = Math.max(0, Number(v.inventory_quantity) || 0);
+        return sum + L;
+      }
+      if (v.is_decant_source) {
+        const units = Math.max(0, Number(v.inventory_quantity) || 0);
+        const perL  = Math.max(0, Number(v.litres_per_unit) || 0);
+        if (perL > 0) return sum + (units * perL);
+      }
+      return sum;
+    }, 0);
+  }
+
+  /* ---------- Coldsaw: blanks by family prefix ---------- */
+  const BLANK_PREFIX_LEN = 7;
+  const isBlankSku = (sku)=> String(sku||'').toUpperCase().endsWith('BLAH') || String(sku||'').toUpperCase().endsWith('BLAC');
+  const familyKey = (sku, n=BLANK_PREFIX_LEN)=> String(sku||'').slice(0,n);
+  function totalBlankUnitsForFamily(selected, n=BLANK_PREFIX_LEN){
+    const key = familyKey(selected.sku, n);
+    if (!key) return 0;
+    return db.reduce((sum, v)=>{
+      if (String(v.id) === String(selected.id)) return sum;
+      if (!v.inventory_management) return sum;
+      if (!isBlankSku(v.sku)) return sum;
+      if (familyKey(v.sku, n) !== key) return sum;
+      return sum + Math.max(0, Number(v.inventory_quantity) || 0);
+    }, 0);
+  }
+
+  // Parse "DD.MM.YYYY" -> Date or null
+function parseDMY(s){
+  if(!s) return null;
+  const m = String(s).match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if(!m) return null;
+  const [_, dd, mm, yyyy] = m;
+  const d = new Date(`${yyyy}-${mm}-${dd}T00:00:00`);
+  return isNaN(d.getTime()) ? null : d;
+}
+// Format to AU (e.g. 30 September 2025)
+function fmtAU(d){
+  return d.toLocaleDateString('en-AU',{ day:'numeric', month:'long', year:'numeric' });
+}
+
+
+  /* ---------- Custom Length: COIL (metres -> mm) ---------- */
+  const isCoilSku = (sku)=> String(sku||'').toUpperCase().endsWith('-COIL');
+  function totalCoilMillimetres(excludeId){
+    return db.reduce((sum, v)=>{
+      if (String(v.id) === String(excludeId)) return sum;
+      if (!v.inventory_management) return sum;
+      if (!(v.is_coil || isCoilSku(v.sku))) return sum;
+      const metres = Math.max(0, Number(v.inventory_quantity) || 0);
+      return sum + metres*1000; // m -> mm
+    }, 0);
+  }
+  function requiredMmFromInput(){
+    if (!lengthInput) return null;
+    const n = Number(String(lengthInput.value||'').trim());
+    return Number.isFinite(n) && n > 0 ? Math.round(n) : null;
+  }
+
+  /* ---------- Hide flagged variants and option pills ---------- */
+function isFlaggedVariant(v){
+  const sku = String(v?.sku || '').toUpperCase();
+  return v?.is_hidden || v?.is_open  || v?.is_blank_source || v?.is_coil
+         || /\.(SVC)$/.test(sku)                  // NEW: hide *.SVC SKUs
+         || /-(OPEN|BLAH|BLAC|COIL)$/.test(sku);
+}
+
+  function hideFlaggedVariants(){
+    document.querySelectorAll('select[name="id"] option').forEach(opt=>{
+      const v = byId(opt.value);
+      if (v && isFlaggedVariant(v)) { opt.disabled = true; opt.hidden = true; }
+    });
+    document.querySelectorAll('input[type="radio"][name="id"]').forEach(inp=>{
+      const v = byId(inp.value);
+      if (v && isFlaggedVariant(v)) {
+        inp.disabled = true;
+        const lab = inp.closest('label') || inp.parentElement;
+        if (lab) lab.style.display = 'none';
+      }
+    });
+    const btns = Array.from(document.querySelectorAll('button[data-value], [role="radio"][data-value], .ex-opt-btn'));
+    let selectedHidden = null;
+    btns.forEach(btn=>{
+      const val = (btn.getAttribute('data-value') || btn.textContent || '').trim().toUpperCase();
+      if (['OPEN','BLAH','BLAC','COIL'].includes(val)) {
+        if (btn.getAttribute('aria-pressed') === 'true' || btn.classList.contains('is-selected')) selectedHidden = btn;
+        btn.style.display = 'none';
+        btn.setAttribute('aria-hidden','true'); btn.setAttribute('aria-disabled','true');
+      }
+    });
+    if (selectedHidden) {
+      const fallback = btns.find(b=>{
+        const v = (b.getAttribute('data-value') || b.textContent || '').trim().toUpperCase();
+        return b.style.display !== 'none' && !['OPEN','BLAH','BLAC','COIL'].includes(v);
+      });
+      fallback && fallback.click();
+    }
+    const idInput = document.querySelector('#{{ form_id }} [name="id"]');
+    if (idInput) {
+      const cur = byId(idInput.value);
+      if (cur && isFlaggedVariant(cur)) {
+        const firstVisible = db.find(x => !isFlaggedVariant(x));
+        if (firstVisible) {
+          idInput.value = firstVisible.id;
+          document.dispatchEvent(new CustomEvent('ex:variant:change', { detail: { variant: firstVisible }}));
+        }
+      }
+    }
+  }
+
+  /* ---------- Paint badge with effective quantity ---------- */
+function paint(){
+  const v = byId(curVarId()); if (!v) return;
+
+  let effQty = Math.max(0, Number(v.inventory_quantity ?? 0) || 0);
+
+  if (v.inventory_management){
+    if (IS_COOLANT){
+      const perUnitL = Math.max(0, Number(v.litres_per_unit) || 0);
+      if (perUnitL > 0){
+        const poolL = Math.max(0, totalSourceLitres(v.id));
+        effQty += Math.max(0, Math.floor(poolL / perUnitL));
+      }
+    } else if (IS_COLDSAW){
+      effQty += Math.max(0, totalBlankUnitsForFamily(v));
+    } else if (IS_CUSTOM_LENGTH){
+      const need = requiredMmFromInput();
+      if (need && need > 0){
+        const mmPool = Math.max(0, totalCoilMillimetres(v.id));
+        effQty += Math.max(0, Math.floor(mmPool / need));
+      }
+    }
+  }
+
+  // Pull and parse the metafield date
+  const restockDate = parseDMY(v.restock_date);
+  const hasRestock = !!restockDate;
+
+  // Sync attrs for qty guard
+  dataEl.setAttribute('data-available', v.available ? 'true' : 'false');
+  dataEl.setAttribute('data-qty', effQty);
+  dataEl.setAttribute('data-managed', v.inventory_management || '');
+  dataEl.setAttribute('data-policy', v.inventory_policy || '');
+  // prefer metafield date for display if present
+  dataEl.setAttribute('data-next', hasRestock ? fmtAU(restockDate) : (v.next_incoming_date || ''));
+
+ // Liquid → JS: turn product.tags into a JS array, then check in JS
+  var productTags = {{ product.tags | json }};
+  var isYG1 = productTags.includes("YG-1");
+
+  if (v.inventory_management) {
+    if (isYG1) {
+      // YG-1 override: 1–2 = Low, 3+ = In
+      if (effQty >= 2) {
+        setBadge('In stock','green');
+      } else if (effQty >= 1) {
+        setBadge('Low stock','orange');
+      } else if (hasRestock) {
+        setBadge(`Restocking ${fmtAU(restockDate)}`,'blue');
+      } else if (v.incoming && v.next_incoming_date) {
+        setBadge(`Restocking ${new Date(v.next_incoming_date).toLocaleDateString()}`,'blue');
+      } else if (v.available && v.inventory_policy === 'continue') {
+        setBadge('5 Days','yellow');
+      } else {
+        setBadge('Out of stock','red');
+      }
+    } else {
+      // Original logic
+      if (effQty > 5) {
+        setBadge('In stock','green');
+      } else if (effQty > 0) {
+        setBadge('Low stock','orange');
+      } else if (hasRestock) {
+        setBadge(`Restocking ${fmtAU(restockDate)}`,'blue');
+      } else if (v.incoming && v.next_incoming_date) {
+        setBadge(`Restocking ${new Date(v.next_incoming_date).toLocaleDateString()}`,'blue');
+      } else if (v.available && v.inventory_policy === 'continue') {
+        setBadge('Order in','red');
+      } else {
+        setBadge('Out of stock','red');
+      }
+    }
+  } else {
+    setBadge('Qty unavailable','grey');
+  }
+
+  overRequested();
+}
+
+
+  /* ---------- Qty guard ---------- */
+  const form=document.querySelector('form[action="/cart/add"], form.product-form, form[id^="product-form"]');
+  const addBtn=form?.querySelector('[type="submit"][name="add"], button[name="add"]');
+  const qtyInput=document.querySelector('#quantity, input[name="quantity"], [id^="Quantity-"], quantity-input input');
+
+  function showWarn(t){ warnEl.textContent=t; warnEl.hidden=false; warnEl.setAttribute('aria-live','polite'); }
+  function hideWarn(){ warnEl.hidden=true; }
+  function overRequested(){
+    const managed=!!dataEl.getAttribute('data-managed');
+    const policy=(dataEl.getAttribute('data-policy')||'').toLowerCase();
+    let avail=parseInt(dataEl.getAttribute('data-qty')||'0',10);
+    const want=parseInt(qtyInput?.value||'1',10);
+    if (!managed){ hideWarn(); return false; }
+    if (isNaN(avail)) avail = 0;
+    const availClamped = Math.max(0, avail);
+    if (want > availClamped){ showWarn(`${availClamped} remaining`); return policy==='deny'; }
+    hideWarn(); return false;
+  }
+
+  /* ---------- Wire up ---------- */
+  form&&form.addEventListener('submit', e=>{ if (overRequested()) e.preventDefault(); });
+  addBtn&&addBtn.addEventListener('click', e=>{ if (overRequested()) e.preventDefault(); });
+  qtyInput&&['input','change'].forEach(ev=> qtyInput.addEventListener(ev, overRequested));
+
+  if (lengthInput){
+    ['input','change','blur'].forEach(ev => lengthInput.addEventListener(ev, paint));
+  }
+
+  document.addEventListener('variant:change', ()=>{ hideFlaggedVariants(); paint(); });
+  document.addEventListener('ex:variant:change', ()=>{ hideFlaggedVariants(); paint(); });
+  document.addEventListener('change', e=>{
+    if (e.target && (e.target.name==='id' || e.target.closest('variant-radios') || e.target.closest('variant-selects'))){
+      setTimeout(()=>{ hideFlaggedVariants(); paint(); }, 0);
+    }
+  });
+
+  hideFlaggedVariants();
+  paint();
+})();
+</script>
+
+
+
+
+
+  <!-- Hidden: carry computed price to cart when matrix applies -->
+  <input type="hidden" name="properties[Computed Price]" id="ex-computed-price">
+
+ <div class="payment-buttons payment-buttons--{{ section.settings.add_to_cart_button_size }} form-payment-buttons">
+  <button onclick="gtag_report_conversion()" type="submit" name="add" id="addToCartButton" class="{{ btn_class }} btn--buyNow">
+    <span style="display:flex;align-items:center;gap:10px;">
+      <i class="fa fa-cart" style="content:url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Asset_Cart-white.png?v=1730169426);height:17px;"></i>
+      Add to Cart
+    </span>
+  </button>
+  <a href="/pages/store-locator" target="_blank" class="{{ btn_class }} buy_local">
+    <span style="display:flex;align-items:center;gap:10px;">
+      <i class="fa fa-map-marker" style="content:url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Asset_Australia.png?v=1730161720);height:17px;"></i>
+      {{ 'Buy Local' }}
+    </span>
+  </a>
+</div>
+
+<!-- Excision: Minimum Order Indicator (PDP) -->
+<div id="ex-min-order-pdp" class="ex-min-order" data-min="20000" aria-live="polite" style="margin-top: 40px;margin-bottom: 40px;">
+  <div class="ex-min-order__row">
+    <div class="ex-min-order__label">Minimum order: <strong>$200.00</strong></div>
+    <div class="ex-min-order__value"><span data-remaining>$200.00</span> to go</div>
+  </div>
+
+  <!-- split-at-join bar (left = active colour, right = grey) -->
+  <div class="ex-min-order__bar" role="progressbar" aria-valuemin="0" aria-valuemax="20000" aria-valuenow="0">
+    <div class="ex-min-order__active" style="flex-basis:0%"></div>
+    <div class="ex-min-order__rest"   style="flex-basis:100%"></div>
+  </div>
+
+  <div class="ex-min-order__note" data-note>Spend $200.00 or more to enable checkout.</div>
+</div>
+
+{% if product.tags contains 'Cancer Council' %}
+  <div class="card cc-banner">
+
+  <div class="cc-banner__content">
+    <p class="cc-banner__headline">
+      Every blade sends <strong>$1.50</strong> to Cancer Council Victoria
+    </p>
+    <p class="cc-banner__sub">
+      Valid on purchases in December and January
+    </p>
+    <p class="cc-banner__legal">
+      This is a fundraising initiative by Excision. Cancer Council Victoria does not endorse this product.
+    </p>
+  </div>
+
+   <div class="cc-banner__logo">
+    <img
+      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Victoria_LOGO_WHITE_YELLOW_RGB.png?v=1764282349"
+      alt="Proudly supporting Cancer Council Victoria"
+      loading="lazy"
+    >
+  </div>
+
+  <div class="cc-banner__badge" aria-hidden="true">
+    <span class="cc-banner__badge-amount">$1.50</span>
+    <span class="cc-banner__badge-note">per blade</span>
+  </div>
+</div>
+
+<style>
+    /* Cancer Council donation banner */
+.cc-banner {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    overflow: hidden;
+    background: #0F1E64;
+}
+
+
+.cc-banner__logo img {
+    display: block;
+    max-width: 130px;
+    right: -10px;
+    bottom: -10px;
+    position: relative;
+}
+
+  .cc-banner__content {
+    display: grid;
+    gap: 4px;
+  }
+
+.cc-banner__headline {
+    font-family: var(--font-bold);
+    font-size: var(--fs-p1);
+    color: white;
+    line-height: normal;
+}
+
+  .cc-banner__sub {
+    margin: 0;
+    font-size: 13px;
+    color: white;
+  }
+
+  .cc-banner__legal {
+    margin: 0;
+    margin-top: 4px;
+    font-size: 11px;
+    color: white;
+  }
+
+.cc-banner__badge {
+    position: absolute;
+    right: -20px;
+    top: 4%;
+    transform: translateY(-50%);
+    width: 150px;
+    height: 150px;
+    border-radius: 999px;
+    background: #FFD200;
+    color: #0F1E64;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    text-align: center;
+    font-family: var(--font-bold);
+    box-shadow: var(--shadow-sm);
+    rotate: -2deg;
+    padding: 25px 40px;
+}
+
+  .cc-banner__badge-amount {
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  .cc-banner__badge-note {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  @media (max-width: 599px) {
+    .cc-banner {
+      flex-direction: row;
+      padding-right: 5rem;
+    }
+
+    .cc-banner__badge {
+      width: 96px;
+      height: 96px;
+      right: -32px;
+    }
+  }
+</style>
+{% endif %}
+
+
+
+  {% if customer and section.settings.enable_payment_button %}
+    {% unless customer.tags contains p_discount_tag or customer.tags contains v_discount_tag %}
+      {{ form | payment_button }}
+    {% endunless %}
+  {% endif %}
+
+{% endform %}
+
+{% render 'BSBL-Price-Select' %}
+
+
+        {% if customer %}
+          <style>
+            #addToCartForm-product-template .payment-buttons.form-payment-buttons{display:block;}
+          </style>
+        {% else %}
+
+        {% endif %}
+
+
+
+        <hr class="{% if section.settings.enable_payment_button %}product-template-hr{% endif %}">
+      </div>
+      <div>
+        {%- if product.metafields.custom.product_testimonials.value != blank -%}
+          <div class="product_testimonials">
+            {% assign productTestimonials = product.metafields.custom.product_testimonials.value %}
+            <div id="demo1" class="carousel slide" data-ride="carousel">
+              <div class="carousel-inner">
+                {%- for productTestimonial in productTestimonials -%}
+                  {%- if forloop.first -%}
+                    <div class="carousel-item active">
+                      <p style="margin-bottom: 0px;">{{ productTestimonial }}</p>
+                    </div>
+                  {%- else -%}
+                    <div class="carousel-item">
+                      <p style="margin-bottom: 0px;">{{ productTestimonial }}</p>
+                    </div>
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+              <ul class="carousel-indicators">
+                {%- for productTestimonial in productTestimonials -%}
+                  <li data-target="#demo1" data-slide-to="{{ forloop.index0 }}"></li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- if product.metafields.custom.promotional_text != blank -%}
+        <a href="{{ product.metafields.custom.promotional_url }}" target="_blank" class="btn--promotional">
+          <span>{{ product.metafields.custom.promotional_text }}</span>
+        </a>
+      {%- endif -%}
+
+      {%- if product.metafields.custom.special_order == true -%}
+        <div class="product-special_order">
+          <p class="special_order_info">
+            <span>ⓘ</span> This item is special-order only. For estimated delivery dates contact our team.
+          </p>
+        </div>
+      {% endif %}
+
+      {%- comment -%} ====== RETURNS BOX (origin • 200% weld • warranty • returns) ====== {%- endcomment -%}
+<div class="returns-box ex-returns">
+  {%- if product.tags contains 'Germany' or product.tags contains 'Italy' or product.tags contains 'France' or product.tags contains 'Spain' or product.tags contains 'United Kingdom' or product.tags contains 'United States' or product.tags contains 'Taiwan' or product.tags contains 'India' or product.tags contains 'Czech Republic' or product.tags contains 'Australia' or product.tags contains 'Turkey' or product.tags contains 'YG-1' or product.tags contains 'Slovenia' -%}
+    <div class="ex-row">
+      <div class="product-origin">
+        {% if product.tags contains 'Germany' %}
+          <div class="product__label--origin">
+            <img width="24" src="{{ "germany.png" | file_url }}" alt="Germany">
+            <span>Made in Germany</span>
+          </div>
+        {% endif %}
+        {% if product.tags contains 'Italy' %}
+          <div class="product__label--origin">
+            <img width="24" src="{{ "italy.png" | file_url }}" alt="Italy">
+            <span>Made in Italy</span>
+          </div>
+        {% endif %}
+        {% if product.tags contains 'France' %}
+          <div class="product__label--origin">
+            <img width="24" src="{{ "france.png" | file_url }}" alt="France">
+            <span>Made in France</span>
+          </div>
+        {% endif %}
+        {% if product.tags contains 'Spain' %}
+          <div class="product__label--origin">
+            <img width="24" src="{{ "spain.png" | file_url }}" alt="Spain">
+            <span>Made in Spain</span>
+          </div>
+        {% endif %}
+        {% if product.tags contains 'United Kingdom' %}
+          <div class="product__label--origin">
+            <img width="24" src="{{ "united-kingdom.png" | file_url }}" alt="United Kingdom">
+            <span>Made in United Kingdom</span>
+          </div>
+        {% endif %}
+        {% if product.tags contains 'United States' %}
+          <div class="product__label--origin">
+            <img width="24" src="{{ "united-states.png" | file_url }}" alt="United States">
+            <span>Made in United States</span>
+          </div>
+        {% endif %}
+        {% if product.tags contains 'Taiwan' %}
+          <div class="product__label--origin">
+            <img width="24" src="{{ "taiwan.png" | file_url }}" alt="Taiwan">
+            <span>Made in Taiwan</span>
+          </div>
+        {% endif %}
+        {% if product.tags contains 'India' %}
+          <div class="product__label--origin">
+            <img width="24" src="{{ "india.png" | file_url }}" alt="India">
+            <span>Made in India</span>
+          </div>
+        {% endif %}
+        {% if product.tags contains 'Czech Republic' %}
+          <div class="product__label--origin">
+            <img width="24" src="{{ "czech-republic.png" | file_url }}" alt="Czech Republic">
+            <span>Made in Czech Republic</span>
+          </div>
+        {% endif %}
+        {% if product.tags contains 'Australia' %}
+          <div class="product__label--origin">
+            <img width="24" src="{{ "australia.png" | file_url }}" alt="Australia">
+            <span>Made in Australia</span>
+          </div>
+        {% endif %}
+        {% if product.tags contains 'Turkey' %}
+          <div class="product__label--origin">
+            <img width="24" src="{{ "turkey.png" | file_url }}" alt="Turkey">
+            <span>Made in Turkey</span>
+          </div>
+        {% endif %}
+        {% if product.tags contains 'YG-1' %}
+          <div class="product__label--origin">
+            <img width="24" src="{{ "South_Korea_Flag_Icon_5b7d9a62-c1c9-4eef-bedc-5befb45a7575.png?v=1736290758" | file_url }}" alt="South Korea">
+            <span>Made in South Korea</span>
+          </div>
+        {% endif %}
+        {% if product.tags contains 'Slovenia' %}
+          <div class="product__label--origin">
+            <img width="24" src="{{ "slovenia.png" | file_url }}" alt="Slovenia">
+            <span>Made in Slovenia</span>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    <hr class="ex-hr">
+  {%- endif -%}
+
+  {%- if product.metafields.custom.product_warranty != blank -%}
+    {%- assign warranty_text = product.metafields.custom.product_warranty | strip -%}
+    {%- assign warranty_badge = warranty_text | slice: 0, 1 -%}
+    <div class="ex-row">
+      <span class="ex-badge">{{ warranty_badge }}</span>
+      <span>{{ warranty_text }}</span>
+    </div>
+    <hr class="ex-hr">
+  {%- endif -%}
+
+  {%- if product.metafields.custom.product_returns == true or product.metafields.custom.product_returns == false -%}
+    <div class="ex-row">
+      <span class="returns-icon">!</span>
+      {%- if product.metafields.custom.product_returns == true -%}
+        <span>If you're not 100% happy with your purchase, we'll replace or refund.</span>
+      {%- else -%}
+        <span>Unfortunately this product is not eligible for replacement or returns.</span>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+</div>
+
+
+
+
+
+      {% if product.tags contains 'Soluble Oils' %}
+        <div class="product-calculator-info">
+          <p class="sub-heading">Not sure how much cutting fluid and water to add to your tank when you top up?</p>
+          <a href="/pages/coolant-concentration-calculator" class="btn waves-effect waves-light cc_btn font-bold"
+            >Use the Concentration Calculator</a
+          >
+        </div>
+      {% endif %}
+
+      <div class="col-md-12 product-contact hide-on-med-and-down">
+        <div class="contact-enquiry card hoverable">
+          <div class="card-content">
+            <div class="custom-form-container grid-item"></div>
+          </div>
+        </div>
+      </div>
+      {% if section.settings.social_sharing_products %}
+        {% include 'social-sharing' %}
+      {% endif %}
+    </div>
+
+    {% comment %}<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>{% endcomment %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+    <script>
+      $(document).ready(function(){
+            $(".product-page-form").slideToggle();
+            $(".product-buyNow-wrapper").hide();
+
+          {% comment %} $(".btn--buyNow").click(function(){
+            $(".product-buyNow-wrapper").slideToggle();
+            $(".product-buyNow-wrapper").css("display", "block");
+            $(".product-page-form").hide();
+          }); {% endcomment %}
+      });
+
+      $(document).ready(function(){
+        setTimeout(function(){
+           var watchVideoStr = $(".fg a:last-of-type").text();
+           var index = watchVideoStr.indexOf("Watch Video");
+           if(index !== -1){
+               $(".fg a:last-of-type").attr('data-fancybox', 'images');
+           }
+           $(".fg a.watch-video").attr('data-fancybox', 'images');
+        }, 4000);
+      });
+    </script>
+
+    <script>
+      window.addEventListener('load', function() {
+      setTimeout(function(){
+            var aa = $(".pdp").find("a:not(.separate-link-none)").get(0).outerHTML;
+            let list = document.querySelector('.fg');
+                     list.insertAdjacentHTML('beforeend', aa);
+
+            var aa1 = $(".pdp").find("a:not(.separate-link-none)").get(1).outerHTML;
+            let list1 = document.querySelector('.fg');
+                     list1.insertAdjacentHTML('beforeend', aa1);
+
+            var aa2 = $(".pdp").find("a:not(.separate-link-none)").get(2).outerHTML;
+            let list2 = document.querySelector('.fg');
+                     list2.insertAdjacentHTML('beforeend', aa2);
+
+            var aa3 = $(".pdp").find("a:not(.separate-link-none)").get(3).outerHTML;
+            let list3 = document.querySelector('.fg');
+               		list3.insertAdjacentHTML('beforeend', aa3);
+
+            var aa4 = $(".pdp").find("a:not(.separate-link-none)").get(4).outerHTML;
+            let list4 = document.querySelector('.fg');
+               		list4.insertAdjacentHTML('beforeend', aa4);
+
+            var aa5 = $(".pdp").find("a:not(.separate-link-none)").get(5).outerHTML;
+            let list5 = document.querySelector('.fg');
+               		list5.insertAdjacentHTML('beforeend', aa5);
+
+            var aa6 = $(".pdp").find("a:not(.separate-link-none)").get(6).outerHTML;
+            let list6 = document.querySelector('.fg');
+               		list6.insertAdjacentHTML('beforeend', aa6);
+
+            var aa7 = $(".pdp").find("a:not(.separate-link-none)").get(7).outerHTML;
+            let list7 = document.querySelector('.fg');
+               		list7.insertAdjacentHTML('beforeend', aa7);
+
+            var aa8 = $(".pdp").find("a:not(.separate-link-none)").get(8).outerHTML;
+            let list8 = document.querySelector('.fg');
+               		list8.insertAdjacentHTML('beforeend', aa8);
+          });
+       }, 3000);
+    </script>
+
+    <script>
+      $(document).ready(function(){
+
+        $('.productPhotoSlider').slick({
+             slidesToShow: 1,
+             slidesToScroll: 1,
+             arrows: true,
+             fade: true,
+           	infinite: false,
+             asNavFor: '.product-photo-thumb-slider-nav',
+             dots: false,
+             prevArrow: '<button type="button" data-role="none" class="slick-prev slick-arrow" aria-label="Previous" tabindex="0" role="button"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" role="img" width="40px" height="40px" fill="#fff"><path stroke="#000" stroke-width="1.5" d="M15.525 18.966L8.558 12l6.967-6.967"></path></svg></button>',
+             nextArrow: '<button type="button" data-role="none" class="slick-next slick-arrow" aria-label="Next" tabindex="0" role="button"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" role="img" width="40px" height="40px" fill="#fff"><path stroke="#000" stroke-width="1.5" d="M8.474 18.966L15.44 12 8.474 5.033"></path></svg></button>',
+           });
+
+           if ( $(window).width() > 767 ) {
+           $('.product-photo-thumb-slider-nav').slick({
+             slidesToShow: 6,
+             slidesToScroll: 6,
+             asNavFor: '.productPhotoSlider',
+             arrows: false,
+             dots: false,
+             centerMode: false,
+             focusOnSelect: true,
+             infinite: false,
+             loop: false,
+             vertical: true,
+             verticalSwiping: false
+           });
+           } else {
+              $('.product-photo-thumb-slider-nav').slick({
+                slidesToShow: 4,
+                slidesToScroll: 4,
+                asNavFor: '.productPhotoSlider',
+                arrows: false,
+                dots: false,
+                infinite: false,
+                loop: false,
+                focusOnSelect: true
+              });
+            }
+
+            // Set active class to first thumbnail slides
+            $('.product-photo-thumb-slider-nav .slick-slide').eq(0).addClass('slick-active');
+
+
+        /*
+        if ( $(window).width() > 767 ) {
+          $('.product-photo-thumb-slider-nav').slick({
+            slidesToShow: 5,
+            slidesToScroll: 5,
+            arrows: true,
+            dots: false,
+            infinite: false,
+            loop: false,
+            vertical: true,
+            verticalSwiping: true
+          });
+        } else {
+          $('.product-photo-thumb-slider-nav').slick({
+            slidesToShow: 4,
+            slidesToScroll: 4,
+            arrows: true,
+            dots: false,
+            infinite: false,
+            loop: false
+          });
+        }   */
+      });
+    </script>
+  
+    
+  </div>
+       {% include 'buy-online-drawer', product:product %}
+
+    {% if product.metafields.custom.pods_section != blank %}
+      <div class="product-additional container dt-prl-30 lazyload-element" style="margin-top: 60px;">
+        {% render 'PODs-Section' %}
+      </div>
+    {% endif %}
+  
+<script>
+(function () {
+  const maxCompareItems = 3;
+  let warningShown = false;
+
+  function getCompareList() {
+    return JSON.parse(localStorage.getItem("compareList")) || [];
+  }
+
+  function setCompareList(list) {
+    localStorage.setItem("compareList", JSON.stringify(list));
+  }
+
+function updateButtonState(btn) {
+  const handle = btn.dataset.handle;
+  const textSpan = btn.querySelector(".compare-text");
+  const img = btn.querySelector("img");
+  const compareList = getCompareList();
+
+  if (!textSpan || !img) return;
+
+  if (compareList.includes(handle)) {
+    textSpan.textContent = "Remove";
+    btn.classList.add("is-added");
+    img.src = "https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_White_Minus.png?v=1748577113";
+  } else {
+    textSpan.textContent = "Compare";
+    btn.classList.remove("is-added");
+    img.src = "https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Black_Plus_Thin.png?v=1748498027";
+  }
+}
+
+
+  function attachCompareLogic(btn) {
+    if (btn.classList.contains("compare-init")) return;
+
+    updateButtonState(btn);
+
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+
+      const handle = btn.dataset.handle;
+      let compareList = getCompareList();
+
+      if (compareList.includes(handle)) {
+        compareList = compareList.filter((item) => item !== handle);
+      } else {
+        if (compareList.length >= maxCompareItems) {
+          if (!warningShown) {
+            alert("You can only compare up to 3 products.");
+            warningShown = true;
+          }
+          return;
+        }
+        compareList.push(handle);
+      }
+
+      setCompareList(compareList);
+      updateButtonState(btn);
+    });
+
+    btn.classList.add("compare-init");
+  }
+
+  function observeLazyContent() {
+    const observer = new MutationObserver(() => {
+      document.querySelectorAll(".add-to-compare").forEach(attachCompareLogic);
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  function setupViewCompare() {
+    document.body.addEventListener("click", function (e) {
+      const viewBtn = e.target.closest(".view-compare");
+      if (!viewBtn) return;
+
+      e.preventDefault();
+      const handles = getCompareList();
+      if (handles.length === 0) {
+        alert("No products selected.");
+        return;
+      }
+      window.location.href = `/pages/compare?handles=${handles.join(",")}`;
+    });
+  }
+
+  // Init everything
+  observeLazyContent();
+  setupViewCompare();
+})();
+</script>
+
+    <div class="product-additional container dt-prl-30 lazyload-element" style="margin-top: 60px;">
+{%- render 'variant-matrix' -%}
+    </div>
+
+    {% render 'turning-grades' %}
+  
+    <div class="product-additional container dt-prl-30 lazyload-element" style="margin-top: 60px;">
+      <div class="product-comparison">
+      <p>Add {{ product.title }} to comparison</p>
+<button class="add-to-compare" data-handle="{{ product.handle }}">
+  <img
+    src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Black_Plus_Thin.png?v=1748498027"
+    style="margin-left: -5px; width: 14px; position: relative; margin-right: 5px;"
+    alt=""
+  >
+  <span class="compare-text">Compare</span>
+</button>
+        <a href="#" class="view-compare">View Comparison</a>
+      </div>
+    
+
+<div id="product-tabs" class="product-details-tabs">
+  {%- comment -%} -----------------------------------------------------------
+    Precompute: description splits + conditional tab flags
+  ------------------------------------------------------------ {%- endcomment -%}
+  {%- assign split_desc = product.description | split: '<h3>' -%}
+
+  {%- assign has_h3 = false -%}
+  {%- if product.description contains '<h3>' -%}
+    {%- assign has_h3 = true -%}
+  {%- endif -%}
+
+  {%- assign op_tags = "Operation_Profiling|Operation_Chamfering|Operation_Side Milling|Operation_Small Part|Operation_Slotting|Operation_Die Sinking|Operation_Facing|Operation_Corner|Operation_Helical-Interpol|Operation_Trochoidal|Operation_Side Taper|Operation_Blind Drilling|Operation_Through Drilling" | split: "|" -%}
+  {%- assign profile_tags = "Solids Profile_Good|Solids Profile_Great|Solids Profile_Excellent|Tubes Profile_Good|Tubes Profile_Great|Tubes Profile_Excellent|Bundles Profile_Good|Bundles Profile_Great|Bundles Profile_Excellent|Structural Profile_Good|Structural Profile_Great|Structural Profile_Excellent" | split: "|" -%}
+  {%- assign wm_tags = "Carbon Steels_Good|Carbon Steels_Great|Carbon Steels_Excellent|Alloy Steels_Good|Alloy Steels_Great|Alloy Steels_Excellent|Aluminium_Good|Aluminium_Great|Aluminium_Excellent|Bronze_Good|Bronze_Great|Bronze_Excellent|Graphite_Good|Graphite_Great|Graphite_Excellent|Plastic_Good|Plastic_Great|Plastic_Excellent|Prehardened Steels_Good|Prehardened Steels_Great|Prehardened Steels_Excellent|Stainless Steels_Good|Stainless Steels_Great|Stainless Steels_Excellent|Cast Iron_Good|Cast Iron_Great|Cast Iron_Excellent|Inconel_Good|Inconel_Great|Inconel_Excellent|Titanium_Good|Titanium_Great|Titanium_Excellent|Acrylic_Good|Acrylic_Great|Acrylic_Excellent|Structural Steels_Good|Structural Steels_Great|Structural Steels_Excellent|Mild & Free Machining_Good|Mild & Free Machining_Great|Mild & Free Machining_Excellent|Tool Steels_Good|Tool Steels_Great|Tool Steels_Excellent|Hardened Steels(HRc40~45)_Good|Hardened Steels(HRc40~45)_Great|Hardened Steels(HRc40~45)_Excellent|Hardened Steels(HRc30~45)_Good|Hardened Steels(HRc30~45)_Great|Hardened Steels(HRc30~45)_Excellent|Hardened Steels(HRc45~55)_Good|Hardened Steels(HRc45~55)_Great|Hardened Steels(HRc45~55)_Excellent|High Hardened Steels(HRc55~70)_Good|High Hardened Steels(HRc55~70)_Great|High Hardened Steels(HRc55~70)_Excellent|High Alloy Steels_Good|High Alloy Steels_Great|High Alloy Steels_Excellent|High Carbon Steels_Good|High Carbon Steels_Great|High Carbon Steels_Excellent|High Alloyed_Good|High Alloyed_Great|High Alloyed_Excellent|Aluminum & Aluminum alloy_Good|Aluminum & Aluminum alloy_Great|Aluminum & Aluminum alloy_Excellent|Structural & Low Carbon Steels_Good|Structural & Low Carbon Steels_Great|Structural & Low Carbon Steels_Excellent|Work Material_No option" | split: "|" -%}
+
+  {%- assign show_operation = false -%}
+  {%- assign show_profiles = false -%}
+  {%- assign show_work_material = false -%}
+  {%- for t in product.tags -%}
+    {%- if op_tags contains t -%}{%- assign show_operation = true -%}{%- endif -%}
+    {%- if profile_tags contains t -%}{%- assign show_profiles = true -%}{%- endif -%}
+    {%- if wm_tags contains t -%}{%- assign show_work_material = true -%}{%- endif -%}
+    {%- if show_operation and show_profiles and show_work_material -%}{%- break -%}{%- endif -%}
+  {%- endfor -%}
+
+  <ul class="tab-nav">
+    <li class="tab active" data-tab="overview">Overview</li>
+
+    {%- if has_h3 -%}
+      {%- for section in split_desc -%}
+        {%- if forloop.index > 1 -%}
+          {%- assign tab_title = section | split: '</h3>' | first | strip -%}
+          <li class="tab" data-tab="{{ tab_title | handleize }}">{{ tab_title }}</li>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+
+    {%- if product.description contains '<a href="' -%}
+      <li class="tab" data-tab="downloads-documents">Downloads &amp; Documents</li>
+    {%- endif -%}
+
+    {%- if product.metafields.custom.table_data != blank -%}
+      <li class="tab" data-tab="specs">Specifications</li>
+    {%- endif -%}
+
+    {%- if product.metafields.custom.capacity_table_data != blank -%}
+      <li class="tab" data-tab="capacity">Capacity</li>
+    {%- endif -%}
+
+    {%- if show_operation -%}
+      <li class="tab" data-tab="operation">Operation</li>
+    {%- endif -%}
+    {%- if show_profiles -%}
+      <li class="tab" data-tab="profiles">Profiles</li>
+    {%- endif -%}
+    {%- if show_work_material -%}
+      <li class="tab" data-tab="work-material">Work Material</li>
+    {%- endif -%}
+
+    {%- if product.tags contains 'BIMETAL BANDSAW BLADES' -%}
+      <li class="tab" data-tab="tooth-selection">Tooth Selection</li>
+    {%- endif -%}
+
+    {% if product.metafields.custom.speeds_feeds
+  or product.metafields.custom.speeds_feeds_slotting
+  or product.metafields.custom.speeds_feeds_side_cutting
+  or product.metafields.custom.speeds_feeds_heavy_side_cutting
+  or product.metafields.custom.speeds_feeds_side_cutting_slotting
+  or product.metafields.custom.speeds_feeds_chamfering
+  or product.metafields.custom.speeds_feeds_chamfering_side_cutting
+  or product.metafields.custom.speeds_feeds_v_grooving
+  or product.metafields.custom.speeds_feeds_side_cutting_HSM_light != blank
+%}
+    <li class="tab" data-tab="speeds-feeds">Speeds &amp; Feeds</li>
+{% endif %}
+
+  <li class="tab" data-tab="reviews">Reviews</li>
+
+  </ul>
+
+  {%- comment -%} ---------------- Overview ---------------- {%- endcomment -%}
+  <div class="tab-content active" data-tab="overview">
+    <div class="tab-split">
+      <div class="tab-desc pdp product-description rte">
+        <div class="excision-accordion-header">
+          <span>Product Description</span>
+        </div>
+        {{ product.description | split: '<h3>' | first }}
+        {%- comment -%} ALL feature points {%- endcomment -%}
+{%- if product.metafields.custom.feature_points != blank -%}
+  {%- assign feature_points = product.metafields.custom.feature_points.value -%}
+  <ul class="pfp-list" role="list">
+    {%- for point in feature_points -%}
+      <li class="pfp-item">{{ point }}</li>
+    {%- endfor -%}
+  </ul>
+{%- endif -%}
+
+      </div>
+      <div class="tab-specs">
+        {% render 'Product Data' %}
+      </div>
+    </div>
+  </div>
+
+  {%- comment -%} ----------- H3-driven sections ----------- {%- endcomment -%}
+  {%- if has_h3 -%}
+    {%- for section in split_desc -%}
+      {%- if forloop.index > 1 -%}
+        {%- assign title = section | split: '</h3>' | first | strip -%}
+        {%- assign content = section | split: '</h3>' | last -%}
+        <div class="tab-content" data-tab="{{ title | handleize }}">
+          {{ content }}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+
+  {%- comment -%} --------------- Downloads ---------------- {%- endcomment -%}
+{%- if product.description contains '<a href="' -%}
+  <div class="tab-content" data-tab="downloads-documents">
+    <ul class="downloads-list" role="list">
+      {%- assign links = product.description | split: '<a href="' -%}
+      {%- for item in links -%}
+        {%- if forloop.index > 1 -%}
+          {%- assign href = item | split: '"' | first -%}
+          {%- assign text_source = item | split: '</a>' | first -%}
+          {%- assign text = text_source | split: '>' | last | strip -%}
+          <li class="downloads-item">
+            <a class="download-link" href="{{ href }}" target="_blank" rel="noopener">
+              <span class="download-text">{{ text }}</span>
+              <img
+                class="download-icon"
+                src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Diagonal_Arrow_White.svg?v=1759892236"
+                alt=""
+                width="14"
+                height="14"
+                loading="lazy"
+                aria-hidden="true"
+              >
+            </a>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}
+
+
+  {%- comment -%} ---------------- Specifications ----------- {%- endcomment -%}
+  {%- if product.metafields.custom.table_data != blank -%}
+    <div class="tab-content" data-tab="specs">
+      <div id="product-raw-specifications-table">
+        <div style="display: none;">{{ product.metafields.custom.table_data | escape }}</div>
+        <div id="target-specifications-table-container"></div>
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} ---------------- Capacity ----------------- {%- endcomment -%}
+  {%- if product.metafields.custom.capacity_table_data != blank -%}
+    <div class="tab-content" data-tab="capacity">
+      <div id="product-raw-capacity-table">
+        <div style="display: none;">{{ product.metafields.custom.capacity_table_data | escape }}</div>
+        <div id="target-capacity-table-container"></div>
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} ------------- Operation/Profile/Material -- {%- endcomment -%}
+  {%- if show_operation -%}
+    <div class="tab-content" data-tab="operation">
+      {% render 'product-operation' %}
+    </div>
+  {%- endif -%}
+
+  {%- if show_profiles -%}
+    <div class="tab-content" data-tab="profiles">
+      {% render 'product-profile' %}
+    </div>
+  {%- endif -%}
+
+  {%- if show_work_material -%}
+    <div class="tab-content" data-tab="work-material">
+      {% render 'product-work-material' %}
+    </div>
+  {%- endif -%}
+
+  {%- if product.tags contains 'BIMETAL BANDSAW BLADES' -%}
+    <div class="tab-content" data-tab="tooth-selection">
+      {% render 'Tooth Selection' %}
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} ---------------- Speeds & Feeds ----------- {%- endcomment -%}
+  <div class="tab-content" data-tab="speeds-feeds">
+    {% render 'product-speeds-feeds' %}
+  </div>
+
+  <div class="tab-content" data-tab="reviews">
+    <!-- Start of Judge.me code --><div style='clear:both'></div><div id='judgeme_product_reviews' class='jdgm-widget jdgm-review-widget' data-product-title='{{ product.title | escape }}' data-id='{{ product.id }}' data-auto-install='false'>{{ product.metafields.judgeme.widget }}</div><!-- End of Judge.me code -->
+  </div>
+
+  <script>
+  window.addEventListener('load', function () {
+    function bindJudgeMeBadges() {
+      // Find all Judge.me preview badges on the page
+      var badges = document.querySelectorAll('.jdgm-preview-badge');
+
+      if (!badges.length) {
+        return;
+      }
+
+      badges.forEach(function (badge) {
+        // Avoid double-binding
+        if (badge.dataset.reviewsBound === 'true') return;
+        badge.dataset.reviewsBound = 'true';
+
+        badge.addEventListener('click', function (e) {
+          e.preventDefault();
+
+          // Find the Reviews tab
+          var reviewsTab = document.querySelector('li.tab[data-tab="reviews"]');
+          if (!reviewsTab) return;
+
+          // Click the tab so your existing tab JS runs
+          reviewsTab.click();
+
+          // Decide where to scroll. Prefer the Judge.me widget if it exists
+          var reviewsWidget = document.getElementById('judgeme_product_reviews');
+          var reviewsPanel = document.querySelector('.tab-content[data-tab="reviews"]');
+          var target = reviewsWidget || reviewsPanel;
+
+          if (!target) return;
+
+          var headerOffset = 100; // adjust if you have a sticky header height
+          var rect = target.getBoundingClientRect();
+          var top = rect.top + window.pageYOffset - headerOffset;
+
+          window.scrollTo({
+            top: top,
+            behavior: 'smooth'
+          });
+        });
+      });
+    }
+
+    // Bind once on load
+    bindJudgeMeBadges();
+
+    // If Judge.me injects badges after load, watch for them
+    var observer = new MutationObserver(function () {
+      bindJudgeMeBadges();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  });
+</script>
+
+
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const tabs = document.querySelectorAll('#product-tabs .tab-nav .tab');
+  const contents = document.querySelectorAll('#product-tabs .tab-content');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function () {
+      const target = this.dataset.tab;
+      tabs.forEach(t => t.classList.remove('active'));
+      contents.forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      const pane = document.querySelector(`#product-tabs .tab-content[data-tab="${target}"]`);
+      if (pane) pane.classList.add('active');
+    });
+  });
+});
+</script>
+
+
+  
+    {%- if product.tags contains 'BIMETAL BANDSAW BLADES' -%}
+      <section>
+        <div style="display: flex; background-color: white; height: 480px; margin-top: 80px;">
+          <div style="background-color: #0069a7; color: white; padding: 40px 60px 40px 40px; flex: 50%; display: flex; flex-direction: column; justify-content: center; border-radius: 15px 0px 0px 15px; align-items: flex-start;">
+            <h2 style="font-family: Humanist777BT-Bold !important; font-size: 44px; margin-bottom: 20px; color: white;">
+              Not sure what bandsaw blade you need?
+            </h2>
+            <p>
+              Based on decades of industry knowledge and experience, we created a Bandsaw Blade selector to help you
+              easily find the blade that best suits you.
+            </p>
+            <a
+              style="font-size: 17px; background: #e0592a; color: white;"
+              class="btn"
+              href="https://excision.com.au/pages/bandsaw-blade-selector"
+              >Find your bandsaw blade</a
+            >
+          </div>
+          <div style="flex: 50%; ">
+            <img
+              style="height: 480px; width: 100%; object-fit: contain; border-radius: 0px 15px 15px 0px; background: #0069a7; padding: 40px"
+              src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/BSBL_Selector_Website_Mockup_1.webp?v=1764764633"
+            >
+          </div>
+        </div>
+      </section>
+    {%- endif -%}
+
+      
+
+    {% if product.metafields.custom.download_file_1 != blank
+    or product.metafields.custom.download_file_2 != blank %}
+    <a href="#download-file-section" data-target="download-file-section">File Download</a>
+{% endif %}
+</div>
+  </div>
+      
+{% if product.metafields.custom.table_data != blank %}
+    <div id="product-raw-specifications-table" class="product-additional container dt-prl-30">
+
+        <div style="display: none;">
+            {{ product.metafields.custom.table_data | escape }}
+        </div>
+
+        <div id="target-specifications-table-container"></div>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const rawSpecTableDiv = document.getElementById("product-raw-specifications-table");
+
+            if (rawSpecTableDiv) {
+                let rawText = rawSpecTableDiv.textContent.trim();
+                let rows = rawText.split("\n").map(row => row.trim()).filter(row => row.length > 0);
+
+                let headers = rows[0].split("\t");
+                let tableRows = rows.slice(1).map(row => row.split("\t"));
+
+                let tableHTML = `
+                    <div class="series-details-table-wrap">
+                        <div class="table-scrollable-wrapper">
+                            <table class="table-type01" id="interactive-specifications-table">
+                                <thead>
+                                    <tr>`;
+                headers.forEach(header => {
+                    tableHTML += `<th>${header}</th>`;
+                });
+                tableHTML += `</tr></thead><tbody>`;
+                tableRows.forEach(row => {
+                    tableHTML += `<tr>`;
+                    row.forEach(cell => {
+                        tableHTML += `<td>${cell}</td>`;
+                    });
+                    tableHTML += `</tr>`;
+                });
+                tableHTML += `</tbody></table></div></div>`;
+
+                const targetContainer = document.getElementById("target-specifications-table-container");
+                if (targetContainer) {
+                    targetContainer.innerHTML = "";
+
+                    const tableHeader = document.createElement("div");
+                    tableHeader.className = "table-header";
+
+                    const specTitle = document.createElement("div");
+                    specTitle.className = "excision-accordion-header";
+                    specTitle.textContent = "Specifications";
+
+                    const tableNotes = document.createElement("div");
+                    tableNotes.className = "table-notes";
+
+                    const noteText = document.createElement("p");
+                    noteText.className = "note-text";
+                    noteText.textContent = "* Click on the column title to sort in order.";
+
+                    const unitText = document.createElement("p");
+                    unitText.className = "unit-text";
+                    unitText.textContent = "(Unit: mm)";
+
+                    tableNotes.appendChild(noteText);
+                    tableNotes.appendChild(unitText);
+                    tableHeader.appendChild(specTitle);
+                    tableHeader.appendChild(tableNotes);
+
+                    // Search bar
+                    const searchWrapper = document.createElement("div");
+                    searchWrapper.className = "search-wrapper";
+                    searchWrapper.innerHTML = `<input type="text" id="search-bar-specifications" placeholder="Search Product Code...">`;
+
+                    targetContainer.appendChild(tableHeader);
+                    targetContainer.appendChild(searchWrapper);
+                    
+                    const tableWrapper = document.createElement("div");
+                    tableWrapper.innerHTML = tableHTML;
+                    targetContainer.appendChild(tableWrapper.firstElementChild);
+
+                    const table = document.querySelector("#interactive-specifications-table");
+                    if (table) {
+                        const headers = table.querySelectorAll("th");
+                        const tableBody = table.querySelector("tbody");
+                        const rows = Array.from(tableBody.querySelectorAll("tr"));
+                        let ascending = true;
+
+                        headers.forEach((header, index) => {
+                            header.style.cursor = "pointer";
+                            header.addEventListener("click", () => {
+                                headers.forEach(h => h.classList.remove("sorted-asc", "sorted-desc"));
+
+                                const sortedRows = rows.sort((a, b) => {
+                                    const aText = a.children[index].textContent.trim();
+                                    const bText = b.children[index].textContent.trim();
+                                    const aValue = isNaN(aText) ? aText : parseFloat(aText);
+                                    const bValue = isNaN(bText) ? bText : parseFloat(bText);
+
+                                    return ascending ? aValue - bValue : bValue - aValue;
+                                });
+
+                                while (tableBody.firstChild) {
+                                    tableBody.removeChild(tableBody.firstChild);
+                                }
+
+                                sortedRows.forEach(row => tableBody.appendChild(row));
+                                ascending = !ascending;
+                                header.classList.add(ascending ? "sorted-asc" : "sorted-desc");
+                            });
+                        });
+
+                        const searchBar = document.getElementById("search-bar-specifications");
+                        searchBar.addEventListener("input", () => {
+                            const searchText = searchBar.value.toLowerCase();
+                            rows.forEach(row => {
+                                const firstCell = row.querySelector("td");
+                                row.style.display = firstCell && firstCell.textContent.toLowerCase().includes(searchText) ? "" : "none";
+                            });
+                        });
+                    }
+                }
+            }
+        });
+    </script>
+{% endif %}
+
+{% if product.metafields.custom.capacity_table_data != blank %}
+    <div id="product-raw-capacity-table" class="product-additional container dt-prl-30 lazyload-element">
+
+        <div style="display: none;">
+            {{ product.metafields.custom.capacity_table_data | escape }}
+        </div>
+
+        <div id="target-capacity-table-container"></div>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const rawCapTableDiv = document.getElementById("product-raw-capacity-table");
+
+            if (rawCapTableDiv) {
+                let rawText = rawCapTableDiv.textContent.trim();
+                let rows = rawText.split("\n").map(row => row.trim()).filter(row => row.length > 0);
+
+                let headers = rows[0].split("\t");
+                let tableRows = rows.slice(1).map(row => row.split("\t"));
+
+                let tableHTML = `
+                    <div class="series-details-table-wrap">
+                        <div class="table-scrollable-wrapper">
+                            <table class="table-type01" id="interactive-capacity-table">
+                                <thead>
+                                    <tr>`;
+                headers.forEach(header => {
+                    tableHTML += `<th>${header}</th>`;
+                });
+                tableHTML += `</tr></thead><tbody>`;
+                tableRows.forEach(row => {
+                    tableHTML += `<tr>`;
+                    row.forEach(cell => {
+                        tableHTML += `<td>${cell}</td>`;
+                    });
+                    tableHTML += `</tr>`;
+                });
+                tableHTML += `</tbody></table></div></div>`;
+
+                const targetContainer = document.getElementById("target-capacity-table-container");
+                if (targetContainer) {
+                    targetContainer.innerHTML = "";
+
+                    const tableHeader = document.createElement("div");
+                    tableHeader.className = "table-header";
+
+                    const capTitle = document.createElement("h2");
+                    capTitle.className = "variants-title";
+                    capTitle.textContent = "Machine Capacity";
+
+                    tableHeader.appendChild(capTitle);
+
+                    targetContainer.appendChild(tableHeader);
+
+                    const tableWrapper = document.createElement("div");
+                    tableWrapper.innerHTML = tableHTML;
+                    targetContainer.appendChild(tableWrapper.firstElementChild);
+
+                    const table = document.querySelector("#interactive-capacity-table");
+                    if (table) {
+                        const headers = table.querySelectorAll("th");
+                        const tableBody = table.querySelector("tbody");
+                        const rows = Array.from(tableBody.querySelectorAll("tr"));
+                        let ascending = true;
+
+                        headers.forEach((header, index) => {
+                            header.style.cursor = "pointer";
+                            header.addEventListener("click", () => {
+                                headers.forEach(h => h.classList.remove("sorted-asc", "sorted-desc"));
+
+                                const sortedRows = rows.sort((a, b) => {
+                                    const aText = a.children[index].textContent.trim();
+                                    const bText = b.children[index].textContent.trim();
+                                    const aValue = isNaN(aText) ? aText : parseFloat(aText);
+                                    const bValue = isNaN(bText) ? bText : parseFloat(bText);
+
+                                    return ascending ? aValue - bValue : bValue - aValue;
+                                });
+
+                                while (tableBody.firstChild) {
+                                    tableBody.removeChild(tableBody.firstChild);
+                                }
+
+                                sortedRows.forEach(row => tableBody.appendChild(row));
+                                ascending = !ascending;
+                                header.classList.add(ascending ? "sorted-asc" : "sorted-desc");
+                            });
+                        });
+                    }
+                }
+            }
+        });
+    </script>
+{% endif %}
+
+    {% if product.metafields.custom.product_video %}
+          <div id="video" class="product-additional container dt-prl-30 lazyload-element" style="padding-top: 60px;">
+      <h2 style="margin-bottom: 40px;">Video</h2>
+
+      {% assign video_url = product.metafields.custom.product_video %}
+      {% if video_url contains '?' %}
+        {% assign final_url = video_url | append: '&origin=https://yourdomain.com&modestbranding=1&playsinline=1' %}
+      {% else %}
+        {% assign final_url = video_url | append: '?origin=https://yourdomain.com&modestbranding=1&playsinline=1' %}
+      {% endif %}
+
+      <div class="plyr__video-embed" id="player">
+        <iframe
+          src="{{ final_url }}"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+      </div>
+
+      <script src="https://cdn.plyr.io/3.6.8/plyr.js"></script>
+      <script>
+        document.addEventListener("DOMContentLoaded", () => {
+          const player = new Plyr('#player iframe', {
+            controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+            youtube: {
+              noCookie: true,
+              playsinline: true
+            }
+          });
+        });
+      </script>
+    {% endif %}
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Remove active class from all
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+
+        // Add active to clicked tab and its content
+        button.classList.add('active');
+        const tabKey = button.getAttribute('data-tab');
+        document.getElementById('content-' + tabKey).classList.add('active');
+      });
+    });
+  });
+</script>
+
+
+    
+
+    
+          </div>
+        </div>
+      </section>
+                </div>
+
+    
+  </div>
+
+      </section>
+                </div>
+
+              </div>
+
+                {% if product.metafields.custom.faq_html != blank %}
+  <div class="product-additional container dt-prl-30">
+    <h2 style="padding-top: 40px; margin-bottom: 40px;">FAQs</h2>
+    <div id="faq-accordion">
+      {{ product.metafields.custom.faq_html }}
+    </div>
+  </div>
+{% endif %}
+
+
+    <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const container = document.getElementById("faq-accordion");
+    if (!container) return;
+
+    const elements = Array.from(container.children);
+    const newContent = document.createElement("div");
+
+    for (let i = 0; i < elements.length; i++) {
+      if (elements[i].tagName.toLowerCase() === "h3") {
+        const h3 = elements[i];
+        const p = elements[i + 1] && elements[i + 1].tagName.toLowerCase() === "p"
+          ? elements[i + 1]
+          : null;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "faq-item";
+
+        const answer = document.createElement("div");
+        answer.className = "faq-answer";
+        answer.style.display = "none";
+
+        if (p) {
+          answer.appendChild(p);
+          i++; // skip <p> in loop
+        }
+
+        // Add toggle functionality to original h3
+        h3.classList.add("faq-question");
+        h3.style.cursor = "pointer";
+
+        h3.addEventListener("click", () => {
+          const isOpen = answer.style.display === "block";
+          answer.style.display = isOpen ? "none" : "block";
+        });
+
+        wrapper.appendChild(h3);
+        wrapper.appendChild(answer);
+        newContent.appendChild(wrapper);
+      }
+    }
+
+    container.innerHTML = "";
+    container.appendChild(newContent);
+  });
+</script>
+
+
+
+  {% if product.metafields.custom.download_file_1 != blank
+  or product.metafields.custom.download_file_1 != blank %}
+
+          <div id="download-file-section" class="product-additional container dt-prl-30 lazyload-element">
+     <section>
+        <div class="work-material series-cont con-box">
+          <h2 style="padding-top: 40px; margin-bottom: 40px;">File Download</h2>
+          <div class="work-material-cont full-width">
+
+{% assign pdf1     = product.metafields.custom.download_file_1.value %}
+{% assign preview1 = product.metafields.custom.download_file_1_preview.value %}
+
+{% assign pdf2     = product.metafields.custom.download_file_2.value %}
+{% assign preview2 = product.metafields.custom.download_file_2_preview.value %}
+
+{% if pdf1 %}
+  <div class="download-card">
+    <div class="download-name-button">
+    <p class="file-name">{{ pdf1.alt }}</p>
+        <a href="{{ pdf1.url }}" class="button" download>
+      Download File
+    </a>
+    </div>
+    {% if preview1 %}
+      <div class="preview">
+      <div class="window">
+      <img class="download-preview" src="{{ preview1 | image_url: width:200 }}"
+           alt="{{ pdf1.alt }}" loading="lazy">
+      </div>
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+
+{% if pdf2 %}
+  <div class="download-card">
+    <div class="download-name-button">
+    <p class="file-name">{{ pdf2.alt }}</p>
+        <a href="{{ pdf2.url }}" class="button" download>
+      Download File
+    </a>
+    </div>
+    {% if preview2 %}
+      <div class="preview">
+      <div class="window">
+      <img class="download-preview" src="{{ preview2 | image_url: width:200 }}"
+           alt="{{ pdf2.alt }}" loading="lazy">
+      </div>
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+
+          </div>
+        </div>
+     </section>
+        </div>
+
+    {% endif %}
+
+
+
+{% render 'product-inline-style' %}
+
+  {% if product.tags contains 'Soluble Oils' %}
+       <div class="product-additional container dt-prl-30 lazyload-element">
+  {% render '90 Day Coolant Guarantee' %}
+       </div>
+    {% endif %}
+
+{%- if product.tags contains 'BIMETAL BANDSAW BLADES' -%}
+  <section>
+                    <div class="product-additional container dt-prl-30 lazyload-element">
+    <div style="display: flex; background-color: white; height: 480px; margin-top: 40px;">
+      <div style="background-color: #0069a7; color: white; padding: 40px 60px 40px 40px; flex: 50%; display: flex; flex-direction: column; justify-content: center; border-radius: 15px 0px 0px 15px;">
+        <h2 style="font-family: Humanist777BT-Bold !important; font-size: 44px; margin-bottom: 20px; color: white;">
+          We guarantee the quality of our welds
+        </h2>
+        <p>We stand by our welds.</p>
+        <p>
+          So, if the weld fails on your Excision bandsaw blade, we’ll replace it and send you an extra, despatched
+          same-day.
+        </p>
+        <div style="display: flex; align-items: center; font-size: 17px; font-family: Humanist777BT-Bold; margin-top: 10px;">
+          <img
+            src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Orange_Certified_Tick.png?v=1736998379"
+            alt="Guarantee Icon"
+            style="margin-right: 10px; width: 24px; height: 24px;"
+          >
+          200% Weld Guarantee
+        </div>
+      </div>
+      <div style="flex: 50%; ">
+        <img
+          style="height: 480px; width: 100%; object-fit: cover; border-radius: 0px 15px 15px 0px;"
+          src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Team_Action_Photos-12_CC_1.webp?v=1764764749"
+        >
+      </div>
+    </div>
+                    </div>
+  </section>
+{%- endif -%}
+
+        {% render 'product-card-scripts' %}
+
+<div class="row">
+  <div class="col-12 col-md-12">
+    {%- for media in product.media -%}
+      {%- case media.media_type -%}
+        {%- when 'external_video' -%}
+          {%- assign video_class = 'js-' | append: media.host -%}
+          {%- if media.host == 'youtube' -%}
+            <div
+              class="card-2 card hoverable modal-video-trigger product_video_container"
+              data-video-id="{{ block.settings.video_id }}"
+            >
+              <div class="card-image">
+                <iframe
+                  width="100%"
+                  height="315"
+                  src="{{ media | external_video_url: autoplay: false, loop: loop, playlist: media.external_id }}"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                ></iframe>
+              </div>
+            </div>
+          {%- endif -%}
+      {%- endcase -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+
+{% if product.handle contains "ebox" %}
+  {% include 'ebox-product' %}
+{% endif %}
+
+{% if product.handle contains "magnex-drill-40"%}
+  {% include 'magnex40-product' %}
+{% endif %}
+
+{% if product.handle contains "emb-35"%}
+  {% include 'emb35-product' %}
+{% endif %}
+
+{% if product.handle contains "em-40"%}
+  {% include 'em40-product' %}
+{% endif %}
+
+{% if product.handle contains "em-50"%}
+  {% include 'em50-product' %}
+{% endif %}
+
+        
+<script>
+  $(document).ready(function(e) {
+      if ($('.sp-blog-items').length === 0) {
+          $('.related-article__outer-wrapper').hide();
+      }
+  });
+</script>
+
+{% unless product == empty %}
+  <script type="application/json" id="ProductJson-{{ section.id }}">
+    {{ product | json }}
+  </script>
+  {% if section.settings.product_quantity_message or section.settings.product_incoming_message %}
+    <script type="application/json" id="VariantJson-{{ section.id }}">
+      [
+        {% for variant in product.variants %}
+      {% comment %} wcp_variant_include {% endcomment %}{% include 'wcp_variant' with variant %}
+          {% capture variant_inventory %}
+            {%- if section.settings.product_incoming_message -%}
+              ,
+              "incoming": {% if variant.incoming == 'null' or variant.next_incoming_date == null %}false{% else %}{{ variant.incoming | default: false | json }}{% endif %},
+              "inventory_policy": {{ variant.inventory_policy | json }},
+              "next_incoming_date": {{ variant.next_incoming_date | date: format: 'date' | json }}
+            {%- endif -%}
+            {%- if section.settings.product_quantity_message -%}
+              ,
+              "inventory_quantity": {{ variant.inventory_quantity | json }}
+            {%- endif -%}
+          {% endcapture %}
+          {
+            {{ variant_inventory | remove_first: ',' | strip }}
+          }
+          {% unless forloop.last %},
+            {% endunless %}
+        {% endfor %}
+      {% assign wcp_v_price = temp_wcp_v_price %} {% assign wcp_v_compare_at_price = temp_wcp_v_compare_at_price %}
+      ]
+    </script>
+  {% endif %}
+{% endunless %}
+
+
+{% unless wcp_vd_HTML_table == '' %}
+  <script type="application/json" class="wcp_vd_table" id="wcp_vd_table_{{ product.id }}">
+    {{- wcp_vd_HTML_table_tmp -}}
+  </script>
+{% endunless %}
+{% unless wcp_vd_HTML_table == '' %}
+  <script id="vdtable" type="text/x-handlebars-template">
+    <table>
+    <tr>
+    <th>Quantity</th>
+    <th>Discount</th>
+    <th>Price</th>
+    </tr>
+    {% raw %}
+    {{#each vdtable}}
+        <tr>
+            <td>{{Qty}}</td>
+            <td>{{Discount}}</td>
+            <td>{{Price}}</td>
+          </tr>
+    {{/each}}
+    {% endraw %}
+    </table>
+  </script>
+  <script>
+    if(typeof Handlebars === 'undefined'){
+       var head = document.getElementsByTagName('head')[0];
+      script = document.createElement('script');
+      script.onload = function() { };
+      script.type = 'text/javascript';
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.12/handlebars.min.js';
+      head.appendChild(script);
+    }
+  </script>
+{% endunless %}
+
+<script>
+  $(document).ready(function(){
+  $(".rlp_regular").slick({
+          dots: false,
+          arrows: true,
+          infinite: false,
+          slidesToShow: 3,
+          slidesToScroll: 1,
+          nextArrow: '<i class="fa fa-angle-right slick-next"></i>',
+          prevArrow: '<i class="fa fa-angle-left slick-prev"></i>',
+          responsive: [
+          {
+            breakpoint: 1024,
+            settings: {
+              slidesToShow: 2,
+              slidesToScroll: 1,
+              dots: true,
+              arrows: false
+            }
+          },
+          {
+            breakpoint: 600,
+            settings: {
+              slidesToShow: 1,
+              slidesToScroll: 1,
+              dots: true,
+              arrows: false
+            }
+          }
+        ]
+        });
+     });
+</script>
+
+<script>
+  $(document).ready(function(){
+    $(".rla_regular").slick({
+      dots: false,
+      arrows: true,
+      infinite: false,
+      slidesToShow: 3,
+      slidesToScroll: 1,
+      nextArrow: '<i class="fa fa-angle-right slick-next"></i>',
+      prevArrow: '<i class="fa fa-angle-left slick-prev"></i>',
+      responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+          dots: true,
+          arrows: false
+        }
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          dots: true,
+          arrows: false
+        }
+      }
+    ]
+    });
+  });
+</script>
+<script>
+  const carousel = document.querySelector('#demo1 .carousel-inner');
+  const items = document.querySelectorAll('#demo1 .carousel-item');
+  let currentIndex = 0;
+
+  function updateCarouselHeight() {
+      const activeItem = items[currentIndex];
+      const contentHeight = activeItem.getBoundingClientRect().height; // More accurate height
+      carousel.style.height = contentHeight + 'px';
+  }
+
+  // Initialize the carousel height
+  updateCarouselHeight();
+
+  // Event listener for slide change
+  $('#demo1').on('slid.bs.carousel', function () { // Use 'slid.bs.carousel' for after the transition
+      currentIndex = $(this).find('.active').index();
+      updateCarouselHeight(); // Adjust height after the transition
+  });
+
+  $(document).ready(function(){
+    $('.your-carousel').slick({
+        autoplay: true,  // Enables auto-play
+        autoplaySpeed: 15000,  // Time between slides (3000ms = 3 seconds)
+        dots: true,  // Optional: Shows navigation dots
+        arrows: false // Optional: Hides navigation arrows
+    });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Product",
+  "class": "product-template-section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "product_image_zoom_enable",
+      "label": "Enable image zoom"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_quantity_enable",
+      "label": "Show quantity selector"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_quantity_message",
+      "label": "Show remaining quantity message"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_incoming_message",
+      "label": "Show incoming stock transfer message when sold out"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_vendor_enable",
+      "label": "Show product vendor"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_show_saved_amount",
+      "label": "Show saved amount",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "product_show_compare_at_price",
+      "label": "Show compare at price",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "related_products_enable",
+      "label": "Show related products"
+    },
+    {
+      "type": "checkbox",
+      "id": "promo_products_enable",
+      "label": "Show promo products"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_payment_button",
+      "label": "Show dynamic checkout button",
+      "info": "Each customer will see their preferred payment method from those available on your store, such as PayPal or Apple Pay. [Learn more](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "social_sharing_products",
+      "label": "Enable product sharing",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "product_reviews_enable",
+      "label": "Enable product reviews",
+      "info": "Install the free Shopify [Product Reviews](https://apps.shopify.com/product-reviews) app to add product reviews."
+    },
+    {
+      "type": "select",
+      "id": "add_to_cart_button_size",
+      "label": "Variant picker and button size",
+      "default": "small",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+{% liquid
+  assign brand_name = product.vendor | default: shop.name
+  assign secondary_title = product.metafields.custom.title.value | default: product.metafields.custom.title
+  assign description_text = product.description | strip_html | strip
+  assign product_url = shop.secure_url | append: product.url
+  assign lead_time_min = product.metafields.custom.lead_time_min_days | default: product.metafields.custom.lead_time_days | default: lead_days
+  assign lead_time_max = product.metafields.custom.lead_time_max_days | default: lead_time_min
+  assign handling_time_days = product.metafields.custom.handling_time_days | default: blank
+  assign shipping_cost_value = product.metafields.custom.shipping_cost.value | default: product.metafields.custom.shipping_cost | default: shop.metafields.custom.default_shipping_cost
+  assign shipping_cost_sanitised = shipping_cost_value | replace: '$', '' | replace: 'AUD', '' | replace: 'aud', '' | strip
+  assign shipping_cost_digits = '0,1,2,3,4,5,6,7,8,9' | split: ','
+  assign shipping_cost_has_digits = false
+  for digit in shipping_cost_digits
+    if shipping_cost_sanitised contains digit
+      assign shipping_cost_has_digits = true
+    endif
+  endfor
+  assign shipping_cost_number = shipping_cost_sanitised | replace: ',', '.' | plus: 0
+  assign shipping_details_available = false
+  if shipping_cost_has_digits and shipping_cost_sanitised != ''
+    assign shipping_details_available = true
+  endif
+  if handling_time_days != blank
+    assign shipping_details_available = true
+  endif
+  if lead_time_min != blank
+    assign shipping_details_available = true
+  endif
+  assign return_policy_flag = product.metafields.custom.product_returns
+  assign return_window_days = product.metafields.custom.return_window_days | default: shop.metafields.custom.default_return_window
+  assign warranty_text = product.metafields.custom.product_warranty | strip
+  assign schema_properties = product.metafields.custom.schema
+  assign review_provider = shop.metafields.ecomposer.app_review.value
+  assign store_country = shop.address.country_code | default: shop.address.country
+  assign price_expiry = 'today' | date: '%s' | plus: 31536000 | date: '%Y-%m-%d'
+%}
+
+{% capture images_json %}
+[
+{% if product.images.size > 0 %}
+  {% for image in product.images %}
+    {{ image | img_url: 'master' | prepend: 'https:' | json }}{% unless forloop.last %},{% endunless %}
+  {% endfor %}
+{% elsif product.featured_image %}
+  {{ product.featured_image | img_url: 'master' | prepend: 'https:' | json }}
+{% endif %}
+]
+{% endcapture %}
+{% assign images_json = images_json | strip_newlines %}
+
+{% assign shipping_details_json = '' %}
+{% if shipping_details_available %}
+  {% capture shipping_details_json %}
+  {
+    "@type": "OfferShippingDetails"
+    {% if shipping_cost_has_digits and shipping_cost_sanitised != '' %}
+      ,"shippingRate": {
+        "@type": "MonetaryAmount",
+        "value": {{ shipping_cost_number | json }},
+        "currency": {{ shop.currency | json }}
+      }
+    {% endif %}
+    ,"shippingDestination": {
+      "@type": "DefinedRegion",
+      "addressCountry": {{ store_country | json }}
+    }
+    {% if handling_time_days != blank or lead_time_min != blank %}
+      ,"deliveryTime": {
+        "@type": "ShippingDeliveryTime"
+        {% if handling_time_days != blank %}
+          ,"handlingTime": {
+            "@type": "QuantitativeValue",
+            "minValue": {{ handling_time_days }},
+            "maxValue": {{ handling_time_days }},
+            "unitCode": "d"
+          }
+        {% endif %}
+        {% if lead_time_min != blank %}
+          ,"transitTime": {
+            "@type": "QuantitativeValue",
+            "minValue": {{ lead_time_min }},
+            "maxValue": {{ lead_time_max }},
+            "unitCode": "d"
+          }
+        {% endif %}
+      }
+    {% endif %}
+  }
+  {% endcapture %}
+  {% assign shipping_details_json = shipping_details_json | strip %}
+{% endif %}
+
+{% capture offers_json %}
+[
+{% for variant in product.variants %}
+  {%- assign availability = 'InStock' -%}
+  {%- if variant.available != true -%}
+    {%- if variant.inventory_policy == 'continue' -%}
+      {%- assign availability = 'PreOrder' -%}
+    {%- else -%}
+      {%- assign availability = 'OutOfStock' -%}
+    {%- endif -%}
+  {%- endif -%}
+  {%- assign variant_url = shop.secure_url | append: variant.url -%}
+  {%- assign restock_date = variant.metafields.custom.restock_date | default: blank -%}
+  {%- assign price_string = variant.price | money_without_currency | replace: ',', '' -%}
+  {%- assign mpn_value = variant.metafields.custom.mpn | default: variant.sku -%}
+  {
+    "@type": "Offer",
+    "url": {{ variant_url | json }},
+    "priceCurrency": {{ shop.currency | json }},
+    "price": "{{ price_string }}",
+    "priceValidUntil": {{ price_expiry | json }},
+    "itemCondition": "https://schema.org/NewCondition",
+    "availability": "https://schema.org/{{ availability }}",
+    "sku": {{ variant.sku | json }},
+    "mpn": {{ mpn_value | json }}
+    {% if variant.barcode != blank %}
+      {% case variant.barcode.size %}
+        {% when 8 %}
+          ,"gtin8": {{ variant.barcode | json }}
+        {% when 12 %}
+          ,"gtin12": {{ variant.barcode | json }}
+        {% when 13 %}
+          ,"gtin13": {{ variant.barcode | json }}
+        {% when 14 %}
+          ,"gtin14": {{ variant.barcode | json }}
+      {% endcase %}
+    {% endif %}
+    {% if variant.available and variant.inventory_quantity %}
+      ,"inventoryLevel": {
+        "@type": "QuantitativeValue",
+        "value": {{ variant.inventory_quantity }},
+        "unitCode": "C62"
+      }
+    {% endif %}
+    {% if restock_date != blank %}
+      ,"availabilityStarts": {{ restock_date | date: '%Y-%m-%d' | json }}
+    {% endif %}
+    {% if shipping_details_json %}
+      ,"shippingDetails": [{{ shipping_details_json }}]
+    {% endif %}
+  }{% unless forloop.last %},{% endunless %}
+{% endfor %}
+]
+{% endcapture %}
+{% assign offers_json = offers_json | strip_newlines %}
+
+{% capture aggregate_json %}
+{% if review_provider %}
+  {% case review_provider %}
+    {% when 'kudo_buzz' %}
+      {% if product.metafields.kudobuzz.reviews_count and product.metafields.kudobuzz.reviews_count != '0' %}
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingCount": {{ product.metafields.kudobuzz.reviews_count }},
+          "ratingValue": {{ product.metafields.kudobuzz.review_rating }}
+        }
+      {% endif %}
+    {% when 'okendo' %}
+      {% if product.metafields.okendo.RatingAndReviewCount and product.metafields.okendo.RatingAndReviewCount != '0' %}
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingCount": {{ product.metafields.okendo.RatingAndReviewCount }},
+          "ratingValue": {{ product.metafields.okendo.RatingAndReviewAverageValue }}
+        }
+      {% endif %}
+    {% when 'egg_views' %}
+      {% if product.metafields.eggviews.reviews_count and product.metafields.eggviews.reviews_count != '0' %}
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingCount": {{ product.metafields.eggviews.reviews_count }},
+          "ratingValue": {{ product.metafields.eggviews.reviews_average }}
+        }
+      {% endif %}
+    {% when 'opinew' %}
+      {% if product.metafields.opinew.reviews_rich_snippet %}
+        {%- assign rating_count = product.metafields.opinew.reviews_rich_snippet | split: 'ratingCount" content="' | last | split: '"' | first | plus: 0 -%}
+        {%- assign rating_value = product.metafields.opinew.reviews_rich_snippet | split: 'ratingValue" content="' | last | split: '"' | first | plus: 0 -%}
+        {% if rating_count > 0 and rating_value > 0 %}
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingCount": {{ rating_count }},
+            "ratingValue": {{ rating_value }}
+          }
+        {% endif %}
+      {% endif %}
+    {% when 'orankl' %}
+      {% if product.metafields.orankl.review_count and product.metafields.orankl.review_count != '0' %}
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingCount": {{ product.metafields.orankl.review_count }},
+          "ratingValue": {{ product.metafields.orankl.rating }}
+        }
+      {% endif %}
+    {% when 'reviews_io' %}
+      {% if product.metafields.reviewscouk.total and product.metafields.reviewscouk.total != '0' %}
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingCount": {{ product.metafields.reviewscouk.total }},
+          "ratingValue": {{ product.metafields.reviewscouk.rating }}
+        }
+      {% endif %}
+    {% when 'loox' %}
+      {% if product.metafields.loox.num_reviews and product.metafields.loox.num_reviews != '0' %}
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingCount": {{ product.metafields.loox.num_reviews }},
+          "ratingValue": {{ product.metafields.loox.avg_rating }}
+        }
+      {% endif %}
+    {% when 'ryviu' %}
+      {% if product.metafields.ryviu.reviews %}
+        {%- assign ryviu_count = product.metafields.ryviu.reviews | split: 'reviewCount" content="' | last | split: '"' | first | plus: 0 -%}
+        {%- assign ryviu_value = product.metafields.ryviu.reviews | split: 'ratingValue" content="' | last | split: '"' | first | plus: 0 -%}
+        {% if ryviu_count > 0 and ryviu_value > 0 %}
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingCount": {{ ryviu_count }},
+            "ratingValue": {{ ryviu_value }}
+          }
+        {% endif %}
+      {% endif %}
+    {% when 'trust' %}
+      {% if product.metafields.vnreviews.reviewCount and product.metafields.vnreviews.reviewCount != '0' %}
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingCount": {{ product.metafields.vnreviews.reviewCount }},
+          "ratingValue": {{ product.metafields.vnreviews.ratingValue }}
+        }
+      {% endif %}
+    {% when 'yotpo' %}
+      {% if product.metafields.yotpo.reviews_count and product.metafields.yotpo.reviews_count != '0' %}
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingCount": {{ product.metafields.yotpo.reviews_count }},
+          "ratingValue": {{ product.metafields.yotpo.reviews_average }}
+        }
+      {% endif %}
+    {% when 'shopify_reviews' %}
+      {% if product.metafields.spr.reviews %}
+        {%- assign spr_count = product.metafields.spr.reviews | split: 'reviewCount" content="' | last | split: '"' | first | plus: 0 -%}
+        {%- assign spr_value = product.metafields.spr.reviews | split: 'ratingValue" content="' | last | split: '"' | first | plus: 0 -%}
+        {% if spr_count > 0 and spr_value > 0 %}
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingCount": {{ spr_count }},
+            "ratingValue": {{ spr_value }}
+          }
+        {% endif %}
+      {% endif %}
+    {% when 'rivio' %}
+      {% if product.metafields.reevio.reviews_count and product.metafields.reevio.reviews_count != '0' %}
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingCount": {{ product.metafields.reevio.reviews_count }},
+          "ratingValue": {{ product.metafields.reevio.reviews_average }}
+        }
+      {% endif %}
+    {% when 'social_shop_wave' %}
+      {% if product.metafields.ssw.count_rate and product.metafields.ssw.count_rate != '0' %}
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingCount": {{ product.metafields.ssw.count_rate }},
+          "ratingValue": {{ product.metafields.ssw.avg_rate }}
+        }
+      {% endif %}
+    {% when 'stampedio' %}
+      {% if product.metafields.stamped.reviews_count and product.metafields.stamped.reviews_count != '0' %}
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingCount": {{ product.metafields.stamped.reviews_count }},
+          "ratingValue": {{ product.metafields.stamped.reviews_average }}
+        }
+      {% endif %}
+  {% endcase %}
+{% else %}
+  {% if product.metafields.loox.num_reviews and product.metafields.loox.num_reviews != '0' %}
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingCount": {{ product.metafields.loox.num_reviews }},
+      "ratingValue": {{ product.metafields.loox.avg_rating }}
+    }
+  {% elsif product.metafields.kudobuzz.reviews_count and product.metafields.kudobuzz.reviews_count != '0' %}
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingCount": {{ product.metafields.kudobuzz.reviews_count }},
+      "ratingValue": {{ product.metafields.kudobuzz.review_rating }}
+    }
+  {% elsif product.metafields.orankl.review_count and product.metafields.orankl.review_count != '0' %}
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingCount": {{ product.metafields.orankl.review_count }},
+      "ratingValue": {{ product.metafields.orankl.rating }}
+    }
+  {% elsif product.metafields.okendo.RatingAndReviewAverageValue and product.metafields.okendo.RatingAndReviewAverageValue != '0' %}
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingCount": {{ product.metafields.okendo.RatingAndReviewCount }},
+      "ratingValue": {{ product.metafields.okendo.RatingAndReviewAverageValue }}
+    }
+  {% elsif product.metafields.vnreviews.reviewCount and product.metafields.vnreviews.reviewCount != '0' %}
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingCount": {{ product.metafields.vnreviews.reviewCount }},
+      "ratingValue": {{ product.metafields.vnreviews.ratingValue }}
+    }
+  {% endif %}
+{% endif %}
+{% endcapture %}
+{% assign aggregate_json = aggregate_json | strip %}
+
+{% capture additional_properties_json %}
+{% if schema_properties != blank %}
+  "additionalProperty": {{ schema_properties | replace: '"[', '[' | replace: ']"', ']' | replace: '\"', '"' }}
+{% endif %}
+{% endcapture %}
+{% assign additional_properties_json = additional_properties_json | strip %}
+
+{% capture return_policy_json %}
+{% if return_policy_flag == true %}
+  "hasMerchantReturnPolicy": {
+    "@type": "MerchantReturnPolicy",
+    "applicableCountry": {{ store_country | json }},
+    "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+    "returnMethod": "https://schema.org/ReturnByMail",
+    "returnFees": "https://schema.org/FreeReturn",
+    "merchantReturnDays": {{ return_window_days | default: 30 }}
+  }
+{% elsif return_policy_flag == false %}
+  "hasMerchantReturnPolicy": {
+    "@type": "MerchantReturnPolicy",
+    "applicableCountry": {{ store_country | json }},
+    "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted"
+  }
+{% endif %}
+{% endcapture %}
+{% assign return_policy_json = return_policy_json | strip %}
+
+{% assign warranty_term = product.metafields.custom.product_warranty_term | default: blank %}
+{% capture warranty_json %}
+{% if warranty_text != blank %}
+  "hasWarrantyPromise": {
+    "@type": "WarrantyPromise",
+    {% if warranty_term != blank %}
+      "durationOfWarranty": {
+        "@type": "QuantitativeValue",
+        "value": {{ warranty_term }},
+        "unitCode": "MON"
+      },
+    {% endif %}
+    "warrantyScope": {{ warranty_text | json }}
+  }
+{% endif %}
+{% endcapture %}
+{% assign warranty_json = warranty_json | strip %}
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": {{ product.title | json }},
+    {% if secondary_title != blank %}
+      "alternateName": {{ secondary_title | json }},
+    {% endif %}
+    "description": {{ description_text | json }},
+    "url": {{ product_url | json }},
+    "image": {{ images_json }},
+    "brand": {
+      "@type": "Brand",
+      "name": {{ brand_name | json }}
+    },
+    "sku": {{ product.selected_or_first_available_variant.sku | json }},
+    "mpn": {{ product.selected_or_first_available_variant.barcode | json }},
+    {% if product.type != blank %}
+      "category": {{ product.type | json }},
+    {% endif %}
+    "offers": {{ offers_json }}
+    {% if aggregate_json != '' %}
+      ,{{ aggregate_json }}
+    {% endif %}
+    {% if additional_properties_json != '' %}
+      ,{{ additional_properties_json }}
+    {% endif %}
+    {% if return_policy_json != '' %}
+      ,{{ return_policy_json }}
+    {% endif %}
+    {% if warranty_json != '' %}
+      ,{{ warranty_json }}
+    {% endif %}
+  }
+</script>
+
+{% if product.options.size >= 1 %}
+  <script>
+    var product_variants_available = [
+      {%- for variant in product.variants -%}
+        {%- if variant.available -%}
+          `{{ variant.title }}`,
+        {%- endif -%}
+      {%- endfor -%}
+    ];
+    var product_options_count = {{ product.options.size }};
+  </script>
+{% endif %}
+
+{% unless product.tags contains 'Custom Length' %}
+<script>
+(function(){
+  var form = document.getElementById('{{ form_id }}'); // addToCartForm-{{ section.id }}
+var btn  = document.getElementById('addToCartButton');
+  if (!form || !btn) return;
+
+  // tiny busy helper (doesn't touch your custom-length styling)
+  function setBusy(el, busy, text){
+    if (!el) return;
+    if (busy){
+      if (!el.dataset.origLabel) el.dataset.origLabel = (el.textContent || '').trim();
+      el.disabled = true;
+      el.textContent = text || 'Adding to cart…';
+    } else {
+      el.disabled = false;
+      el.textContent = el.dataset.origLabel || 'Add to Cart';
+    }
+  }
+
+  // Build payload (id, quantity, properties)
+function getVariantIdFromForm(f){
+  // Prefer the hidden select we own
+  var sel = f.querySelector('#productSelect-{{ section.id }}');
+  if (sel && sel.value) return sel.value;
+
+  // Else a checked radio (some themes/apps render radios)
+  var chk = f.querySelector('input[name="id"]:checked');
+  if (chk && chk.value) return chk.value;
+
+  // Else a hidden id field
+  var hid = f.querySelector('input[type="hidden"][name="id"]');
+  if (hid && hid.value) return hid.value;
+
+  // Last resort: any name="id" inside this form
+  var any = f.querySelector('[name="id"]');
+  return any ? any.value : '';
+}
+
+function payloadFromForm(f){
+  var vid  = getVariantIdFromForm(f);
+  var qtyEl = f.querySelector('#quantity, [name="quantity"], [id^="Quantity-"]');
+  var qty   = Math.max(1, parseInt(qtyEl && qtyEl.value, 10) || 1);
+  var props = {};
+  f.querySelectorAll('[name^="properties["]').forEach(function(inp){
+    var m = inp.name.match(/^properties\[(.+)\]$/);
+    if (!m) return;
+    var key = m[1];
+    var val = (inp.type === 'checkbox') ? (inp.checked ? 'Yes' : '') : (inp.value || '');
+    if (val !== '') props[key] = val;
+  });
+  return { id: Number(vid), quantity: qty, properties: props };
+}
+
+
+async function addAjax(e){
+  const isQuote = btn.classList.contains('is-quote');
+  if (isQuote) {
+    e.preventDefault();
+
+    // Build the same safe fallback URL you already had
+    const sel   = form.querySelector('[name="id"]');
+    const vid   = sel && sel.value;
+    const v     = (window.__exVariants || []).find(x => String(x.id) === String(vid));
+
+    const base  = "{{ shop.metafields.custom.quote_url | default: '/pages/request-a-quote' }}";
+    const href  = btn.dataset.quoteHref
+               || (base
+                   + '?product={{ product.title | url_encode }}'
+                   + (v && v.id  ? ('&variant=' + encodeURIComponent(v.id)) : '')
+                   + (v && v.sku ? ('&sku='    + encodeURIComponent(v.sku)) : ''));
+
+    // Prefer the real pop-up. Fall back to your site hooks, then last-resort redirect.
+    if (typeof window.__openQuotePopup === 'function') {
+      window.__openQuotePopup(v, href);
+    } else {
+      // Fire your site event so any theme/app can open its modal
+      document.dispatchEvent(new CustomEvent('ex:quote:open', { detail: { variant: v, href } }));
+
+      // Try common triggers if nothing is listening
+      var trigger = document.querySelector('[data-quote-trigger], .js-quote-trigger, a[href="#quote-popup"], button[name="quote"]');
+      if (trigger) { trigger.click(); }
+      else {
+        var modal = document.getElementById('quoteModal') || document.getElementById('QuotePopup') || document.getElementById('request-a-quote');
+        if (modal) {
+          modal.classList.add('is-open');
+          modal.removeAttribute('hidden');
+          if (window.MicroModal?.show) MicroModal.show(modal.id);
+          if (window.Fancybox?.show)   Fancybox.show([{ src:'#'+modal.id, type:'inline' }]);
+        } else {
+          window.location.href = href; // absolute last resort
+        }
+      }
+    }
+    return; // IMPORTANT: don’t run normal add-to-cart
+  }
+
+    e.preventDefault();
+    var pl = payloadFromForm(form);
+    if (!pl.id) return;
+
+    setBusy(btn, true);
+    try {
+      const res = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(pl)
+      });
+      if (!res.ok) throw new Error('add_failed_' + res.status);
+      const lineItem = await res.json(); // /cart/add.js returns the added line item
+
+      // 🔔 use your header popup exactly as written
+      if (window.showCartPopup) window.showCartPopup(lineItem);
+    } catch (err) {
+      console.error('[non-custom ATC] AJAX failed:', err);
+      // graceful fallback
+      window.location.href = '/cart';
+    } finally {
+      setBusy(btn, false);
+    }
+  }
+
+  // Intercept both button click and form submit (Enter key)
+  if (!btn.dataset.exAjaxBound){
+    btn.addEventListener('click', addAjax, false);
+    form.addEventListener('submit', addAjax, true);
+    btn.dataset.exAjaxBound = '1';
+  }
+})();
+</script>
+{% endunless %}
+
+<script>
+(function(){
+  var sectionId = "{{ section.id }}";
+  var $nav  = jQuery('#productThumbs-' + sectionId);
+  var $main = jQuery('#productPhotoContainer-' + sectionId + ' .productPhotoSlider');
+
+  // Normalize a Shopify image path to its base filename (no sizing suffixes or @2x)
+  function baseFile(u){
+    try{
+      var f = String(u).split('?')[0].split('/').pop();      // filename.ext or filename_600x600@2x.ext
+      // strip _{w}x{h} and optional @Nx before the extension
+      f = f.replace(/_(\d+)x(\d+)(@[0-9.]x)?(?=\.)/i, '');
+      // also strip plain @Nx before the extension if present
+      f = f.replace(/@[0-9.]x(?=\.)/i, '');
+      return f.toLowerCase();
+    }catch(e){ return ''; }
+  }
+
+  function goToIndex(idx){
+    if (idx == null || idx < 0) return;
+    if ($nav.length  && $nav.hasClass('slick-initialized'))  $nav.slick('slickGoTo', idx, true);
+    if ($main.length && $main.hasClass('slick-initialized')) $main.slick('slickGoTo', idx, true);
+  }
+
+  function findThumbAnchorById(imgId){
+    if (!imgId) return jQuery();
+    return $nav.find('a.product-photo-thumb-' + sectionId + '[data-image-id="'+ String(imgId) +'"]');
+  }
+
+  function findThumbAnchorByFile(vsrc){
+    var token = baseFile(vsrc);
+    if (!token) return jQuery();
+    var found = jQuery();
+    $nav.find('a.product-photo-thumb-' + sectionId).each(function(){
+      var href = jQuery(this).attr('href') || '';
+      var img  = jQuery(this).find('img').attr('src') || '';
+      if (baseFile(href) === token || baseFile(img) === token){
+        found = jQuery(this);
+        return false; // break
+      }
+    });
+    return found;
+  }
+
+  function idxOfThumb($a){
+    if (!$a || !$a.length) return -1;
+    var $li = $a.closest('li');
+    var idx = $li.data('slick-index');
+    if (typeof idx !== 'number') {
+      // compute among the original (non-cloned) slides
+      idx = $nav.find('li:not(.slick-cloned)').index($li);
+    }
+    return idx;
+  }
+
+  function showSingleImage(imgId){
+    if (!imgId) return;
+    var $wraps = jQuery('#productPhotoContainer-' + sectionId + ' .lazyload__image-wrapper[data-image-id]');
+    if ($wraps.length){
+      $wraps.addClass('hide').filter('[data-image-id="'+ String(imgId) +'"]').removeClass('hide');
+    }
+  }
+
+  function resolveVariant(v){
+    var fi = v && v.featured_image;
+    var fm = v && v.featured_media;
+    var pvi = fm && fm.preview_image;
+
+    var imgId = (fi && fi.id) || (pvi && pvi.id) || null;
+    var src   = (fi && fi.src) || (pvi && pvi.src) || (fm && fm.src) || '';
+    return { imgId: imgId ? String(imgId) : null, src: src };
+  }
+
+  function syncToVariant(v){
+    if (!v) return;
+    var tgt = resolveVariant(v);
+
+    // 1) Try exact data-image-id
+    var $a = findThumbAnchorById(tgt.imgId);
+
+    // 2) Fallback to filename match (handles _1024x1024@2x etc.)
+    if (!$a.length) $a = findThumbAnchorByFile(tgt.src);
+
+    if ($a.length){
+      var idx = idxOfThumb($a);
+      if (idx >= 0) { goToIndex(idx); return; }
+    }
+
+    // 3) No thumbs? Toggle single image wrappers by data-image-id
+    if (tgt.imgId) showSingleImage(tgt.imgId);
+  }
+
+  // —— Events we respond to ——
+  document.addEventListener('variant:changed', function(e){
+    syncToVariant(e && e.detail && e.detail.variant);
+  }, { passive:true });
+
+  document.addEventListener('variant:change', function(e){
+    syncToVariant(e && e.detail && e.detail.variant);
+  }, { passive:true });
+
+  // Fallback: hidden <select name="id">
+  var sel = document.getElementById('productSelect-' + sectionId);
+  if (sel){
+    sel.addEventListener('change', function(){
+      try{
+        var id = this.value;
+        var list = (window.__exVariants || []);
+        var v = list.find(function(x){ return String(x.id) === String(id); });
+        if (v) syncToVariant(v);
+      } catch(_) {}
+    });
+  }
+
+  // Prime once after Slick is ready (handles first paint and ?variant=)
+  function initialSync(){
+    try{
+      var idEl = document.getElementById('productSelect-' + sectionId);
+      var id = idEl && idEl.value;
+      var v = (window.__exVariants || []).find(function(x){ return String(x.id) === String(id); });
+      if (v) syncToVariant(v);
+    }catch(_){}
+  }
+
+  function bothReady(){
+    return (!$nav.length || $nav.hasClass('slick-initialized')) &&
+           (!$main.length || $main.hasClass('slick-initialized'));
+  }
+
+  function safeInitialSync(){
+    try{
+      var idEl = document.getElementById('productSelect-' + sectionId);
+      var id = idEl && idEl.value;
+      var v = (window.__exVariants || []).find(function(x){ return String(x.id) === String(id); });
+      if (v) syncToVariant(v);
+    }catch(_){}
+  }
+
+  if (bothReady()) {
+    safeInitialSync();
+  } else {
+    var trySync = function(){ if (bothReady()) { $nav.off('init', trySync); $main.off && $main.off('init', trySync); safeInitialSync(); } };
+    if ($nav.length && !$nav.hasClass('slick-initialized'))  $nav.on('init', trySync);
+    if ($main.length && !$main.hasClass('slick-initialized')) $main.on('init', trySync);
+    setTimeout(trySync, 300); // safety if init already happened
+  }
+
+
+  // Also handle back/forward when ?variant= changes
+  window.addEventListener('popstate', initialSync, { passive:true });
+
+  // If your theme hasn’t exposed minimal variant data yet, do it once:
+  (function primeVariants(){
+    if (window.__exVariants && window.__exVariants.length) return;
+    try {
+      window.__exVariants = [
+        {% for v in product.variants %}
+          { id: {{ v.id }}, featured_image: {{ v.featured_image | json }}, featured_media: {{ v.featured_media | json }} }
+          {% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      ];
+    } catch(_) {}
+  })();
+})();
+</script>
+
+<script>
+(function($){
+  var sectionId = "{{ section.id }}";
+  var $nav  = $('#productThumbs-' + sectionId);
+  var $main = $('#productPhotoContainer-' + sectionId + ' .productPhotoSlider');
+
+  function nonClonedIndex($li){
+    if (!$nav.length) return -1;
+    var idx = $li.data('slick-index');
+    if (typeof idx !== 'number') {
+      idx = $nav.find('li:not(.slick-cloned)').index($li);
+    }
+    return idx;
+  }
+
+  // Keep this somewhere once (top or bottom). It’s safe and tiny.
+window.updateImageUI = window.updateImageUI || function (v) {
+  try { document.dispatchEvent(new CustomEvent('variant:changed', { detail: { variant: v } })); } catch (_) {}
+};
+
+
+  function bindThumbFix(){
+    if (!$nav.length || $nav.data('exThumbPatched')) return;
+
+    // Make thumbs behave like buttons (never navigate)
+    $nav.find('a.product-photo-thumb')
+      .removeAttr('target')
+      .attr('role','button')
+      .attr('tabindex','0');
+
+    // Prevent link navigation; then drive both sliders to the correct index
+    $nav.on('click', 'a.product-photo-thumb', function(e){
+      e.preventDefault(); // stop opening image URL/new tab
+       e.stopPropagation();
+
+      var $a  = $(this);
+      var $li = $a.closest('li');
+      var idx = nonClonedIndex($li);
+      if (idx < 0) return;
+
+      if ($nav.hasClass('slick-initialized'))  $nav.slick('slickGoTo', idx, true);
+      if ($main.length && $main.hasClass('slick-initialized')) $main.slick('slickGoTo', idx, true);
+    });
+
+    // Keyboard support (Enter/Space)
+    $nav.on('keydown', 'a.product-photo-thumb', function(e){
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $(this).trigger('click'); }
+    });
+
+    $nav.data('exThumbPatched', 1);
+  }
+
+  if ($nav.hasClass('slick-initialized')) bindThumbFix();
+  else $nav.on('init', bindThumbFix);
+})(jQuery);
+</script>
+
+<script>
+/* PDP-only: permanently disable any global GST toggle */
+window.__gstApply = function(){};           // no-op the toggle
+try { localStorage.removeItem('gst_mode'); } catch(_) {}
+</script>
+
+  
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  try {
+    var wrap = document.getElementById('ex-price-wrap-{{ section.id }}');
+    var isZero = !!(wrap && wrap.getAttribute('data-ex-init-zero') === '1');
+
+    var sel = document.getElementById('productSelect-{{ section.id }}');
+    var vid = sel && sel.value;
+    var v = (window.__exVariants || []).find(x => String(x.id) === String(vid));
+
+    if (window.__setAtcMode) window.__setAtcMode(isZero, v);
+  } catch(_) {}
+});
+</script>
+
+<script>
+(function () {
+  // ------- Config resolver (from JSON tag or hardcoded fallback) -------
+  function getHsConfig() {
+    try {
+      const el = document.getElementById('hs-quote-config');
+      if (el && el.textContent.trim()) {
+        const j = JSON.parse(el.textContent);
+        if (j.portalId && j.formId) return j;
+      }
+    } catch (e) {}
+    // Fallback: hardcode here if you prefer
+    return {
+      portalId: "{{ shop.metafields.custom.hs_portal_id | default: '' | escape }}",
+      formId:   "{{ shop.metafields.custom.hs_quote_form_id | default: '' | escape }}"
+    };
+  }
+
+  // ------- Ensure HubSpot forms library is present -------
+  function ensureHsForms(cb) {
+    if (window.hbspt && window.hbspt.forms && typeof window.hbspt.forms.create === 'function') {
+      cb(); return;
+    }
+    const existing = document.querySelector('script[src*="js.hsforms.net/forms/embed/v2.js"]');
+    if (existing) { existing.addEventListener('load', cb, { once:true }); return; }
+    const s = document.createElement('script');
+    s.src = 'https://js.hsforms.net/forms/embed/v2.js';
+    s.async = true;
+    s.onload = cb;
+    document.head.appendChild(s);
+  }
+
+  // ------- Minimal modal (no dependencies) -------
+  function ensureModal() {
+    let modal = document.getElementById('hs-quote-modal');
+    if (modal) return modal;
+
+    const css = `
+      #hs-quote-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;opacity:0;transition:opacity .15s;}
+      #hs-quote-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9999;visibility:hidden;}
+      #hs-quote-modal.is-open{visibility:visible;}
+      #hs-quote-modal.is-open + #hs-quote-overlay{opacity:1;}
+      .hs-modal-box{background:#fff;max-width:720px;width:92vw;max-height:88vh;overflow:auto;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.25);}
+      .hs-modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #eee;}
+      .hs-modal-title{font-weight:700;font-size:18px;margin:0;}
+      .hs-modal-close{appearance:none;border:0;background:transparent;font-size:22px;line-height:1;cursor:pointer;padding:6px;}
+      .hs-modal-body{padding:20px;}
+    `;
+    const style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
+
+    modal = document.createElement('div');
+    modal.id = 'hs-quote-modal';
+    modal.innerHTML = `
+      <div class="hs-modal-box" role="dialog" aria-modal="true" aria-label="Request a Quote">
+        <div class="hs-modal-head">
+          <h3 class="hs-modal-title">Request a Quote</h3>
+          <button class="hs-modal-close" aria-label="Close">×</button>
+        </div>
+        <div class="hs-modal-body">
+          <div id="hs-quote-form"></div>
+        </div>
+      </div>
+    `;
+    const overlay = document.createElement('div');
+    overlay.id = 'hs-quote-overlay';
+
+    document.body.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    const close = () => { modal.classList.remove('is-open'); overlay.style.pointerEvents = 'none'; setTimeout(()=>{ overlay.removeAttribute('style'); }, 160); };
+    modal.querySelector('.hs-modal-close').addEventListener('click', close);
+    overlay.addEventListener('click', close);
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+
+    return modal;
+  }
+
+  // ------- Prefill helper (fills whichever fields exist) -------
+  function prefillFormFields(root, data) {
+    if (!root) return;
+    const trySet = (names, val) => {
+      names.forEach(n => {
+        const el = root.querySelector(`[name="${n}"]`);
+        if (el && val != null) el.value = String(val);
+      });
+    };
+    trySet(['product','product_name','quote_product'], data.productTitle);
+    trySet(['variant','variant_id'], data.variantId);
+    trySet(['sku'], data.sku);
+  }
+
+  // ------- Open the HubSpot modal with form -------
+  function openQuotePopup(variant, href) {
+    const modal = ensureModal();
+    const formWrap = modal.querySelector('#hs-quote-form');
+    const { portalId, formId } = getHsConfig();
+
+    // Always open modal (no navigation)
+    modal.classList.add('is-open');
+
+    // Load + render form once
+    if (!formWrap.dataset.rendered) {
+      ensureHsForms(function () {
+        if (!portalId || !formId || !window.hbspt || !window.hbspt.forms) {
+          console.warn('[quote] Missing HubSpot portalId/formId');
+          formWrap.innerHTML = '<p>Sorry, the quote form is unavailable right now.</p>';
+          return;
+        }
+        window.hbspt.forms.create({
+          portalId: portalId,
+          formId: formId,
+          target: '#hs-quote-form',
+          // Prefill after HubSpot inserts the form
+          onFormReady: function ($form) {
+            // Build data for prefill
+            var vid = variant && variant.id;
+            var sku = variant && variant.sku;
+            var data = {
+              productTitle: "{{ product.title | escape }}",
+              variantId: vid ? String(vid) : '',
+              sku: sku ? String(sku) : ''
+            };
+            // HubSpot passes a jQuery-like object sometimes; fallback to DOM
+            var root = ($form && $form[0]) ? $form[0] : document.querySelector('#hs-quote-form form');
+            prefillFormFields(root, data);
+          }
+        });
+        formWrap.dataset.rendered = '1';
+      });
+    } else {
+      // If form already exists, try to refresh fields for current variant
+      var root = formWrap.querySelector('form');
+      var vid = variant && variant.id;
+      var sku = variant && variant.sku;
+      prefillFormFields(root, {
+        productTitle: "{{ product.title | escape }}",
+        variantId: vid ? String(vid) : '',
+        sku: sku ? String(sku) : ''
+      });
+    }
+  }
+
+  // ------- Keep your ATC toggler as-is (used elsewhere) -------
+  function setAtcMode(isZero, variant) {
+    var btn  = document.getElementById('addToCartButton');
+    var form = document.querySelector('form[action="/cart/add"], form.product-form, form[id^="product-form"]');
+    if (!btn || !form) return;
+
+    if (isZero) {
+      btn.classList.add('is-quote');
+      btn.type = 'button';
+      btn.setAttribute('aria-label', 'Request a Quote');
+      btn.innerHTML =
+        '<span style="display:flex;align-items:center;gap:10px;">'
+        + '<i class="fa fa-cart" style="content:url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Asset_Cart-white.png?v=1730169426);height:17px;"></i>'
+        + 'Request a Quote</span>';
+
+      var dyn = form.querySelector('.shopify-payment-button');
+      if (dyn) dyn.style.display = 'none';
+
+      // Bind once: clicking should open the HubSpot modal (no navigation)
+      if (!btn.dataset.hsBound) {
+        btn.addEventListener('click', function(e){
+          if (!btn.classList.contains('is-quote')) return;
+          e.preventDefault();
+          try {
+            var sel = form.querySelector('[name="id"]');
+            var vid = sel && sel.value;
+            var v   = (window.__exVariants || []).find(x => String(x.id) === String(vid)) || variant || null;
+            openQuotePopup(v);
+          } catch (err) {
+            console.warn('[quote] open failed', err);
+          }
+        }, false);
+        btn.dataset.hsBound = '1';
+      }
+    } else {
+      btn.classList.remove('is-quote');
+      btn.type = 'submit';
+      btn.removeAttribute('aria-label');
+      btn.innerHTML =
+        '<span style="display:flex;align-items:center;gap:10px;">'
+        + '<i class="fa fa-cart" style="content:url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Asset_Cart-white.png?v=1730169426);height:17px;"></i>'
+        + 'Add to Cart</span>';
+
+      var dyn2 = form.querySelector('.shopify-payment-button');
+      if (dyn2) dyn2.style.display = '';
+    }
+  }
+
+  // Expose globals expected by the rest of your code
+  window.__openQuotePopup = openQuotePopup;
+  window.__setAtcMode     = setAtcMode;
+
+  // Safety: block submit in quote mode
+  document.addEventListener('submit', function (e) {
+    var btn = document.getElementById('addToCartButton');
+    if (btn && btn.classList.contains('is-quote')) e.preventDefault();
+  }, true);
+})();
+</script>
+
+<script>
+(function () {
+  // ----- Your HubSpot form IDs -----
+  const HS = {
+    portalId: "2595431",
+    formId:   "40149631-403b-45b0-897c-3c1d08fa1a32",
+    region:   "ap1"
+  };
+
+  // Load HubSpot forms library once
+  function ensureHsForms(cb){
+    if (window.hbspt?.forms?.create) return cb();
+    const existing = document.querySelector('script[src*="js.hsforms.net/forms/embed/v2.js"]');
+    if (existing) { existing.addEventListener('load', cb, { once:true }); return; }
+    const s = document.createElement('script');
+    s.src = 'https://js.hsforms.net/forms/embed/v2.js';
+    s.async = true;
+    s.onload = cb;
+    document.head.appendChild(s);
+  }
+
+  // Tiny modal (no dependencies)
+  function ensureModal(){
+    let modal = document.getElementById('hs-quote-modal');
+    if (modal) return modal;
+
+    const css = `
+      #hs-quote-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;opacity:0;transition:opacity .15s;}
+      #hs-quote-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9999;visibility:hidden;}
+      #hs-quote-modal.is-open{visibility:visible;}
+      #hs-quote-modal.is-open + #hs-quote-overlay{opacity:1;}
+      .hs-modal-box{background:#fff;max-width:720px;width:92vw;max-height:88vh;overflow:auto;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.25);}
+      .hs-modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #eee;}
+      .hs-modal-title{font-weight:700;font-size:18px;margin:0;}
+      .hs-modal-close{appearance:none;border:0;background:transparent;font-size:22px;line-height:1;cursor:pointer;padding:6px;}
+      .hs-modal-body{padding:20px;}
+    `;
+    const style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
+
+    modal = document.createElement('div');
+    modal.id = 'hs-quote-modal';
+    modal.innerHTML = `
+      <div class="hs-modal-box" role="dialog" aria-modal="true" aria-label="Request a Quote">
+        <div class="hs-modal-head">
+          <h3 class="hs-modal-title">Request a Quote</h3>
+          <button class="hs-modal-close" aria-label="Close">×</button>
+        </div>
+        <div class="hs-modal-body">
+          <div id="hs-quote-form"></div>
+        </div>
+      </div>`;
+    const overlay = document.createElement('div');
+    overlay.id = 'hs-quote-overlay';
+    document.body.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    const close = () => { modal.classList.remove('is-open'); overlay.style.pointerEvents='none'; setTimeout(()=>overlay.removeAttribute('style'),160); };
+    modal.querySelector('.hs-modal-close').addEventListener('click', close);
+    overlay.addEventListener('click', close);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+
+    return modal;
+  }
+
+  // Build the string for HubSpot field "quote_product"
+  function buildQuoteProduct() {
+    const title = "{{ product.title | escape }}";
+    const sel = document.getElementById('productSelect-{{ section.id }}');
+    const opt = sel?.selectedOptions?.[0];
+    const variantTextRaw = (opt?.text || '').trim();
+    const variantText = variantTextRaw && variantTextRaw.toLowerCase() !== 'default title' ? variantTextRaw : '';
+    const sku = opt?.getAttribute('data-sku') || (function(){
+      try {
+        const id = sel?.value;
+        const v  = (window.__exVariants || []).find(x => String(x.id) === String(id));
+        return v?.sku || '';
+      } catch(_) { return ''; }
+    })();
+    let s = title;
+    if (variantText) s += ' — ' + variantText;
+    if (sku)         s += ' (SKU ' + sku + ')';
+    s += ' — ' + window.location.href;
+    return s;
+  }
+
+  // If the form is present, set quote_product now
+  function prefillQuoteField() {
+    const f  = document.querySelector('#hs-quote-form form');
+    const qp = f?.querySelector('[name="quote_product"]');
+    if (!qp) return;
+    qp.value = buildQuoteProduct();
+    qp.dispatchEvent(new Event('input',  { bubbles:true }));
+    qp.dispatchEvent(new Event('change', { bubbles:true }));
+  }
+
+  // Open the modal and render (or reuse) the HubSpot form
+  function openQuotePopup() {
+    const modal = ensureModal();
+    modal.classList.add('is-open');
+
+    if (!document.querySelector('#hs-quote-form form')) {
+      ensureHsForms(function(){
+        window.hbspt.forms.create({
+          portalId: HS.portalId,
+          formId:   HS.formId,
+          region:   HS.region,
+          target:   '#hs-quote-form',
+          onFormReady: function(){ prefillQuoteField(); }
+        });
+      });
+    } else {
+      prefillQuoteField(); // refresh value for current selection
+    }
+  }
+
+  // Toggle main button between ATC and Quote; intercept click to open modal
+  function setAtcMode(isZero /* Boolean */, variant) {
+    const btn  = document.getElementById('addToCartButton');
+    const form = document.querySelector('form[action="/cart/add"], form.product-form, form[id^="product-form"]');
+    if (!btn || !form) return;
+
+    if (isZero) {
+      btn.classList.add('is-quote');
+      btn.type = 'button';
+      btn.setAttribute('aria-label', 'Request a Quote');
+      btn.innerHTML =
+        '<span style="display:flex;align-items:center;gap:10px;">'
+        + '<i class="fa fa-cart" style="content:url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Asset_Cart-white.png?v=1730169426);height:17px;"></i>'
+        + 'Request a Quote</span>';
+
+      const dyn = form.querySelector('.shopify-payment-button');
+      if (dyn) dyn.style.display = 'none';
+
+      if (!btn.dataset.hsBound) {
+        btn.addEventListener('click', function(e){
+          if (!btn.classList.contains('is-quote')) return;
+          e.preventDefault();
+          openQuotePopup();
+        }, false);
+        btn.dataset.hsBound = '1';
+      }
+    } else {
+      btn.classList.remove('is-quote');
+      btn.type = 'submit';
+      btn.removeAttribute('aria-label');
+      btn.innerHTML =
+        '<span style="display:flex;align-items:center;gap:10px;">'
+        + '<i class="fa fa-cart" style="content:url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Asset_Cart-white.png?v=1730169426);height:17px;"></i>'
+        + 'Add to Cart</span>';
+
+      const dyn2 = form.querySelector('.shopify-payment-button');
+      if (dyn2) dyn2.style.display = '';
+    }
+  }
+
+  // Expose the two hooks your existing code calls
+  window.__openQuotePopup = openQuotePopup;
+  window.__setAtcMode     = setAtcMode;
+
+  // Keep HubSpot field in sync if the user changes variant while modal is open
+  document.addEventListener('variant:changed', prefillQuoteField, { passive:true });
+
+  // Safety: block form submit if we’re in quote mode
+  document.addEventListener('submit', function (e) {
+    const btn = document.getElementById('addToCartButton');
+    if (btn && btn.classList.contains('is-quote')) e.preventDefault();
+  }, true);
+})();
+</script>
+
+{% if template contains 'product' %}
+<script>
+(() => {
+  // Call this right after a successful add-to-cart
+  async function syncAfterAdd(lineItem){
+    try {
+      // 1) Update the min-order bars (PDP + cart sidebar if present)
+      if (window.exMinOrder && typeof exMinOrder.refresh === 'function') {
+        await exMinOrder.refresh();
+      }
+
+      // 2) Re-lock / unlock the popup checkout button (header popup)
+      if (typeof refreshPopupMinGate === 'function') {
+        refreshPopupMinGate();
+      }
+
+      // 3) Update the header badge
+      if (typeof refreshCartCount === 'function') {
+        refreshCartCount();
+      }
+    } catch(_) {}
+  }
+
+  // A) If your theme calls showCartPopup(lineItem) on success, hook it
+  if (typeof window.showCartPopup === 'function') {
+    const __oldShow = window.showCartPopup;
+    window.showCartPopup = function(lineItem){
+      try { __oldShow && __oldShow(lineItem); }
+      finally { syncAfterAdd(lineItem); }
+    };
+  }
+
+  // B) Patch fetch to catch AJAX adds
+  const _fetch = window.fetch;
+  window.fetch = function(input, init){
+    const p = _fetch.apply(this, arguments);
+    try {
+      const url = (typeof input === 'string' ? input : input?.url) || '';
+      const method = (init?.method || input?.method || 'GET').toUpperCase();
+      if (/\/cart\/add(\.js)?(?:\?|$)/.test(url) && method === 'POST'){
+        return p.then(async res => {
+          try {
+            if (res && res.ok) {
+              let li = null;
+              try { li = await res.clone().json(); } catch(_){}
+              await syncAfterAdd(li);
+            }
+          } finally { return res; }
+        });
+      }
+    } catch(_) {}
+    return p;
+  };
+
+  // C) Patch XHR too (some apps/themes still use it)
+  const _open = XMLHttpRequest.prototype.open;
+  const _send = XMLHttpRequest.prototype.send;
+
+  XMLHttpRequest.prototype.open = function(method, url){
+    this.__ex_isAdd = /\/cart\/add(\.js)?(?:\?|$)/.test(String(url)) &&
+                      String(method).toUpperCase() === 'POST';
+    return _open.apply(this, arguments);
+  };
+
+  XMLHttpRequest.prototype.send = function(){
+    this.addEventListener('load', async function(){
+      if (this.__ex_isAdd && this.status >= 200 && this.status < 300){
+        let li = null;
+        try { li = JSON.parse(this.responseText); } catch(_){}
+        await syncAfterAdd(li);
+      }
+    });
+    return _send.apply(this, arguments);
+  };
+})();
+</script>
+{% endif %}
+
+<style>
+  /* Make overlay non-interactive by default; only active while modal is open */
+  #hs-quote-overlay { pointer-events: none; opacity: 0; transition: opacity .15s; }
+  #hs-quote-modal.is-open + #hs-quote-overlay { pointer-events: auto; opacity: 1; }
+</style>
+
+<script>
+(function () {
+  function hardCloseQuote() {
+    const modal   = document.getElementById('hs-quote-modal');
+    const overlay = document.getElementById('hs-quote-overlay');
+    if (modal)   modal.classList.remove('is-open');
+    if (overlay) { overlay.style.pointerEvents = 'none'; overlay.style.opacity = '0'; }
+  }
+
+  // Close when clicking X, the overlay, pressing Esc, or navigating away
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.hs-modal-close') || e.target.id === 'hs-quote-overlay') hardCloseQuote();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hardCloseQuote(); });
+  window.addEventListener('popstate', hardCloseQuote);
+  window.addEventListener('hashchange', hardCloseQuote);
+
+  // Allow external code to force-close
+  document.addEventListener('ex:quote:close', hardCloseQuote);
+
+  // If Fancybox/MicroModal are used anywhere, also close our overlay on their close events
+  if (window.Fancybox) {
+    document.addEventListener('fancybox:closing', hardCloseQuote);
+    document.addEventListener('fancybox:closed',  hardCloseQuote);
+  }
+  if (window.MicroModal && window.MicroModal.close) {
+    const _mmClose = window.MicroModal.close;
+    window.MicroModal.close = function() { try { hardCloseQuote(); } catch(_){} return _mmClose.apply(this, arguments); };
+  }
+})();
+</script>
+<script>
+(function () {
+  // treat "svc" as a word token, whether it's "· svc", "- svc", or just "svc"
+  const SVC_RX_ANY    = /\bsvc\b/i;
+  const SVC_RX_SUFFIX = /\s*[·\-]?\s*svc\s*$/i;
+
+  const hasSvc   = (s) => SVC_RX_ANY.test(String(s || ''));
+  const stripSvc = (s) => String(s || '').replace(SVC_RX_SUFFIX, '').trim();
+
+  function purgeSvcOptionsInUI(root = document) {
+    // 1) native <select> options (all selects)
+    root.querySelectorAll('select').forEach(sel => {
+      for (let i = sel.options.length - 1; i >= 0; i--) {
+        const o = sel.options[i];
+        if (hasSvc(o.value) || hasSvc(o.text)) sel.remove(i);
+      }
+      // if current value got removed, pick first non-empty option
+      if (sel.selectedIndex === -1 && sel.options.length) {
+        const firstOK = Array.from(sel.options).find(o => o.value !== '');
+        if (firstOK) sel.value = firstOK.value;
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+
+    // 2) common custom UIs (pills/labels/radios). remove the wrapper if possible.
+    const candidates = root.querySelectorAll(
+      [
+        '[data-value]',
+        '[data-option-value]',
+        '.swatch-element',
+        'label',
+        'button',
+        'li',
+        'input[type="radio"]',
+        'input[type="button"]'
+      ].join(',')
+    );
+
+    candidates.forEach(el => {
+      const val =
+        el.getAttribute?.('data-value') ||
+        el.getAttribute?.('data-option-value') ||
+        ('value' in el ? el.value : '') ||
+        el.textContent;
+
+      if (hasSvc(val)) {
+        const wrap = el.closest('.swatch-element, .single-option-selector__item, li, label') || el;
+        wrap.remove();
+      }
+    });
+  }
+
+  function sanitizeNativeVariantSelect() {
+    const variantSelect =
+      document.querySelector('select[name="id"]') ||
+      document.querySelector('#productSelect, [id^="productSelect-"]');
+
+    if (!variantSelect) return;
+
+    // remove options whose text/value has "svc"
+    for (let i = variantSelect.options.length - 1; i >= 0; i--) {
+      const opt = variantSelect.options[i];
+      if (hasSvc(opt.value) || hasSvc(opt.text)) variantSelect.remove(i);
+    }
+
+    // if the selected one was svc, move to the first remaining
+    if (variantSelect.selectedIndex === -1 && variantSelect.options.length) {
+      variantSelect.selectedIndex = 0;
+      variantSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }
+
+  function ensureNonSvcSelected() {
+    const variantSelect =
+      document.querySelector('select[name="id"]') ||
+      document.querySelector('#productSelect, [id^="productSelect-"]');
+
+    if (!variantSelect) return;
+
+    const opt = variantSelect.options[variantSelect.selectedIndex];
+    if (!opt) return;
+
+    if (hasSvc(opt.value) || hasSvc(opt.text)) {
+      // choose first clean option
+      const clean = Array.from(variantSelect.options).find(o => !(hasSvc(o.value) || hasSvc(o.text)));
+      if (clean) {
+        variantSelect.value = clean.value;
+        variantSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+  }
+
+  // re-run on hydration/mutations (themes love to reinsert UI)
+  function startSvcWatcher(root = document) {
+    let t;
+    const run = () => {
+      clearTimeout(t);
+      t = setTimeout(() => {
+        sanitizeNativeVariantSelect();
+        purgeSvcOptionsInUI(root);
+        ensureNonSvcSelected();
+      }, 30);
+    };
+    const mo = new MutationObserver(run);
+    mo.observe(root, { childList: true, subtree: true });
+    // a couple of delayed sweeps
+    setTimeout(run, 200);
+    setTimeout(run, 800);
+  }
+
+  function init() {
+    sanitizeNativeVariantSelect();
+    purgeSvcOptionsInUI();
+    ensureNonSvcSelected();
+    startSvcWatcher();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+<script>
+(() => {
+  const css = `
+    .as-widget-wrapper{
+      border:2px solid #e8e8e8 !important;
+      border-radius: 15px !important;
+      padding: 20px !important;
+    }
+
+    .as-widget-destination-button{
+      color:#0069a7 !important;
+      font-family: Humanist777BT-Bold !important;
+      font-size: 16px !important;
+      text-decoration: none !important;
+      border-bottom: 2px solid #0069a7;
+    }
+    div.as-widget-template span {
+    font-family: Humanist777BT-Bold !important;
+    }
+  `;
+
+  function inject() {
+    const host = document.querySelector('aftership-aedd');
+    if (!host || !host.shadowRoot) return false;
+
+    // avoid duplicate injection
+    if (host.shadowRoot.querySelector('style[data-aedd-override]')) return true;
+
+    const style = document.createElement('style');
+    style.setAttribute('data-aedd-override', 'true');
+    style.textContent = css;
+    host.shadowRoot.appendChild(style);
+    return true;
+  }
+
+  // try immediately
+  if (inject()) return;
+
+  // retry when it mounts / re-renders
+  const mo = new MutationObserver(() => inject());
+  mo.observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>

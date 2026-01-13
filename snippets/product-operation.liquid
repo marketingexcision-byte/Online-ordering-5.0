@@ -1,0 +1,137 @@
+{% if product.tags contains 'Operation_Profiling'
+  or product.tags contains 'Operation_Chamfering'
+  or product.tags contains 'Operation_Side Milling'
+  or product.tags contains 'Operation_Small Part'
+  or product.tags contains 'Operation_Slotting'
+  or product.tags contains 'Operation_Die Sinking'
+  or product.tags contains 'Operation_Facing'
+  or product.tags contains 'Operation_Corner'
+  or product.tags contains 'Operation_Helical-Interpol'
+  or product.tags contains 'Operation_Trochoidal'
+  or product.tags contains 'Operation_Side Taper'
+  or product.tags contains 'Operation_Blind Drilling'
+  or product.tags contains 'Operation_Through Drilling'
+%}
+      <div class="work-material series-cont con-box">
+        <div class="work-material-cont full-width">
+          <div id="product-info" data-tags="{{ product.tags | join: ',' }}" style="display: none;"></div>
+
+          {% if product.tags contains 'Operation_Profiling' %}
+            <div class="operation quarter-width">
+              <div class="operation-info">
+                <div class="operation-name">Profiling</div>
+                <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MS_Profiling.gif?v=1734488393">
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Operation_Chamfering' %}
+            <div class="operation quarter-width">
+              <div class="operation-info">
+                <div class="operation-name">Chamfering</div>
+                <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MS_Chamfering.gif?v=1737693363">
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Operation_Side Milling' %}
+            <div class="operation quarter-width">
+              <div class="operation-info">
+                <div class="operation-name">Side Milling</div>
+                <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MS_SideMilling.gif?v=1734488394">
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Operation_Small Part' %}
+            <div class="operation quarter-width">
+              <div class="operation-info">
+                <div class="operation-name">Small Part</div>
+                <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MS_SmallPart.gif?v=1734488393">
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Operation_Slotting' %}
+            <div class="operation quarter-width">
+              <div class="operation-info">
+                <div class="operation-name">Slotting</div>
+                <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MS_Slotting.gif?v=1734491359">
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Operation_Die Sinking' %}
+            <div class="operation quarter-width">
+              <div class="operation-info">
+                <div class="operation-name">Die Sinking</div>
+                <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MS_DieSinking.gif?v=1734491359">
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Operation_Facing' %}
+            <div class="operation quarter-width">
+              <div class="operation-info">
+                <div class="operation-name">Facing</div>
+                <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MS_Facing.gif?v=1734491359">
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Operation_Corner' %}
+            <div class="operation quarter-width">
+              <div class="operation-info">
+                <div class="operation-name">Corner</div>
+                <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MS_Corner.gif?v=1734561347">
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Operation_Helical-Interpol' %}
+            <div class="operation quarter-width">
+              <div class="operation-info">
+                <div class="operation-name">Helical Interpol</div>
+                <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MS_Helical-Interpol.gif?v=1734561347">
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Operation_Trochoidal' %}
+            <div class="operation quarter-width">
+              <div class="operation-info">
+                <div class="operation-name">Trochoidal</div>
+                <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MS_Trochoidal.gif?v=1734577579">
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Operation_Side Taper' %}
+            <div class="operation quarter-width">
+              <div class="operation-info">
+                <div class="operation-name">Side Taper</div>
+                <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MS_TaperSide.gif?v=1736721769">
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Operation_Blind Drilling' %}
+            <div class="operation quarter-width">
+              <div class="operation-info">
+                <div class="operation-name">Blind Drilling</div>
+                <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HS_Blind.gif?v=1737416646">
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Operation_Through Drilling' %}
+            <div class="operation quarter-width">
+              <div class="operation-info">
+                <div class="operation-name">Through Drilling</div>
+                <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HS_Through.gif?v=1737416644">
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+{% endif %}

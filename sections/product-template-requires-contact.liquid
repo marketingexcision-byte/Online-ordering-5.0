@@ -1,0 +1,743 @@
+<style>
+    .lazyload-element {
+      opacity: 0; /* Start hidden */
+      transition-property: opacity;
+  }
+
+  .lazyload-element.animate {
+      animation-name: fadeInUp;
+      animation-duration: 0.75s;
+      animation-delay: 0.4s;
+      animation-fill-mode: forwards; /* Keeps the final state */
+  }
+  .simple-lazyload {
+      opacity: 0;
+      transition: opacity 0.15s ease-in-out;
+  }
+
+  .simple-lazyload.loaded {
+      opacity: 1;
+  }
+
+  /* Optional: a placeholder style to ensure elements are not shown until fully loaded */
+  .simple-lazyload {
+      visibility: hidden;
+  }
+
+  .simple-lazyload.loaded {
+      visibility: visible;
+  }
+</style>
+
+<script>
+  window.addEventListener('load', function () {
+    const lazyloadElements = document.querySelectorAll('.simple-lazyload');
+
+    lazyloadElements.forEach((element) => {
+      if (element.tagName === 'IMG') {
+        // Check if the image is already loaded
+        if (element.complete) {
+          // Add a slight delay to ensure CSS transition applies smoothly
+          setTimeout(() => {
+            element.classList.add('loaded');
+          }, 100); // Adjust delay as needed
+        } else {
+          element.addEventListener('load', () => {
+            // Add a slight delay to ensure CSS transition applies smoothly
+            setTimeout(() => {
+              element.classList.add('loaded');
+            }, 100); // Adjust delay as needed
+          });
+        }
+      } else {
+        // Non-image elements
+        setTimeout(() => {
+          element.classList.add('loaded');
+        }, 100); // Adjust delay as needed
+      }
+    });
+  });
+  window.addEventListener('load', function () {
+    const lazyloadElements = document.querySelectorAll('.lazyload-element');
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate');
+            observer.unobserve(entry.target); // Stop observing after animation
+          }
+        });
+      },
+      {
+        root: null, // Use the viewport as the root
+        rootMargin: '0px 0px 400px 0px', // Load elements 400px before they enter the viewport
+        threshold: 0, // Trigger as soon as any part of the element is in view
+      }
+    );
+
+    lazyloadElements.forEach((element) => {
+      observer.observe(element);
+    });
+  });
+</script>
+{%- include 'wcp_discount' with product -%}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{% include 'wcp_variant' with current_variant %}
+{% include 'wcp_vd_table_change' with product %}
+{% include 'wcp_variant' with current_variant %}
+{% include 'wcp_vd_product' with product %}
+{% include 'wcp_variant' with current_variant %}
+{% assign temp_wcp_v_price = wcp_v_price %}
+{% assign temp_wcp_v_compare_at_price = wcp_v_compare_at_price %}
+<div
+  id="ProductSection"
+  data-section-id="{{ section.id }}"
+  data-section-type="product-template"
+  data-zoom-toggle="zoom-in"
+  data-zoom-enabled="{{ section.settings.product_image_zoom_enable }}"
+  data-related-enabled="{{ section.settings.product_related_enable }}"
+  data-social-sharing="{{ section.settings.social_sharing }}"
+  data-show-compare-at-price="{{ section.settings.product_show_compare_at_price }}"
+  data-stock="{{ section.settings.product_quantity_message }}"
+  data-incoming-transfer="{{ section.settings.product_incoming_message }}"
+  data-ajax-cart-method="{{ settings.ajax_cart_method }}"
+>
+  {% include 'breadcrumb' %}
+  {% case section.settings.add_to_cart_button_size %}
+    {% when 'small' %}
+      {% assign btn_class = 'btn' %}
+    {% when 'medium' %}
+      {% assign btn_class = 'btn btn--wide' %}
+    {% when 'large' %}
+      {% assign btn_class = 'btn btn--full btn--large' %}
+  {% endcase %}
+
+  {% if section.settings.add_to_cart_button_size == 'large' %}
+    <style>
+      .selector-wrapper select, .product-variants select {
+        max-width: 100%;
+      }
+    </style>
+  {% endif %}
+
+  {% if section.settings.product_quantity_enable == false %}
+    <style>
+      .selector-wrapper select, .product-variants select {
+        margin-bottom: 13px;
+      }
+    </style>
+  {% endif %}
+
+  <div class="grid simple-lazyload" itemscope itemtype="http://schema.org/Product">
+    <meta itemprop="url" content="{{ shop.url }}{{ product.url }}">
+    <meta itemprop="image" content="{{ product.featured_image.src | img_url: 'grande' }}">
+    <div class="grid-item large--two-fifths simple-lazyload">
+      <div class="grid">
+        <div class="grid-item large--eleven-twelfths text-center">
+          <div class="product-photo-container" id="productPhotoContainer-{{ section.id }}">
+            {% assign featured_image = product.selected_or_first_available_variant.featured_image
+              | default: product.featured_image
+            %}
+            {% for image in product.images %}
+              {%- capture img_wrapper_id -%}productPhotoWrapper-{{ section.id }}-{{ image.id }}{%- endcapture -%}
+              {%- assign max_width = 700 -%}
+              {%- assign max_height = 1024 -%}
+              {%- include 'image-logic' with width: max_width, height: max_height -%}
+              {%- assign img_url = image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+              <div
+                id="{{ img_wrapper_id }}"
+                class="lazyload__image-wrapper{% unless image == featured_image %} hide{% endunless %}"
+                data-image-id="{{ image.id }}"
+                style="max-width: {{ max_width }}px"
+              >
+                <div
+                  class="no-js product__image-wrapper"
+                  style="padding-top:{{ 1 | divided_by: image.aspect_ratio | times: 100}}%;"
+                >
+                  <img
+                    id="{{ img_id }}"
+                    {% if forloop.first == true %}
+                      src="{{ featured_image | img_url: '300x300' }}"
+                    {% endif %}
+                    class="lazyload no-js lazypreload"
+                    data-src="{{ img_url }}"
+                    data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                    data-aspectratio="{{ image.aspect_ratio }}"
+                    data-sizes="auto"
+                    alt="{{ image.alt | escape }}"
+                    {% if section.settings.product_image_zoom_enable %}
+                      data-zoom="{{ image | img_url: '1024x1024', scale: 2 }}"
+                    {% endif %}
+                  >
+                </div>
+              </div>
+              {% if forloop.first == true %}
+                <noscript>
+                  <img
+                    src="{{ image | img_url: '580x' }}"
+                    srcset="{{ image | img_url: '580x' }} 1x, {{ image | img_url: '580x', scale: 2 }} 2x"
+                    alt="{{ image.alt }}"
+                    style="opacity:1;"
+                  >
+                </noscript>
+              {% endif %}
+            {% endfor %}
+            {% assign wcp_v_price = temp_wcp_v_price %}
+            {% assign wcp_v_compare_at_price = temp_wcp_v_compare_at_price %}
+          </div>
+
+          {% if product.images.size > 1 %}
+            <ul class="product-photo-thumbs grid-uniform" id="productThumbs-{{ section.id }}">
+              {% for image in product.images %}
+                <li class="grid-item medium-down--one-quarter large--one-quarter">
+                  <a
+                    href="{{ image.src | img_url: '1024x1024', scale: 2 }}"
+                    class="product-photo-thumb product-photo-thumb-{{ section.id }}"
+                    data-image-id="{{ image.id }}"
+                  >
+                    <img src="{{ image.src | img_url: 'compact' }}" alt="{{ image.alt | escape }}">
+                  </a>
+                </li>
+              {% endfor %}
+              {% assign wcp_v_price = temp_wcp_v_price %}
+              {% assign wcp_v_compare_at_price = temp_wcp_v_compare_at_price %}
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-item large--three-fifths">
+      <h1 class="h2" itemprop="name">{{ product.title }}</h1>
+      {% assign current_variant = product.selected_or_first_available_variant %}
+      <p>
+        SKU: <span class="variant-sku">{{ current_variant.sku }}</span>
+      </p>
+      {% if section.settings.product_vendor_enable %}
+        <p class="product-meta" itemprop="brand">{{ product.vendor }}</p>
+      {% endif %}
+      <div itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+        {% assign variant = product.selected_or_first_available_variant %}
+        <meta itemprop="priceCurrency" content="{{ cart.currency.iso_code }}">
+        <meta itemprop="price" content="{{ wcp_v_price | divided_by: 100.00 }}">
+        {% if customer %}
+          <ul class="inline-list product-meta" data-price>
+            <li>
+              <span id="productPrice-{{ section.id }}" class="h1">
+                {% include 'price' with wcp_v_price %}
+              </span>
+              {% include 'product-unit-price', variant: variant %}
+            </li>
+            {% if wcp_compare_at_price_max > wcp_price and section.settings.product_show_saved_amount %}
+              <li>
+                <span id="comparePrice-{{ section.id }}" class="sale-tag large">
+                  {% assign compare_price = wcp_v_compare_at_price %}
+                  {% assign product_price = wcp_v_price %}
+                  {% include 'price-sale' %}
+                </span>
+              </li>
+            {% endif %}
+            {% if section.settings.product_reviews_enable %}
+              <li class="product-meta--review">
+                <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+              </li>
+            {% endif %}
+          </ul>
+        {% endif %}
+
+        {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+          <div class="product__policies rte">
+            {%- if shop.taxes_included -%}
+              {{ 'products.general.include_taxes' | t }}
+            {%- endif -%}
+            {%- if shop.shipping_policy.body != blank -%}
+              {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        <hr id="variantBreak" class="hr--clear hr--small">
+        <link
+          itemprop="availability"
+          href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}"
+        >
+
+        <!-- Excision: Minimum Order Indicator (PDP) -->
+        <div id="ex-min-order-pdp" class="ex-min-order" data-min="20000" aria-live="polite">
+          <div class="ex-min-order__row">
+            <div class="ex-min-order__label">Minimum order: <strong>$200.00</strong></div>
+            <div class="ex-min-order__value"><span data-remaining>$200.00</span> to go</div>
+          </div>
+          <div class="ex-min-order__bar">
+            <div class="ex-min-order__fill"></div>
+          </div>
+          <div class="ex-min-order__note" data-note>Spend $200.00 or more to enable checkout.</div>
+        </div>
+
+        {% capture "form_class" -%}
+        addToCartForm{% if section.settings.enable_payment_button %} addToCartForm--payment-button{% endif %}
+      {%- endcapture %}
+        {%- capture "form_id" -%}addToCartForm-{{ section.id }}{%- endcapture -%}
+        {% form 'product', product, class: form_class, id: form_id, data-product-form: '' %}
+          {% if section.settings.product_quantity_enable %}
+            <label for="quantity" class="quantity-selector quantity-selector-{{ section.id }}">
+              {{- 'products.product.quantity' | t -}}
+            </label>
+            <input type="number" id="quantity" name="quantity" value="1" min="1" class="quantity-selector">
+          {% endif %}
+
+          {% if section.settings.product_quantity_message %}
+            <div
+              id="variantQuantity-{{ section.id }}"
+              class="variant-quantity {% if variant.inventory_management and variant.inventory_quantity < 10 and variant.inventory_quantity > 0 %} is-visible{% endif %}"
+            >
+              {% include 'svg-definitions' with 'stock-icon' %}
+              {% assign qty = variant.inventory_quantity %}
+              <span id="variantQuantity-{{ section.id }}__message">
+                {{- 'products.product.only_left' | t: count: qty -}}
+              </span>
+            </div>
+          {% endif %}
+
+          {% if section.settings.product_incoming_message %}
+            <div
+              id="variantIncoming-{{ section.id }}"
+              class="variant-quantity {% if variant.inventory_management and variant.inventory_quantity <= 0 and variant.incoming %} is-visible{% endif %}"
+            >
+              {% if variant.inventory_management
+                and variant.inventory_quantity == 0
+                or variant.inventory_quantity < 0
+                and current_variant.incoming
+              %}
+                {% include 'svg-definitions' with 'stock-icon' %}
+                {% if variant.available %}
+                  {% assign date = variant.next_incoming_date | date: format: 'date' %}
+                  <span id="variantIncoming-{{ section.id }}__message">
+                    {{- 'products.product.will_not_ship_until' | t: date: date -}}
+                  </span>
+                {% else %}
+                  {% assign date = variant.next_incoming_date | date: format: 'date' %}
+                  <span id="variantIncoming-{{ section.id }}__message">
+                    {{- 'products.product.will_be_in_stock_after' | t: date: date -}}
+                  </span>
+                {% endif %}
+              {% endif %}
+            </div>
+          {% endif %}
+
+          <div class="payment-buttons payment-buttons--{{ section.settings.add_to_cart_button_size }}">
+            <button
+              type="submit"
+              name="add"
+              id="addToCart-{{ section.id }}"
+              class="{{ btn_class }} btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"
+            >
+              <span class="icon icon-cart"></span>
+              <span id="addToCartText-{{ section.id }}">{{ 'products.product.add_to_cart' | t }}</span>
+            </button>
+            {% if section.settings.enable_payment_button %}
+              {% unless customer.tags contains p_discount_tag or customer.tags contains v_discount_tag %}
+                {{ form | payment_button }}
+              {% endunless %}
+            {% endif %}
+          </div>
+          <div>
+            <b>
+              {%- unless wcp_vd_HTML_table == '' or wcp_vd_HTML_table == blank -%}
+                <br>
+                <span>
+                  {{- shop.metafields.wcp_net.VDTableNote -}}
+                  <br>
+                </span>
+              {%- endunless -%}
+            ></b>
+            <div class-data="{{wcp_vd_HTML_table}}" id="wcp_vd_table" style="margin-top :20px;">
+              {{ wcp_vd_HTML_table }}
+            </div>
+          </div>
+        {% endform %}
+
+        <div class="product-page-form form-vertical">
+          <h4>Request Quote</h4>
+          {% form 'contact' %}
+            {% if form.posted_successfully? %}
+              <p class="note form-success">
+                {{ 'contact.form.post_success' | t }}
+              </p>
+            {% endif %}
+            {% include 'form-errors-custom' %}
+            <div id="contactFormWrapper">
+              <div class="row">
+                <div class="col-12 col-md-6">
+                  <label for="contactFormName" class="hidden-label">{{ 'contact.form.name' | t }}</label>
+                  <input
+                    type="text"
+                    id="contactFormName"
+                    name="contact[{{ 'contact.form.name' | t }}]"
+                    placeholder="{{ 'contact.form.name' | t }}"
+                    value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+                    required
+                  >
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="contactFormEmail" class="hidden-label">{{ 'contact.form.email' | t }}</label>
+                  <input
+                    type="email"
+                    id="contactFormEmail"
+                    name="contact[email]"
+                    placeholder="{{ 'contact.form.email' | t }}"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+                    required
+                  >
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="contactFormPhone" class="hidden-label">{{ 'contact.form.phone' | t }}</label>
+                  <input
+                    type="tel"
+                    id="contactFormPhone"
+                    name="contact[{{ 'contact.form.phone' | t }}]"
+                    placeholder="{{ 'contact.form.phone' | t }}"
+                    value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+                  >
+                </div>
+                <div class="col-12 col-md-6">
+                  <label for="contactFormQuantity" class="hidden-label-none contactFormQuantity">
+                    {{- 'Quantity' -}}
+                  </label>
+                  <input
+                    min="1"
+                    type="number"
+                    id="ContactFormQuantity"
+                    name="contact[Quantity]"
+                    placeholder="{{ 'Quantity' }}"
+                    value="1"
+                  >
+                </div>
+                <input
+                  type="hidden"
+                  class="hide"
+                  id="ContactFormProductName"
+                  name="contact[Product Name]"
+                  value="{{product.title}} -- {{ shop.url }}{{product.url}}"
+                >
+
+                <div class="col-12 col-md-12">
+                  <label for="contactFormMessage" class="hidden-label">{{ 'contact.form.message' | t }}</label>
+                  <textarea
+                    rows="4"
+                    id="contactFormMessage"
+                    name="contact[{{ 'contact.form.message' | t }}]"
+                    placeholder="{{ 'contact.form.message' | t }}"
+                  >{% if form.body %}{{ form.body }}{% endif %}</textarea>
+                </div>
+                <div class="col-12 col-md-12">
+                  <input type="submit" class="btn right" value="{{ 'contact.form.send' | t }}">
+                </div>
+              </div>
+            </div>
+
+            <style>
+              input {
+                border-radius: 10px;
+                background-color: #e8e8e8;
+                border-width: 0;
+              }
+              input:focus {
+                background: #0069a7;
+              }
+              body#contact-us .content .card-panel .inner-wrapper {
+                background: #e0592a;
+              }
+            </style>
+          {% endform %}
+        </div>
+
+        <div id="fg"></div>
+        <hr class="{% if section.settings.enable_payment_button %}product-template-hr{% endif %}">
+      </div>
+      <div id="pdp" class="product-description rte" itemprop="description">
+        {{ product.description }}
+      </div>
+      {% if section.settings.social_sharing_products %}
+        {% include 'social-sharing' %}
+      {% endif %}
+    </div>
+
+    <script>
+      window.addEventListener(
+        'load',
+        function () {
+          setTimeout(function () {
+            var aa = $('#pdp').find('a').get(0).outerHTML;
+            console.log(aa);
+            let list = document.querySelector('#fg');
+            list.insertAdjacentHTML('beforeend', aa);
+          });
+        },
+        3000
+      );
+    </script>
+
+    <style>
+      .stp {
+          margin-top: 45px;
+      }
+      div#smart-tabs-content-0 a {
+          display: none;
+      }
+      div#fg {
+          width: 176px;
+      }
+      div#fg a {
+          background: #40ab4c;
+          display: inline-block;
+          font-weight: 400;
+          color: #ffff;
+          text-align: center;
+          vertical-align: middle;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+          border: 1px solid transparent;
+          padding: .375rem .75rem;
+          font-size: .9rem;
+          line-height: 1.9;
+          border-radius: .25rem;
+          color: #fff;width: 100%;
+      }
+      div#fg {
+          margin-top: -21px;
+      }
+    </style>
+
+    <div class="product-additional container">
+      <div class="row">
+        <div class="col-sm-5 product-contact hide-on-med-and-down">
+          <div class="card contact-card for-product hoverable card-panel waves-effect waves-light">
+            <div class="inner-wrapper">
+              <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+              <p class="sub-heading">Question about this product?</p>
+              <h4>Give Us a Call</h4>
+              <a href="tel:+1800633448">1800 633 448</a>
+            </div>
+          </div>
+          <div class="contact-enquiry card hoverable">
+            <div class="card-content">
+              <div class="custom-form-container grid-item"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-7">
+          <div class="card-1 card hoverable">
+            <div class="card-content">
+              <h2>Become an Official Excision Distributor</h2>
+              <p>As a distributor of Excision's products you can keep track of your order and prices online</p>
+            </div>
+            <a class="card-action waves-effect waves-block waves-light" href="#">
+              <p class="action">Register Now <i class="fa fa-arrow-circle-right" aria-hidden="true"></i></p>
+            </a>
+          </div>
+          <section class="store-finder mini valign-wrapper card hoverable">
+            <div class="inner-wrapper">
+              <div class="heading">
+                <div class="excision-badge"></div>
+                <h2>Find a Distributor Near You</h2>
+                <p>
+                  Enter your state and postcode and let us help you find one of our 100 suppliers in the country at a
+                  convenient location near you
+                </p>
+                <a href="/pages/distributor-finder" class="btn waves-effect waves-light" type="submit">
+                  <span class="hide-on-small-only"> Find a Distributor </span>
+                </a>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="col-sm-5 show-on-medium-and-down hide-on-med-and-up">
+          <div class="contact-enquiry card hoverable">
+            <div class="card-content">
+              <div class="custom-form-container"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if section.settings.related_products_enable %}
+    {% assign grid_item_width = 'large--one-fifth medium--one-third small--one-half' %}
+    {% include 'related-products' %}
+  {% endif %}
+
+  {% if section.settings.product_reviews_enable %}
+    <hr>
+    <div id="shopify-product-reviews" data-id="{{ product.id }}">{{ product.metafields.spr.reviews }}</div>
+  {% endif %}
+
+  {% unless product == empty %}
+    <script type="application/json" id="ProductJson-{{ section.id }}">
+      {{ product | json }}
+    </script>
+    {% if section.settings.product_quantity_message or section.settings.product_incoming_message %}
+      <script type="application/json" id="VariantJson-{{ section.id }}">
+              [
+                {% for variant in product.variants %}
+        {% comment %} wcp_variant_include {% endcomment %}{% include 'wcp_variant' with variant %}
+                  {% capture variant_inventory %}
+                    {%- if section.settings.product_incoming_message -%}
+                      ,
+                      "incoming": {% if variant.incoming == 'null' or variant.next_incoming_date == null %}false{% else %}{{ variant.incoming | default: false | json }}{% endif %},
+                      "inventory_policy": {{ variant.inventory_policy | json }},
+                      "next_incoming_date": {{ variant.next_incoming_date | date: format: 'date' | json }}
+                    {%- endif -%}
+                    {%- if section.settings.product_quantity_message -%}
+                      ,
+                      "inventory_quantity": {{ variant.inventory_quantity | json }}
+                    {%- endif -%}
+                  {% endcapture %}
+                  {
+                    {{ variant_inventory | remove_first: ',' | strip }}
+                  }{% unless forloop.last %},{% endunless %}
+                {% endfor %}
+         {% assign wcp_v_price = temp_wcp_v_price %} {% assign wcp_v_compare_at_price = temp_wcp_v_compare_at_price %}
+              ]
+      </script>
+    {% endif %}
+  {% endunless %}
+</div>
+
+{% unless product == empty %}
+  <script type="application/json" class="wcp_json wcp_json_{{ product.id }}" id="wcp_json_{{ product.id }}">
+    {% include 'wcp_product_json' with product %}
+  </script>
+{% endunless %}
+
+{% unless wcp_vd_HTML_table == '' %}
+  <script type="application/json" class="wcp_vd_table" id="wcp_vd_table_{{ product.id }}">
+    {{- wcp_vd_HTML_table_tmp -}}
+  </script>
+{% endunless %}
+{% unless wcp_vd_HTML_table == '' %}
+  <script id="vdtable" type="text/x-handlebars-template">
+    <table>
+    <tr>
+    <th>Quantity</th>
+    <th>Discount</th>
+    <th>Price</th>
+    </tr>
+    {% raw %}
+    {{#each vdtable}}
+        <tr>
+            <td>{{Qty}}</td>
+            <td>{{Discount}}</td>
+            <td>{{Price}}</td>
+          </tr>
+    {{/each}}
+    {% endraw %}
+    </table>
+  </script>
+  <script>
+    if (typeof Handlebars === 'undefined') {
+      var head = document.getElementsByTagName('head')[0];
+      script = document.createElement('script');
+      script.onload = function () {};
+      script.type = 'text/javascript';
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.12/handlebars.min.js';
+      head.appendChild(script);
+    }
+  </script>
+{% endunless %}
+
+{% schema %}
+{
+  "name": "Product",
+  "class": "product-template-section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "product_image_zoom_enable",
+      "label": "Enable image zoom"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_quantity_enable",
+      "label": "Show quantity selector"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_quantity_message",
+      "label": "Show remaining quantity message"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_incoming_message",
+      "label": "Show incoming stock transfer message when sold out"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_vendor_enable",
+      "label": "Show product vendor"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_show_saved_amount",
+      "label": "Show saved amount",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "product_show_compare_at_price",
+      "label": "Show compare at price",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "related_products_enable",
+      "label": "Show related products"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_payment_button",
+      "label": "Show dynamic checkout button",
+      "info": "Each customer will see their preferred payment method from those available on your store, such as PayPal or Apple Pay. [Learn more](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "social_sharing_products",
+      "label": "Enable product sharing",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "product_reviews_enable",
+      "label": "Enable product reviews",
+      "info": "Install the free Shopify [Product Reviews](https://apps.shopify.com/product-reviews) app to add product reviews."
+    },
+    {
+      "type": "select",
+      "id": "add_to_cart_button_size",
+      "label": "Variant picker and button size",
+      "default": "small",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,295 @@
+{% if product.tags contains 'Solids Profile_Good'
+  or product.tags contains 'Solids Profile_Great'
+  or product.tags contains 'Solids Profile_Excellent'
+  or product.tags contains 'Tubes Profile_Good'
+  or product.tags contains 'Tubes Profile_Great'
+  or product.tags contains 'Tubes Profile_Excellent'
+  or product.tags contains 'Bundles Profile_Good'
+  or product.tags contains 'Bundles Profile_Great'
+  or product.tags contains 'Bundles Profile_Excellent'
+  or product.tags contains 'Structural Profile_Good'
+  or product.tags contains 'Structural Profile_Great'
+  or product.tags contains 'Structural Profile_Excellent'
+%}
+      <div class="work-material series-cont con-box">
+        <div class="work-material-cont full-width">
+          <div id="product-info" data-tags="{{ product.tags | join: ',' }}" style="display: none;"></div>
+
+          {% if product.tags contains 'Solids Profile_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <img
+                    style="width: 50px; height: 50px; object-fit: contain; margin-right: 15px;"
+                    src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Profile_Solids.png?v=1736918736"
+
+                  >Solids
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Solids Profile_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <img
+                    style="width: 50px; height: 50px; object-fit: contain; margin-right: 15px;"
+                    src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Profile_Solids.png?v=1736918736"
+
+                  >Solids
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Solids Profile_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <img
+                    style="width: 50px; height: 50px; object-fit: contain; margin-right: 15px;"
+                    src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Profile_Solids.png?v=1736918736"
+
+                  >Solids
+                </div>
+                <h3 class="rating-label Good">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Tubes Profile_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <img
+                    style="width: 50px; height: 50px; object-fit: contain; margin-right: 15px;"
+                    src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Profile_Tubes.png?v=1736918736"
+
+                  >Tubes
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Tubes Profile_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <img
+                    style="width: 50px; height: 50px; object-fit: contain; margin-right: 15px;"
+                    src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Profile_Tubes.png?v=1736918736"
+
+                  >Tubes
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Tubes Profile_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <img
+                    style="width: 50px; height: 50px; object-fit: contain; margin-right: 15px;"
+                    src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Profile_Tubes.png?v=1736918736"
+
+                  >Tubes
+                </div>
+                <h3 class="rating-label Good">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Bundles Profile_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <img
+                    style="width: 50px; height: 50px; object-fit: contain; margin-right: 15px;"
+                    src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Profile_Bundles.png?v=1736918736"
+
+                  >Bundles
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Bundles Profile_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <img
+                    style="width: 50px; height: 50px; object-fit: contain; margin-right: 15px;"
+                    src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Profile_Bundles.png?v=1736918736"
+
+                  >Bundles
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Bundles Profile_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <img
+                    style="width: 50px; height: 50px; object-fit: contain; margin-right: 15px;"
+                    src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Profile_Bundles.png?v=1736918736"
+
+                  >Bundles
+                </div>
+                <h3 class="rating-label Good">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Structural Profile_Good' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <img
+                    style="width: 50px; height: 50px; object-fit: contain; margin-right: 15px;"
+                    src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Profile_Structural.png?v=1736918736"
+
+                  >Structural
+                </div>
+                <h3 class="rating-label Good">Good</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="33">
+                <div class="progress-bar progress" style="width: 33%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Structural Profile_Great' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <img
+                    style="width: 50px; height: 50px; object-fit: contain; margin-right: 15px;"
+                    src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Profile_Structural.png?v=1736918736"
+
+                  >Structural
+                </div>
+                <h3 class="rating-label Good">Great</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="66">
+                <div class="progress-bar progress" style="width: 66%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if product.tags contains 'Structural Profile_Excellent' %}
+            <div class="steel-progress half-width">
+              <div class="work-material-info">
+                <div class="graph-name">
+                  <img
+                    style="width: 50px; height: 50px; object-fit: contain; margin-right: 15px;"
+                    src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Profile_Structural.png?v=1736918736"
+
+                  >Structural
+                </div>
+                <h3 class="rating-label Good">Excellent</h3>
+              </div>
+              <div class="progress-wrap progress Good" data-progress-percent="100">
+                <div class="progress-bar progress" style="width: 100%; background-color: #0069a7;"></div>
+              </div>
+              <div class="graph-table">
+                <span style="margin-left: 30%;">Good</span>
+                <span style="margin-left: 3%;">Great</span>
+                <span>Excellent</span>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+{% endif %}

@@ -1,0 +1,114 @@
+{% if page.handle  == 'register' %}
+  <script>
+   window.location.replace("https://www.myexcision.com.au/register");
+  </script>
+{% endif %}
+<div class="team-bio__page simple-lazyload">
+  <section class="hero-banner light-bg">
+     <div class="container dt-prl-30">
+        <div class="row align-item-center">
+           <div class="col-12 col-md-6 lazyload-element">
+              <div class="placeholder">
+                 <h1 class="page_title">{{ page.title }}</h1>
+                 <p class="team__role font-bold">{{ page.metafields.custom.team_role }}</p>
+                 <div class="team-bio__body rte">
+                    {{ page.content }}
+                 </div>
+                  
+                 <div class="team__social-links">                    
+                    {%- if page.metafields.custom.team_social_links.value != blank -%}
+                    {%- assign titleArray = page.title | split: " " -%}
+                    <p><small>Connect with {{ titleArray[0] }}:</small></p>
+                    {% assign custom_ts_links = page.metafields.custom.team_social_links.value %}
+                    {%- for c_ts_link in custom_ts_links -%}
+                      <a class="team__social-link tsl-{{ c_ts_link.text | handle }}" href="{{ c_ts_link.url }}" target="_blank">{{ c_ts_link.text }} </a>
+                    {%- endfor -%}
+                    
+                    {%- endif -%}
+                 </div>
+              </div>
+           </div>
+           <div class="col-12 col-md-6 lazyload-element">
+              <div class="team__image">
+                 <img src="{{ page.metafields.custom.team_image.value | image_url: 600x }}" alt="{{ page.title }}" class="fade-in" />
+              </div>
+           </div>
+        </div>
+     </div>
+  </section>
+
+  <div class="template-product cc-calculator-page-sec lazyload-element">
+    <div class="grid grid-border">
+      <div class="related-article__outer-wrapper">
+         <div class="sppbp__outer-wrapper">
+          <div class="container dt-prl-30 single-product-page-blog-posts">
+           <div class="sppbp__inner">
+              <h2 class="related_article_heading lazyload-element">More From {{ page.title }}</h2>
+               <div class="grid-uniform_none blog-items rla_regular">                
+                {% for article in blogs.learning-centre.articles %} 
+                  {% assign current_author = page.title %}
+                  {% assign article_author = article.metafields.global.author.value %}
+                  {% if article_author == current_author %}
+                    {% include 'product-articles-by-tag' %}
+                  {% endif %}                                          
+                {% endfor %}
+               </div>
+             </div>
+           </div>
+         </div>
+      </div>
+    </div>
+  </div>  
+</div>
+
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.5.9/slick.min.css'>
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.5.9/slick-theme.min.css'>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js'></script> 
+<script> 
+    $(document).ready(function(){  
+      $(".rla_regular").slick({
+        dots: false,
+        arrows: true,
+        infinite: false,
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        nextArrow: '<i class="fa fa-angle-right slick-next"></i>',
+        prevArrow: '<i class="fa fa-angle-left slick-prev"></i>',
+        responsive: [
+        {
+          breakpoint: 1024,
+          settings: {
+            slidesToShow: 2,
+            slidesToScroll: 1,
+            dots: true,
+            arrows: false
+          }
+        },
+        {
+          breakpoint: 600,
+          settings: {
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            dots: true,
+            arrows: false
+          }
+        }
+      ]
+      });
+
+      var articleLength = $(".blog-items .slick-track > div").length;         
+      if (articleLength == 0) {
+          $(".related-article__outer-wrapper").addClass( "disableSection");
+      }
+  });
+</script>
+
+<style>
+  .team-bio__page .related-article__outer-wrapper.disableSection{
+      display: none !important;
+  }
+</style>
+
+
+
+

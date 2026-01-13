@@ -1,0 +1,2212 @@
+<header
+  class="site-header simple-lazyload"
+  role="banner"
+  data-section-id="{{ section.id }}"
+  data-section-type="header-section"
+>
+  <div class="wrapper">
+    <div class="grid--full">
+      <div class="grid-item large--one-fifth">
+        {% if request.page_type == 'index' %}
+          <h1 class="header-logo" itemscope itemtype="http://schema.org/Organization">
+        {% else %}
+          <div class="h1 header-logo" itemscope itemtype="http://schema.org/Organization">
+        {% endif %}
+        {% if section.settings.logo %}
+          {% capture image_size %}{{ section.settings.logo_max_width | escape }}x{% endcapture %}
+          {%- assign img_url = section.settings.logo | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+          {% capture logo_alt %}{{ section.settings.logo.alt | default: shop.name }}{% endcapture %}
+          <a href="{{ routes.root_url }}" itemprop="url">
+            <div
+              class="lazyload__image-wrapper no-js header-logo__image"
+              style="max-width:{{ section.settings.logo_max_width }}px;"
+            >
+              <div style="padding-top:{{ 1 | divided_by: section.settings.logo.aspect_ratio | times: 100}}%;">
+                <img
+                  class="lazyload js"
+                  src="{{ section.settings.logo | img_url: '200x56' }}"
+                  width="{{ section.settings.logo_max_width }}px"
+                  alt="{{ logo_alt | escape }}"
+                >
+                {% comment %}
+                  <img class="lazyload js"
+                  data-src="{{ img_url }}"
+                  data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                  data-aspectratio="{{ section.settings.logo.aspect_ratio }}"
+                  data-sizes="auto"
+                  alt="{{ logo_alt | escape }}"
+                  style="width:{{ section.settings.logo_max_width }}px;">
+                {% endcomment %}
+              </div>
+            </div>
+            <noscript>
+              {% capture image_size %}{{ section.settings.logo_max_width | escape }}x{% endcapture %}
+              <img
+                src="{{ section.settings.logo | img_url: 'original' }}"
+                srcset="{{ section.settings.logo | img_url: 'original' }} 1x, {{ section.settings.logo | img_url: 'original', scale: 2 }} 2x"
+                alt="{{ logo_alt | escape }}"
+                itemprop="logo"
+                style="max-width:{{ section.settings.logo_max_width }}px;"
+              >
+            </noscript>
+          </a>
+        {% else %}
+          <a href="{{ routes.root_url }}" itemprop="url">{{ shop.name }}</a>
+        {% endif %}
+        {% if request.page_type == 'index' %}
+          </h1>
+        {% else %}
+          </div>
+        {% endif %}
+      </div>
+      <script>
+        let lastScrollTop = 0;
+        let delta = 5;
+        let header = document.getElementById('shopify-section-header');
+        let navbarHeight = header.offsetHeight;
+
+        window.addEventListener(
+          'scroll',
+          function () {
+            let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+            if (Math.abs(lastScrollTop - currentScroll) <= delta) {
+              return;
+            }
+            if (currentScroll > lastScrollTop) {
+              // Scrolling down
+              header.style.top = '-' + navbarHeight + 'px';
+
+              // Hide any open dropdowns and overlay
+              document.querySelectorAll('.mega-dropdown').forEach((dd) => (dd.style.height = 'none'));
+              document.querySelectorAll('.menu-overlay').forEach((ov) => (ov.style.display = 'none'));
+            } else {
+              // Scrolling up
+              header.style.top = '0';
+            }
+            lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+          },
+          false
+        );
+      </script>
+
+      <div class="grid-item large--four-fifths large--text-center">
+        {% if section.settings.show_announcement or shop.customer_accounts_enabled %}
+          <div class="site-header--text-links{% if section.settings.announcement_text == blank %} medium-down--hide{% endif %}">
+            {% if section.settings.show_announcement %}
+              {% if section.settings.announcement_link != blank %}
+                <a href="{{ section.settings.announcement_link }}">
+              {% endif %}
+              <p>{{ section.settings.announcement_text | escape }}</p>
+              {% if section.settings.announcement_link != blank %}
+                </a>
+              {% endif %}
+            {% endif %}
+
+            {% comment %}
+              {% if shop.customer_accounts_enabled %}
+                <span class="site-header--meta-links medium-down--hide">
+                  {% if customer %}
+                    {% capture first_name %}<a href="{{ routes.account_url }}">{{ customer.first_name }}</a>{% endcapture %}
+                    {{ 'layout.customer.logged_in_as_html' | t: first_name: first_name }} &middot; {{ 'layout.customer.log_out' | t | customer_logout_link }}
+                  {% else %}
+                    <a href="https://www.myexcision.com.au/" id="customer_login_link" style="background-color: #e0592a;">{{ 'layout.customer.sign_in' | t }}</a>
+                    <span class="site-header--spacer">{{ 'layout.customer.or' | t }}</span>
+                    <span class="create-act"> <a href="/apps/wpdapp" id="customer_register_link">Create an Account</a> <!--{{ 'layout.customer.create_account' | t | customer_register_link }}--></span>
+                  {% endif %}
+                </span>
+              {% endif %}
+            {% endcomment %}
+
+            <div class="grid-item large--two-thirds text-center large--text-center">
+              <div class="site-header--meta-links medium-down--hide">
+                <div class="site-nav-wrapper simple-lazyload">
+                  <!-- Main Navigation -->
+                  <nav class="main-nav">
+                    <ul class="primary-menu">
+                      <!-- Products -->
+                      <li class="primary-item with-mega" data-primary="products">
+                        <a style="padding: 10px 15px 10px 60px;" href="#">
+                          <div class="primary-div">Products</div>
+                        </a>
+
+                        <div class="mega-dropdown">
+                          <div class="mega-menu-container">
+                            <!-- Main Menu Column -->
+                            <div class="menu-column main-menu" style="flex: 0.5;">
+                              <ul>
+                                <li>
+                                  <a href="/pages/bandsaw-blade-range" data-submenu="bandsaw">Bandsaw Blades</a>
+                                </li>
+                                <li>
+                                  <a href="/pages/coldsaw-blades" data-submenu="coldsaw">Coldsaw Blades</a>
+                                </li>
+                                <li>
+                                  <a
+                                    href="/pages/tct-circular-blades"
+                                    data-submenu="tct-circular"
+                                    >TCT Circular Blades</a
+                                  >
+                                </li>
+                                <li>
+                                  <a href="/pages/coolant" data-submenu="fluids">Metal Working Fluids</a>
+                                </li>
+                                <li>
+                                  <a href="/pages/magnetic-based-drills" data-submenu="magnetic"
+                                    >Magnetic Based Drills</a
+                                  >
+                                </li>
+                                <li>
+                                  <a
+                                    href="/pages/core-drills-accessories"
+                                    data-submenu="core-drills"
+                                    >Core Drills & Accessories</a
+                                  >
+                                </li>
+                                <li>
+                                  <a href="/collections/punch-dies" data-submenu="punch">Punch & Dies</a>
+                                </li>
+                                <li>
+                                  <a
+                                    href="/pages/metal-cutting-machines"
+                                    data-submenu="cutting-machines"
+                                    >Metal Cutting Machines</a
+                                  >
+                                </li>
+                                <li>
+                                  <a
+                                    href="/pages/metal-preparing-machines"
+                                    data-submenu="prep-machines"
+                                    >Metal Preparing Machines</a
+                                  >
+                                </li>
+                                <li>
+                                  <a href="/pages/yg-1-tooling" data-submenu="yg1">YG-1 Tooling</a
+                                  ><span class="new-badge font-bold" style="scale: 65%; margin: 0px;">New</span>
+                                </li>
+                                <li>
+                                  <a href="/collections/industrial-clamps" data-submenu="clamps">Industrial Clamps</a>
+                                </li>
+                                <li>
+                                  <a href="/pages/material-handling-page" data-submenu="handling">Material Handling</a>
+                                </li>
+                              </ul>
+                            </div>
+
+                            <!-- Sub Menu Column -->
+                            <div class="menu-column sub-menu">
+                              <div class="sub-menu-links" data-sub="bandsaw">
+                                <div class="sub-menu-collections">
+                                  <a href="/collections/metals"
+                                    >Metal Cutting Blades
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/M42BSBL_Cropped_1.webp?v=1764761161"
+                                      alt="Metal Cutting Blades"
+                                  ></a>
+                                  <a href="/collections/timber-plastic">Timber Cutting Blades</a>
+                                  <a href="/collections/tct-bandsaw-blades">Other Blades</a>
+                                </div>
+                                <a class="sub-view-all" href="/pages/bandsaw-blade-range">View All Bandsaw Blades</a>
+                              </div>
+
+                              <div class="sub-menu-links" data-sub="coldsaw">
+                                <div class="sub-menu-collections">
+                                  <a href="/collections/high-speed-steel"
+                                    >HSS Blades
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/2002040_Cropped_1.webp?v=1764761523"
+                                      alt="HSS Blades"
+                                  ></a>
+                                  <a href="/collections/high-speed-steel-cobalt"
+                                    >HSS-Co Blades
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/2002040_Cropped_1.webp?v=1764761523"
+                                      alt="HSS-Co Blades"
+                                  ></a>
+                                  <a href="/collections/other-coldsaw-blades">Other Blades</a>
+                                </div>
+                                <a class="sub-view-all" href="/pages/coldsaw-blades">View All Coldsaw Blades</a>
+                              </div>
+
+                              <div class="sub-menu-links" data-sub="tct-circular">
+                                <div class="sub-menu-collections">
+                                  <a href="/collections/tct-dry-cut-blades"
+                                    >TCT Dry-Cut Blades
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/5113552572_Cropped_1.webp?v=1764761660"
+                                      alt="TCT Dry-Cut Blades"
+                                  ></a>
+                                  <a href="/collections/tct-alu-blades"
+                                    >TCT Alu Blades
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/5243503096_Alu_NF_Blade_Cropped_1.webp?v=1764761769"
+                                      alt="TCT Alu Blades"
+                                  ></a>
+                                  <a href="/collections/cermet-tipped-blades"
+                                    >Cermet Tipped Blades
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/TCT_Cermet_Blade_Cropped_1.webp?v=1764761837"
+                                      alt="Cermet Tipped Blades"
+                                  ></a>
+                                  <a href="/collections/other-tct-circular-blades"
+                                    >Other TCT Circular Blades
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Aluminium_Circular_Blade_1.webp?v=1764761923"
+                                      alt="TCT Circular Blades"
+                                  ></a>
+                                </div>
+                                <a class="sub-view-all" href="/pages/tct-circular-blades"
+                                  >View All TCT Circular Blades</a
+                                >
+                              </div>
+
+                              <div class="sub-menu-links" data-sub="fluids">
+                                <div class="sub-menu-collections">
+                                  <a href="/collections/soluble-oils"
+                                    >Water-Miscible Fluids
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/XDP1000_Range_Cropped_1.webp?v=1764762038"
+                                      alt="Water-Miscible Fluids"
+                                  ></a>
+                                  <a href="/collections/neat-oils"
+                                    >Neat Oils
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/84168-5_Cropped_7f480710-ab9f-4e.webp?v=1764762102"
+                                      alt="Neat Oils"
+                                  ></a>
+                                  <a href="/collections/cutting-tapping-compounds"
+                                    >Cutting & Tapping Compounds
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/XDP905_Range_Small_Cropped_7ff26.webp?v=1764762185"
+                                      alt="Cutting Tapping Compounds"
+                                  ></a>
+                                  <a href="/collections/other-metal-working-fluids"
+                                    >Industrial Fluids
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/84168-5_Cropped_1.webp?v=1764762242"
+                                      alt="Industrial Fluids"
+                                  ></a>
+                                </div>
+                                <a class="sub-view-all" href="/pages/coolant">View All Metal Working Fluids</a>
+                              </div>
+
+                              <div class="sub-menu-links" data-sub="core-drills">
+                                <div class="sub-menu-collections">
+                                  <a href="/collections/hss-cobalt-30mm-depth"
+                                    >HSS-Co Core Drills
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/19505_Cropped_1.webp?v=1764762320"
+                                      alt="HSS-Co Core Drills"
+                                  ></a>
+                                  <a href="/collections/tct-core-drills"
+                                    >TCT Core Drills
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/20050_Cropped_1.webp?v=1764762387"
+                                      alt="TCT Core Drills"
+                                  ></a>
+                                  <a href="/collections/twist-drills"
+                                    >HSS-Co Twist Drills
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/1915011035_Cropped_1.webp?v=1764762464"
+                                      alt="HSS-Co Twist Drills"
+                                  ></a>
+                                  <a href="/collections/countersink-bits"
+                                    >HSS-Co Countersinks
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/18534_Cropped_1.webp?v=1764762545"
+                                      alt="HSS-Co Countersinks"
+                                  ></a>
+                                </div>
+                                <a class="sub-view-all" href="/pages/core-drills-accessories">View All Core Drills</a>
+                              </div>
+
+                              <div class="sub-menu-links" data-sub="cutting-machines">
+                                <div class="sub-menu-collections">
+                                  <a href="/pages/bandsaw-machines"
+                                    >Bandsaw Machines
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/401360GD3_4_Cropped_1.webp?v=1764762625"
+                                      alt="Bandsaw Machines"
+                                  ></a>
+                                  <a href="/collections/coldsaw-machines"
+                                    >Coldsaw Machines
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/402315SMD1_Cropped_1.webp?v=1764762728"
+                                      alt="Coldsaw Machines"
+                                  ></a>
+                                </div>
+                                <a class="sub-view-all" href="/pages/metal-cutting-machines"
+                                  >View All Cutting Machines</a
+                                >
+                              </div>
+
+                              <div class="sub-menu-links" data-sub="prep-machines">
+                                <div class="sub-menu-collections">
+                                  <a href="/collections/punching-machines"
+                                    >Punching Machines
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/23_004_Copped_1.webp?v=1764762819"
+                                      alt="Punching Machines"
+                                  ></a>
+                                  <a href="/collections/bevelling-machines"
+                                    >Bevelling Machines
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/25315_05_1.webp?v=1764762873"
+                                      alt="Bevelling Machines"
+                                  ></a>
+                                  <a href="/collections/accessories-metal-preparing">Metal Preparing Accessories</a>
+                                </div>
+                                <a class="sub-view-all" href="/pages/metal-preparing-machines"
+                                  >View All Preparing Machines</a
+                                >
+                              </div>
+
+                              <div class="sub-menu-links" data-sub="yg1">
+                                <div class="sub-menu-collections">
+                                  <a href="/pages/yg-1-milling"
+                                    >Milling Tools
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/E9936_pic_3320878d-6b4f-4c29-a51.webp?v=1764762964"
+                                      alt="Milling Tools"
+                                  ></a>
+                                  <a href="/pages/yg-1-holemaking"
+                                    >Holemaking Tools
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DH500_pic_1.avif?v=1764763021"
+                                      alt="Holemaking Tools"
+                                  ></a>
+                                  <a href="/pages/yg-1-threading"
+                                    >Threading Tools
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/TC814-IC_2_1.webp?v=1764764072"
+                                      alt="Threading Tools"
+                                  ></a>
+                                  <a href="/pages/yg-1-turning"
+                                    >Turning Tools
+                                    <img
+                                      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/TCMT110204-UG_YG3115_Sub_fbc559c.webp?v=1764764000"
+                                      alt="Turning Tools"
+                                  ></a>
+                                </div>
+                                <a class="sub-view-all" href="/pages/yg-1-tooling">View All YG-1 Tooling</a>
+                              </div>
+
+                              <div class="sub-menu-links" data-sub="handling">
+                                <div class="sub-menu-collections">
+                                  <a
+                                    style="background-image: url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Haywards_Action-5_Cropped_LR_10e.webp?v=1764763936); color: white; background-position: center; background-size: cover;"
+                                    href="/pages/roller-tables"
+                                    >Heavy Duty Roller Tables</a
+                                  >
+                                  <a
+                                    style="background-image: url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Bluescope_Distribution_Shoot_1-2.webp?v=1764763879); color: white; background-position: center; background-size: cover;"
+                                    href="/pages/heavy-duty-loading-and-storage-systems"
+                                    >Heavy-duty Loading and Storage Systems</a
+                                  >
+                                  <a
+                                    style="background-image: url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Powermax_Uniplan_Production_Shot.webp?v=1764763814); color: white; background-position: center; background-size: cover;"
+                                    href="/pages/heavy-duty-length-stops"
+                                    >Heavy-duty Digital Length Stops</a
+                                  >
+                                </div>
+                                <a class="sub-view-all" href="/pages/material-handling-page"
+                                  >View All Material Handling</a
+                                >
+                              </div>
+                            </div>
+
+                            <!-- Promo Column -->
+                            <div class="menu-column promo-column lazyload-element.animate">
+                              <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                                <span class="new-badge font-bold" style="background:#d52e30;">New</span>
+                                <h2 style="color: white;">YG-1 Threading</h2>
+                              </div>
+                              <a href="/pages/yg-1-threading" class="promo-btn">Shop now</a>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+
+                      <!-- Resources -->
+                      <li class="primary-item with-mega" data-primary="resources">
+                        <a href="#">
+                          <div class="primary-div">Resources</div>
+                        </a>
+                        <div class="mega-dropdown">
+                          <div class="mega-menu-container">
+                            <div class="menu-column main-menu">
+                              <ul>
+                                <li><a href="/blogs/learning-centre">Learning Centre</a></li>
+                                <li><a href="/pages/media-downloads">Videos</a></li>
+                                <li><a href="/pages/product-overviews">Product Overviews</a></li>
+                                <li>
+                                  <a href="/pages/material-and-safety-data-sheets">Material & Safety Data Sheets</a>
+                                </li>
+                                <li>
+                                  <a href="/pages/coolant-concentration-calculator">Coolant Concentration Calculator</a>
+                                </li>
+                                <li>
+                                  <a href="/pages/bandsaw-blade-selector">Bandsaw Blade Selector</a>
+                                </li>
+                                <li>
+                                  <a href="/pages/bandsaw-speeds-and-feeds-calculator"
+                                    >Bandsaw Speeds & Feeds Calculator</a
+                                  >
+                                </li>
+                              </ul>
+                            </div>
+                            <div class="menu-column resource-column lazyload-element.animate">
+                              <div style="max-width: 300px; display: flex; flex-direction: column; align-items: flex-start;">
+                                <h2 style="color: white; margin-bottom: 20px;">
+                                  Not sure how to test your concentration?
+                                </h2>
+                                <p style="color: white; font-size: 17px;">We'll guide you through it.</p>
+                              </div>
+                              <a
+                                href="/blogs/learning-centre/how-to-test-the-concentration-level-in-my-coolant"
+                                class="promo-btn"
+                                >Read the guide</a
+                              >
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+
+                      <!-- About -->
+                      <li class="primary-item with-mega" data-primary="about">
+                        <a href="#">
+                          <div class="primary-div">About</div>
+                        </a>
+                        <div class="mega-dropdown">
+                          <div class="mega-menu-container">
+                            <div class="menu-column main-menu">
+                              <ul>
+                                <li><a href="/pages/contact-us">Contact Us</a></li>
+                                <li>
+                                  <a href="/pages/company-information">Company Information</a>
+                                </li>
+                                <li><a href="/pages/our-team">Our Team</a></li>
+                                <li><a href="/pages/store-locator">Find a Distributor</a></li>
+                              </ul>
+                            </div>
+                            <div
+                              class="menu-column resource-column lazyload-element.animate"
+                              style="background-image: none; flex-direction: row; border: 2px solid #e1e1e1; background: none;"
+                            >
+                              <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; height: 100%;">
+                                <div style="max-width: 300px; display: flex; flex-direction: column; align-items: flex-start;">
+                                  <h2 style="margin-bottom: 20px;">Love our service?</h2>
+                                  <p style="font-size: 17px;">Consider leaving us a Google review!</p>
+                                </div>
+                                <a
+                                  href="https://www.google.com/search?sca_esv=9cc9d8b9600304b9&rlz=1C1GCEA_enAU1032AU1032&sxsrf=AE3TifOOv7ghDQgkkUM2ZE9Wn9v7dps6LA:1753827636418&si=AMgyJEvkVjFQtirYNBhM3ZJIRTaSJ6PxY6y1_6WZHGInbzDnMadEid9GBOM2-Rc-t5k9FiMzIPdoD3Zhlk-yb1WbZPHozeI8AT5bwYDOCT04uXWcobizaTFCoLn74nd9OOOiWIYjQGcE&q=Excision+Pty+Ltd+Reviews&sa=X&ved=2ahUKEwjEj5CKjeOOAxUs-TgGHdXpBVUQ0bkNegQIJBAE&biw=1536&bih=730&dpr=1.25&safe=active&ssui=on#lrd=0x6accfe0c961e8691:0x60a101a57fa64555,3,,,,"
+                                  class="promo-btn"
+                                  style="color: black !important; border: 2px solid #e0592a;"
+                                  >Tell us what you think</a
+                                >
+                              </div>
+                              <img
+                                style="max-height: 70px;"
+                                src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Google_Business_House_White.png?v=1753829897"
+                                alt="review"
+                              >
+                              {% comment %}
+                                <img style="max-height: 310px; margin-bottom: -40px;" src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Team_Photos-10_4c60cf93-62cf-4a13-8b87-30e7126b15bc.png?v=1722900113" alt="team">
+                              {% endcomment %}
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </nav>
+
+                  <style>
+                                        /* RESET */
+                                        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+                                        /* NAV BASE */
+                                        .main-nav { background: white; position: relative; z-index: 100; }
+
+                                        .primary-menu {
+                                          display: flex;
+                                          list-style: none;
+                                          margin-bottom: 0px;
+                                        }
+
+                                        .primary-item { position: relative; }
+
+
+
+                                        .primary-item > a {
+                                          text-decoration: none;
+                                          font-family: 'Humanist777BT-Bold';
+                                          font-size: 16px;
+                                          padding: 10px 15px;
+                                          display: block;
+                                          margin: 0px !important;
+                                        }
+
+                                        .primary-div {
+                                          padding: 10px 15px;
+                                          border-radius: 25px;
+                                          line-height: 1;
+                                          border: 2px solid transparent;
+                                        }
+
+                                        .primary-item > a:hover .primary-div {
+                                          border: 2px solid #e0592a;
+                                        }
+
+                                        /* DROPDOWN */
+                                        .mega-dropdown {
+                                          position: fixed;
+                                          top: 84px; /* adjust to header height */
+                                          left: 0;
+                                          width: 100vw;
+                                          background: white;
+                                          display: none;
+                                          z-index: 100;
+                                          padding: 20px 0 60px;
+                                        }
+
+                                        /* CONTAINER */
+                                        .mega-menu-container {
+                                          max-width: 1320px;
+                                          margin: 0 auto;
+                                          display: flex;
+                                          gap: 40px;
+                                          box-sizing: border-box;
+                                        }
+
+                                        /* MENU COLUMNS */
+                                        .menu-column { flex: 1; }
+
+                                        .main-menu ul {
+                                          list-style: none;
+                                          margin: 0px;
+                                          display: flex;
+                                          flex-direction: column;
+                                          align-items: flex-start;
+                                        }
+
+                                        .sub-menu-div {
+                                          display: flex;
+                                          flex-direction: column;
+                                          align-items: flex-start;
+                                          justify-content: space-between;
+                                          height: 100%;
+                                        }
+
+                                        a.sub-view-all {
+                                          font-family: 'Humanist777BT-Bold';
+                                          border-radius: 25px !important;
+                                          line-height: 1;
+                                          padding: 10px 15px !important;
+                                          background: #e0592a !important;
+                                          color: white !important;
+                                          border: 0px solid transparent !important;
+                                          height: unset !important;
+                                        }
+
+                                        .main-menu a {
+                                            padding: 8px 0;
+                                            cursor: pointer;
+                                            font-family: 'Humanist777BT-Bold';
+                                            font-size: 17px;
+                                            text-align: start;
+                                            border-bottom: 2px solid #e8e8e8;
+                                            border-radius: 0px !important;
+                                            display: inline-flex;
+                                            margin: 0px !important;
+                                        }
+
+                                          .main-menu li {
+                                            display: flex;
+                                            align-items: center;
+                                          }
+
+                                        .main-menu a:hover {
+                                            border-bottom: 2px solid #e0592a;
+                                        }
+
+                                        .main-menu a.active {
+                                            border-bottom: 2px solid #e0592a;
+                                        }
+
+                                        /* SUB MENU */
+                                        .sub-menu-links {justify-content: space-between; align-items: flex-start; height: 100%; display: none; width: 100%; flex-direction: column; gap: 12px; padding-top: 13px; }
+
+                                        .sub-menu-links a {
+                                          display: flex;
+                                          justify-content: space-between;
+                                          align-items: flex-start;
+                                          text-decoration: none;
+                                          height: 100px;
+                                          padding: 20px;
+                                          border: 2px solid #e8e8e8;
+                                          border-radius: 10px;
+                                          font-size: 17px;
+                                          font-family: 'Humanist777BT-Bold';
+                                        }
+
+                                        .sub-menu-links a:hover {
+                                          background: #e8e8e8;
+                                          transition: 0.15s ease-in-out;
+                                        }
+
+                                        .sub-menu-links img {
+                                          max-width: 100px !important;
+                                          max-height: 60px;
+                                          object-fit: cover;
+                                          margin: auto 0;
+                                        }
+
+                                        .sub-menu-collections {
+                                          gap: 10px;
+                                          display: flex;
+                                          flex-direction: column;
+                                          width: 100%;
+                                        }
+
+                                        .sub-menu-collections a {
+                                          width: 100%;
+                                        }
+
+                                        /* PROMO */
+                                        .promo-column {
+                                          background: #f5f5f5;
+                                          padding: 40px;
+                                          margin-top: 13px;
+                                          border-radius: 15px;
+                                          background-image: url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/YGTap_-_Hardened_Steels_01_1.webp?v=1764763655);
+                                          background-size: cover;
+                                          background-position: center;
+                                          display: flex;
+                                          flex-direction: column;
+                                          align-items: flex-start;
+                                          justify-content: space-between;
+                                        }
+
+                                        .resource-column {
+                                          background: #0069a7;
+                                          padding: 40px;
+                                          margin-top: 13px;
+                                          border-radius: 15px;
+                                          background-image: url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Concentration_Testing_Lab_Action.webp?v=1764763603);
+                                          background-size: cover;
+                                          display: flex;
+                                          flex-direction: column;
+                                          align-items: flex-start;
+                                          justify-content: space-between;
+                                          background-position: center;
+                                          min-height: 350px;
+                                        }
+
+                                        .account-column {
+                                          background: #0069a7;
+                                          padding: 40px;
+                                          margin-top: 13px;
+                                          border-radius: 15px;
+                                          background-size: cover;
+                                          display: flex;
+                                          flex-direction: column;
+                                          align-items: flex-start;
+                                          justify-content: space-between;
+                                          background-position: center;
+                                          min-height: 350px;
+                                        }
+
+                                        .promo-column img {
+                                          margin-bottom: 20px;
+                                          max-height: 50px;
+                                        }
+
+                                        .promo-btn {
+                                          display: inline-block;
+                                          margin-top: 15px;
+                                          padding: 10px 15px;
+                                          color: white !important;
+                                          text-decoration: none;
+                                          border-radius: 25px;
+                                          border: 2px solid white;
+                                          font-size: 17px;
+                                          font-family: 'Humanist777BT-Bold';
+                                          line-height: 1;
+                                        }
+
+                                        .promo-btn:hover .promo-column {
+                                          background-size: 100% !important;
+                                        }
+
+                                        /* OVERLAY */
+                                        .menu-overlay {
+                                          position: fixed;
+                                          top: 84px;
+                                          left: 0;
+                                          width: 100vw;
+                                          height: 100vh;
+                                          background: rgba(0,0,0,0.5);
+                                          display: none;
+                                          z-index: 90;
+                                        }
+                                        /* Prevent background scroll */
+                    body.no-scroll {
+                      overflow: hidden;
+                    }
+
+                    /* Overlay position by breakpoint */
+@media (min-width: 990px){
+  .menu-overlay { top: 84px; }   /* match your desktop header height */
+}
+@media (max-width: 989px){
+  .menu-overlay { top: 0; }      /* flush to top on mobile */
+}
+
+
+
+                    @media (max-width: 1320px) {
+                      .mega-menu-container {
+                        padding: 0 40px;
+                      }
+                    }
+                    
+                  </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const isDesktopHover =
+      matchMedia('(min-width: 990px)').matches &&
+      matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (!isDesktopHover) return;
+
+    const overlay = document.querySelector('.menu-overlay');
+    const primaryItems = document.querySelectorAll('.primary-item.with-mega');
+
+    primaryItems.forEach((primaryItem) => {
+      const megaDropdown = primaryItem.querySelector('.mega-dropdown');
+      const mainMenuItems = primaryItem.querySelectorAll('.main-menu a');
+      const subMenus = primaryItem.querySelectorAll('.sub-menu-links');
+      const topLink = primaryItem.querySelector(':scope > a .primary-div') || primaryItem.querySelector(':scope > a');
+
+      primaryItem.addEventListener('mouseenter', () => {
+        if (megaDropdown) megaDropdown.style.display = 'block';
+        if (overlay) overlay.style.display = 'block';
+        if (topLink) topLink.classList.add('hover');
+      });
+      primaryItem.addEventListener('mouseleave', () => {
+        if (megaDropdown) megaDropdown.style.display = 'none';
+        if (overlay) overlay.style.display = 'none';
+        if (topLink) topLink.classList.remove('hover');
+      });
+
+      mainMenuItems.forEach((item) => {
+        item.addEventListener('mouseenter', () => {
+          const target = item.dataset.submenu;
+          subMenus.forEach((menu) => (menu.style.display = 'none'));
+          const activeMenu = primaryItem.querySelector(`.sub-menu-links[data-sub="${target}"]`);
+          if (activeMenu) activeMenu.style.display = 'flex';
+        });
+      });
+    });
+
+    // Keep your active underline hover only on desktop
+    const menuLinks = document.querySelectorAll('.main-menu a');
+    menuLinks.forEach((link) => {
+      link.addEventListener('mouseover', () => {
+        menuLinks.forEach((l) => l.classList.remove('active'));
+        link.classList.add('active');
+      });
+    });
+  });
+</script>
+
+
+                </div>
+              </div>
+              <div class="site-header--meta-links medium-down--hide">
+                <div class="search-bar-wrapper">
+                  {% include 'search-bar' %}
+                </div>
+              </div>
+
+              {%- if customer -%}
+                <!-- Account dropdown -->
+                <li class="primary-item with-mega" data-primary="account">
+                  <a href="{{ routes.account_url }}">
+                    <div class="primary-div">Account</div>
+                  </a>
+
+                  <div class="mega-dropdown">
+                    <div class="mega-menu-container">
+                      <!-- Account Menu -->
+                      <div class="menu-column main-menu" style="flex: 0.4;">
+                        <ul>
+                          <li>
+                            <a href="{{ routes.account_url }}">{{ 'customer.orders.title' | t }}</a>
+                          </li>
+                          <li>
+                            <a href="{{ routes.account_addresses_url }}">{{ 'customer.addresses.title' | t }}</a>
+                          </li>
+                          <li>
+                            <a href="{{ routes.account_url }}#details">{{ 'customer.account.details' | t }}</a>
+                          </li>
+                          <li>
+                            <a href="{{ routes.account_logout_url }}">{{ 'layout.customer.log_out' | t }}</a>
+                          </li>
+                        </ul>
+                      </div>
+
+                      <!-- Account Promo Column -->
+                      <div class="menu-column account-column lazyload-element.animate">
+                        <div style="max-width: 300px; display: flex; flex-direction: column; align-items: flex-start;">
+                          <h2 style="color: white; margin-bottom: 10px;">Welcome back, {{ customer.first_name }}</h2>
+                          <p style="color: white;">Access your orders, saved addresses, and more.</p>
+                        </div>
+                        <a href="{{ routes.account_url }}" class="promo-btn">Go to Account</a>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              {%- else -%}
+                <!-- Login link -->
+                <li class="primary-item" data-primary="login">
+                  <a href="{{ routes.account_login_url }}">
+                    <div class="primary-div">Login</div>
+                  </a>
+                </li>
+              {%- endif -%}
+
+              <div
+                id="pageOverlay"
+                style="position: fixed; top: 104px; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.3); z-index: 90; display: none;"
+              ></div>
+              <div
+                id="customCartPopup"
+                style="position: fixed; top: 90px; z-index: 9999; background: #fff; border-radius: 0px 0px 15px 15px; padding: 30px; display: none; width: 350px; font-size: 18px;"
+              >
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <strong style="display: flex; align-items: center;"
+                    ><i
+                      class="fa fa-cart"
+                      style="content: url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Tick_White.svg?v=1759450598); height: 17px; margin-right: 10px;"
+                    ></i
+                    >Added to Cart</strong
+                  >
+                  <button
+                    onclick="closeCartPopup()"
+                    style="background: none; border: none; font-size: 18px; cursor: pointer;"
+                  >
+                    &times;
+                  </button>
+                </div>
+                <div id="cartPopupContent" style="margin-top: 15px;"></div>
+                <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+                  <div class="payment-buttons payment-buttons--{{ section.settings.add_to_cart_button_size }} form-payment-buttons">
+                    <a
+                      href="/cart"
+                      class="{{ btn_class }} btn--buyNow"
+                      style="border: 2px solid #e8e8e8; border-radius: 20px; margin-bottom: 10px;"
+                    >
+                      <span style="display: flex; align-items: center; gap: 10px;"> View Cart </span>
+                    </a>
+                    <a
+                      id="popupCheckout"
+                      class="{{ btn_class }} btn--buyNow is-locked"
+                      data-href="/checkout"
+                      aria-disabled="true"
+                      data-min="20000"
+                      tabindex="-1"
+                      style="background:#e0592a;border-radius:20px;color:#fff;"
+                    >
+                      <span style="display:flex;align-items:center;gap:10px;">
+                        <i
+                          class="fa fa-cart"
+                          style="content:url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Shopping_Cart_Orange.svg?v=1759451738);height:17px;"
+                        ></i>
+                        Checkout
+                      </span>
+                    </a>
+
+                    <small id="popupMinNote" style="display:block;color:#666;font-size:12px;margin-top:5px;"></small>
+                  </div>
+                </div>
+              </div>
+
+              <style>
+                  .site-header--meta-links.store-locator:hover .hover-img {
+                    content: url("https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Geo_Pin_White.svg?v=1759450844");
+                  }
+                    .site-header--meta-links.cart:hover .hover-img {
+                    content: url("https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Shopping_Cart_White_Bold.svg?v=1759450598");
+                  }
+                  div.purchase-icons {
+                    display: flex;
+                    gap: 20px;
+                }
+              </style>
+
+              <script>
+                // ---------- helpers ----------
+                function renderMoney(cents) {
+                  try {
+                    return new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(
+                      (Number(cents) || 0) / 100
+                    );
+                  } catch (e) {
+                      return '$' + ((Number(cents) || 0) / 100).toFixed(2);
+                  }
+                }
+
+                function setCartCount(n) {
+                  const badge = document.getElementById('CartCount');
+                  if (badge) badge.textContent = String(n);
+                }
+
+                async function refreshCartCount() {
+                  try {
+                    const res = await fetch('/cart.js', { credentials: 'same-origin' });
+                    const cart = await res.json();
+                    setCartCount(cart.item_count || 0);
+                  } catch (e) {}
+                }
+
+                // keep one auto-close timer
+                let cartPopupTimer = null;
+
+                // ---------- open / close ----------
+                function openCartPopup() {
+                  const pop = document.getElementById('customCartPopup');
+                  const ov = document.getElementById('pageOverlay');
+                  if (!pop) return;
+
+                  // show
+                  pop.style.display = 'block';
+                  if (ov) ov.style.display = 'block';
+
+                  // scroll to top so it’s visible
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                  // lock background scroll
+                  document.body.classList.add('no-scroll');
+
+                  // (re)start 30s auto-close
+                  if (cartPopupTimer) clearTimeout(cartPopupTimer);
+                  cartPopupTimer = setTimeout(closeCartPopup, 30000);
+                }
+
+                function closeCartPopup() {
+                  const pop = document.getElementById('customCartPopup');
+                  const ov = document.getElementById('pageOverlay');
+                  if (pop) pop.style.display = 'none';
+                  if (ov) ov.style.display = 'none';
+
+                  // unlock scroll
+                  document.body.classList.remove('no-scroll');
+
+                  if (cartPopupTimer) {
+                    clearTimeout(cartPopupTimer);
+                    cartPopupTimer = null;
+                  }
+                }
+
+                // make close available to inline onclick
+                window.closeCartPopup = closeCartPopup;
+
+                // close on overlay click or ESC (attach once)
+                document.addEventListener('DOMContentLoaded', () => {
+                  document.getElementById('pageOverlay')?.addEventListener('click', closeCartPopup, { once: false });
+                  document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') closeCartPopup();
+                  });
+                });
+
+                // ---------- fill content   open ----------
+                // Accepts the JSON returned by /cart/add.js (a single line item)
+                window.showCartPopup = function (lineItem) {
+                  const pop = document.getElementById('customCartPopup');
+                  const cnt = document.getElementById('cartPopupContent');
+                  if (!pop || !cnt) return;
+
+                  const img = lineItem?.image || '';
+                  const title = lineItem?.product_title || lineItem?.title || '';
+
+                  // Clean variant title and remove the " · svc" suffix (keep the space)
+                  const rawVariant = lineItem?.variant_title || '';
+                  const cleanVariant = rawVariant.replace(/\s*·\s*svc\s*/gi, ' ');
+
+                  let vParts = cleanVariant
+                    .split('/')
+                    .map((p) => p.trim())
+                    .filter(Boolean);
+
+                  const lenProp =
+                    (lineItem?.properties && (lineItem.properties.Length || lineItem.properties.length)) || '';
+                  if (lenProp) {
+                    const len = String(lenProp)
+                      .replace(/\s*mm\s*$/i, '')
+                      .trim();
+                    vParts = [len, ...vParts];
+                  }
+
+                  const variant = vParts.join(' / ');
+                  const quantity = lineItem?.quantity ?? 1;
+                  const price = renderMoney(lineItem?.final_line_price ?? lineItem?.line_price ?? lineItem?.price);
+
+                  // 👇 when you output it, just add quantity before price:
+                  const details = `
+  ${variant}<br>
+  Qty: ${quantity}<br>
+  ${price}
+`;
+
+                  cnt.innerHTML = `
+      <div style="display:flex;gap:14px;align-items:center; text-align: left;">
+        ${img ? `<img src="${img}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;">` : ''}
+        <div style="display:flex;flex-direction:column;gap:4px;max-width:220px;">
+          <a href="${
+            lineItem?.url || '#'
+          }" style="font-family:'Humanist777BT-Bold';text-decoration:none;color:#111;line-height:1.2;margin-bottom:5px;">${title}</a>
+          ${variant ? `<div style="color:#555;font-size:14px;">${variant}</div>` : ''}
+          <div style="margin-top:2px;">${price}</div>
+        </div>
+      </div>
+    `;
+
+                  refreshCartCount();
+                  openCartPopup();
+                };
+              </script>
+              <style>
+                #popupCheckout.is-locked { opacity:.55; cursor:not-allowed; }
+                #popupMinNote.flash { outline:2px solid #e0592a; outline-offset:2px; }
+              </style>
+
+              <script>
+                const MIN_CENTS_POPUP = 20000; // $200.00 (fallback if no data-min)
+
+                const formatMoneyAU = (c) =>
+                  new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format((Number(c) || 0) / 100);
+
+                  // Allow per-button override via data-min (optional)
+            function getPopupMinCents(){
+               const btn = document.getElementById('popupCheckout');
+               const fromData = Number(btn?.dataset.min);
+              return Number.isFinite(fromData) && fromData > 0 ? fromData : MIN_CENTS_POPUP;
+              }
+
+                // Fast hard-lock (runs before any async)
+                function hardLockPopupCheckout() {
+                  const btn = document.getElementById('popupCheckout');
+                  const note = document.getElementById('popupMinNote');
+                  if (!btn || !note) return;
+
+                  if (!btn.dataset.href) btn.dataset.href = btn.getAttribute('href') || '/checkout';
+                  btn.classList.add('is-locked');
+                  btn.removeAttribute('href'); // no href = no nav (even middle-click)
+                  btn.setAttribute('aria-disabled', 'true');
+                  btn.setAttribute('tabindex', '-1');
+                  note.textContent = 'Checking minimum…';
+                  note.style.display = 'block';
+                }
+
+                 // Read PRE-DISCOUNT subtotal (ignores discount codes)
+                 async function popupReadPreDiscountSubtotalCents() {
+                   // 1) If the page exposes the original subtotal, use it
+                   const el = document.querySelector('.wcp-original-cart-total'); // if present on page
+                   if (el && el.textContent) {
+                     const num = el.textContent.replace(/[^0-9.,-]/g,'').replace(/,/g,'');
+                     const f = parseFloat(num);
+                     if (!isNaN(f) && f > 0) return Math.round(f * 100);
+                   }
+                   // 2) Fallback to Ajax cart
+                   try {
+                     const r = await fetch('/cart.js', { credentials: 'same-origin' });
+                     if (!r.ok) return 0;
+                     const d = await r.json();
+                     if (typeof d.original_total_price === 'number' && d.original_total_price > 0) {
+                       return d.original_total_price;
+                     }
+                     if (typeof d.items_subtotal_price === 'number' && d.items_subtotal_price > 0) {
+                       return d.items_subtotal_price;
+                     }
+                     if (Array.isArray(d.items) && d.items.length) {
+                       const sum = d.items.reduce((acc, it) => {
+                         const cents = (typeof it.original_line_price === 'number' && it.original_line_price > 0)
+                           ? it.original_line_price
+                           : (typeof it.line_price === 'number' ? it.line_price : 0);
+                         return acc + cents;
+                       }, 0);
+                       if (sum > 0) return sum;
+                     }
+                     // Last resort (discounted): total_price
+                     return Number(d.total_price || 0);
+                   } catch (e) {
+                     return 0;
+                   }
+                 }
+
+                async function refreshPopupMinGate() {
+                  const btn = document.getElementById('popupCheckout');
+                  const note = document.getElementById('popupMinNote');
+                  if (!btn || !note) return;
+
+                  const minCents = getPopupMinCents();
+                  const subtotal = await popupReadPreDiscountSubtotalCents();
+                  const remaining = Math.max(0, minCents - (subtotal | 0));
+
+                  if (remaining > 0) {
+                    // stay locked
+                    btn.classList.add('is-locked');
+                    btn.removeAttribute('href');
+                    btn.setAttribute('aria-disabled', 'true');
+                    btn.setAttribute('tabindex', '-1');
+                    note.textContent = `Add ${formatMoneyAU(remaining)} more to enable checkout.`;
+                    note.style.display = 'block';
+                  } else {
+                    // unlock
+                    btn.classList.remove('is-locked');
+                    btn.setAttribute('href', btn.dataset.href || '/checkout');
+                    btn.removeAttribute('aria-disabled');
+                    btn.removeAttribute('tabindex');
+                    note.textContent = `You’ve reached the ${formatMoneyAU(minCents)} minimum — you can checkout.`;
+                    note.style.display = 'none';
+                  }
+                }
+
+                // Intercept clicks while locked (defensive)
+                document.addEventListener(
+                  'click',
+                  (e) => {
+                    const locked = e.target.closest('#popupCheckout.is-locked');
+                    if (!locked) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const note = document.getElementById('popupMinNote');
+                    if (note) {
+                      note.classList.add('flash');
+                      setTimeout(() => note.classList.remove('flash'), 450);
+                    }
+                  },
+                  true
+                );
+
+                // Hook your existing popup entry points so we lock immediately, then verify async:
+                (function hookPopup() {
+                  const oldShow = window.showCartPopup;
+                  window.showCartPopup = function (item) {
+                    try {
+                      hardLockPopupCheckout();
+                      oldShow && oldShow(item);
+                    } finally {
+                      refreshPopupMinGate();
+                    }
+                  };
+
+                  const oldOpen = window.openCartPopup;
+                  if (typeof oldOpen === 'function') {
+                    window.openCartPopup = function () {
+                      try {
+                        hardLockPopupCheckout();
+                        oldOpen();
+                      } finally {
+                        refreshPopupMinGate();
+                      }
+                    };
+                  }
+                })();
+              </script>
+
+              <div class="purchase-icons">
+
+                <div>
+  <div class="cart-visibility-target" data-display="block"
+       style="display:{% if customer or cart.item_count > 0 %}block{% else %}none{% endif %};">
+    <div class="site-header--meta-links cart medium-down--hide">
+      <a
+        href="/cart"
+        class="btn header-login-btn waves-effect waves-light z-depth-3 cart-icon-wrapper"
+        style="width: 46px;"
+      >
+        <img
+          class="hover-img"
+          src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Shopping_Cart_White_Alt_Bold.svg?v=1759450598"
+          style="max-height: 24px; max-width: 24px;"
+          alt="cart"
+        >
+      </a>
+    </div>
+<span class="cart-count-badge CartCount">2</span>
+  </div>
+</div>
+
+
+              <style>
+                .cart-visibility-target[aria-hidden="true"] { display: none !important; }
+
+                .cart-icon-wrapper {
+                  position: relative;
+                  display: inline-block;
+                }
+                .cart-count-badge {
+                  position: absolute;
+                  background: #3995e6;
+                  color: white;
+                  font-size: 10px;
+                  font-weight: bold;
+                  padding: 4px 5px;
+                  border-radius: 9999px;
+                  line-height: 1;
+                  text-align: center;
+                  margin-left: -15px;
+                  z-index: 100;
+                }
+
+              </style>
+
+
+            </div>
+            {% comment %}<br class="medium-down--hide">{% endcomment %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Overlay -->
+<div class="menu-overlay"></div>
+
+<div id="mobileNavBar" class="mobile-header" role="banner">
+  <button class="mobile-header__menu" aria-controls="navBar" aria-expanded="false">
+    <span class="icon icon-hamburger" aria-hidden="true"></span>
+  </button>
+
+  <div class="mobile-header__logo">
+    {% if request.page_type == 'index' %}
+      <h1 class="header-logo" itemscope itemtype="http://schema.org/Organization">
+    {% else %}
+      <div class="h1 header-logo" itemscope itemtype="http://schema.org/Organization">
+    {% endif %}
+      {% if section.settings.logo %}
+        {% capture image_size %}{{ section.settings.logo_max_width | escape }}x{% endcapture %}
+        {%- assign img_url = section.settings.logo | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+        {% capture logo_alt %}{{ section.settings.logo.alt | default: shop.name }}{% endcapture %}
+        <a href="{{ routes.root_url }}" itemprop="url" class="mobile-header__logo-link">
+          <img
+            class="lazyload js mobile-header__logo-img"
+            data-src="{{ img_url }}"
+            data-widths="[180,360,540,720,900,1080,1296,1512,1728,2048]"
+            data-aspectratio="{{ section.settings.logo.aspect_ratio }}"
+            data-sizes="auto"
+            alt="{{ logo_alt | escape }}">
+          <noscript>
+            <img
+              src="{{ section.settings.logo | img_url: image_size }}"
+              srcset="{{ section.settings.logo | img_url: image_size }} 1x, {{ section.settings.logo | img_url: image_size, scale: 2 }} 2x"
+              alt="{{ logo_alt | escape }}"
+              itemprop="logo"
+              class="mobile-header__logo-img">
+          </noscript>
+        </a>
+      {% else %}
+        <a href="{{ routes.root_url }}" class="mobile-header__logo-link">{{ shop.name }}</a>
+      {% endif %}
+    {% if request.page_type == 'index' %}</h1>{% else %}</div>{% endif %}
+  </div>
+
+<div class="mobile-header__cart cart-visibility-target"
+     data-display="block"
+     style="display:{% if customer or cart.item_count > 0 %}block{% else %}none{% endif %};">
+  <a href="{{ routes.cart_url }}" class="mobile-header__cart-btn" aria-label="{{ 'cart.general.title' | t }}">
+    <img class="mobile-header__cart-icon"
+      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Shopping_Cart_White_Alt_Bold.svg?v=1759450598"
+      alt="">
+    <span class="mobile-header__cart-badge CartCount" id="CartCount" aria-live="polite">2</span>
+  </a>
+</div>
+
+</div>
+
+
+<nav class="nav-bar" id="navBar" role="navigation">
+  <div class="wrapper">
+    {% include 'search-bar' %}
+<!-- Drilldown Mobile Menu -->
+<div id="mnavSlide" class="mnav mnav--slide" role="navigation" aria-label="Mobile menu">
+  <!-- Page header (Back + Title) -->
+  <div class="mnav__bar">
+  <button class="mnav__back" aria-label="Back" title="Back">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M15 18l-6-6 6-6" stroke-width="2" fill="none" stroke="currentColor"></path>
+    </svg>
+  </button>
+  <div class="mnav__title" role="button" tabindex="0">Products</div>
+</div>
+
+
+  <!-- Animated viewport -->
+  <div class="mnav__viewport">
+    <div class="mnav__track">
+      <!-- ROOT PAGE -->
+      <section class="mnav__page is-active" data-page="root" data-title="Menu" aria-label="Main">
+        <ul class="mnav__list">
+          <!-- Products -->
+          <li>
+            <button class="mnav__next" data-go="products">
+              <span>Products</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </li>
+
+          <!-- Resources -->
+          <li>
+            <button class="mnav__next" data-go="resources">
+              <span>Resources</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </li>
+
+          <!-- About -->
+          <li>
+            <button class="mnav__next" data-go="about">
+              <span>About</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </li>
+        </ul>
+      </section>
+
+      <!-- PRODUCTS PAGE -->
+      <section class="mnav__page" data-page="products" data-title="Products" aria-label="Products">
+        <ul class="mnav__list">
+          <li>
+            <button class="mnav__next" data-go="bandsaw"><span>Bandsaw Blades</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+          <li>
+            <button class="mnav__next" data-go="coldsaw"><span>Coldsaw Blades</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+          <li>
+            <button class="mnav__next" data-go="tct"><span>TCT Circular Blades</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+          <li>
+            <button class="mnav__next" data-go="fluids"><span>Metal Working Fluids</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+
+          <li><a class="mnav__link" href="/pages/magnetic-based-drills">Magnetic Based Drills</a></li>
+
+          <li>
+            <button class="mnav__next" data-go="core"><span>Core Drills & Accessories</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+
+          <li><a class="mnav__link" href="/collections/punch-dies">Punch &amp; Dies</a></li>
+
+          <li>
+            <button class="mnav__next" data-go="cutting-machines"><span>Metal Cutting Machines</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+          <li>
+            <button class="mnav__next" data-go="prep-machines"><span>Metal Preparing Machines</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+
+          <li>
+            <button class="mnav__next" data-go="yg1"><span>YG-1 Tooling</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+
+          <li>
+            <button class="mnav__next" data-go="end-mills"><span>End Mills</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+
+          <li>
+            <button class="mnav__next" data-go="iso-turning"><span>ISO Turning Tools</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+
+          <li><a class="mnav__link" href="/collections/industrial-clamps">Industrial Clamps</a></li>
+
+          <li>
+            <button class="mnav__next" data-go="handling"><span>Material Handling</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Bandsaw -->
+      <section class="mnav__page" data-page="bandsaw" data-title="Bandsaw Blades" aria-label="Bandsaw">
+        <ul class="mnav__list mnav__list--inner">
+          <li><a class="mnav__link" href="/collections/metals">Metal Cutting Blades</a></li>
+          <li><a class="mnav__link" href="/collections/timber-plastic">Timber Cutting Blades</a></li>
+          <li><a class="mnav__link" href="/collections/tct-bandsaw-blades">Other Blades</a></li>
+          <li><a class="mnav__link mnav__viewall" href="/pages/bandsaw-blade-range">View All Bandsaw Blades</a></li>
+        </ul>
+      </section>
+
+      <!-- Coldsaw -->
+      <section class="mnav__page" data-page="coldsaw" data-title="Coldsaw Blades">
+        <ul class="mnav__list mnav__list--inner">
+          <li><a class="mnav__link" href="/collections/high-speed-steel">HSS Blades</a></li>
+          <li><a class="mnav__link" href="/collections/high-speed-steel-cobalt">HSS-Co Blades</a></li>
+          <li><a class="mnav__link" href="/collections/other-coldsaw-blades">Other Blades</a></li>
+          <li><a class="mnav__link mnav__viewall" href="/pages/coldsaw-blades">View All Coldsaw Blades</a></li>
+        </ul>
+      </section>
+
+      <!-- TCT -->
+      <section class="mnav__page" data-page="tct" data-title="TCT Circular Blades">
+        <ul class="mnav__list mnav__list--inner">
+          <li><a class="mnav__link" href="/collections/tct-dry-cut-blades">TCT Dry-Cut Blades</a></li>
+          <li><a class="mnav__link" href="/collections/tct-alu-blades">TCT Alu Blades</a></li>
+          <li><a class="mnav__link" href="/collections/cermet-tipped-blades">Cermet Tipped Blades</a></li>
+          <li><a class="mnav__link" href="/collections/other-tct-circular-blades">Other TCT Circular Blades</a></li>
+          <li><a class="mnav__link mnav__viewall" href="/pages/tct-circular-blades">View All TCT Circular Blades</a></li>
+        </ul>
+      </section>
+
+      <!-- Fluids -->
+      <section class="mnav__page" data-page="fluids" data-title="Metal Working Fluids">
+        <ul class="mnav__list mnav__list--inner">
+          <li><a class="mnav__link" href="/collections/soluble-oils">Water-Miscible Fluids</a></li>
+          <li><a class="mnav__link" href="/collections/neat-oils">Neat Oils</a></li>
+          <li><a class="mnav__link" href="/collections/cutting-tapping-compounds">Cutting &amp; Tapping Compounds</a></li>
+          <li><a class="mnav__link" href="/collections/other-metal-working-fluids">Industrial Fluids</a></li>
+          <li><a class="mnav__link mnav__viewall" href="/pages/coolant">View All Metal Working Fluids</a></li>
+        </ul>
+      </section>
+
+      <!-- Core -->
+      <section class="mnav__page" data-page="core" data-title="Core Drills & Accessories">
+        <ul class="mnav__list mnav__list--inner">
+          <li><a class="mnav__link" href="/collections/hss-cobalt-30mm-depth">HSS-Co Core Drills</a></li>
+          <li><a class="mnav__link" href="/collections/tct-core-drills">TCT Core Drills</a></li>
+          <li><a class="mnav__link" href="/collections/twist-drills">HSS-Co Twist Drills</a></li>
+          <li><a class="mnav__link" href="/collections/countersink-bits">HSS-Co Countersinks</a></li>
+          <li><a class="mnav__link mnav__viewall" href="/pages/core-drills-accessories">View All Core Drills</a></li>
+        </ul>
+      </section>
+
+      <!-- Cutting Machines -->
+      <section class="mnav__page" data-page="cutting-machines" data-title="Metal Cutting Machines">
+        <ul class="mnav__list mnav__list--inner">
+          <li><a class="mnav__link" href="/pages/bandsaw-machines">Bandsaw Machines</a></li>
+          <li><a class="mnav__link" href="/collections/coldsaw-machines">Coldsaw Machines</a></li>
+          <li><a class="mnav__link mnav__viewall" href="/pages/metal-cutting-machines">View All Cutting Machines</a></li>
+        </ul>
+      </section>
+
+      <!-- Preparing Machines -->
+      <section class="mnav__page" data-page="prep-machines" data-title="Metal Preparing Machines">
+        <ul class="mnav__list mnav__list--inner">
+          <li><a class="mnav__link" href="/collections/punching-machines">Punching Machines</a></li>
+          <li><a class="mnav__link" href="/collections/bevelling-machines">Bevelling Machines</a></li>
+          <li><a class="mnav__link" href="/collections/accessories-metal-preparing">Metal Preparing Accessories</a></li>
+          <li><a class="mnav__link mnav__viewall" href="/pages/metal-preparing-machines">View All Preparing Machines</a></li>
+        </ul>
+      </section>
+
+      <!-- YG-1 -->
+      <section class="mnav__page" data-page="yg1" data-title="YG-1 Tooling">
+        <ul class="mnav__list mnav__list--inner">
+          <li><a class="mnav__link" href="/pages/yg-1-milling">Milling Tools</a></li>
+          <li><a class="mnav__link" href="/pages/yg-1-holemaking">Holemaking Tools</a></li>
+          <li><a class="mnav__link" href="/pages/yg-1-threading">Threading Tools</a></li>
+          <li><a class="mnav__link" href="/pages/yg-1-turning">Turning Tools</a></li>
+          <li><a class="mnav__link mnav__viewall" href="/pages/yg-1-tooling">View All YG-1 Tooling</a></li>
+        </ul>
+      </section>
+
+      <section class="mnav__page" data-page="end-mills" data-title="End Mills">
+        <ul class="mnav__list">
+          <li>
+            <button class="mnav__next" data-go="general-purpose-coated-carbide-end-mills"><span>General Purpose Coated Carbide End Mills</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+          <li>
+            <button class="mnav__next" data-go="general-purpose-hss-end-mills"><span>General Purpose HSS & HSS-PM End Mills</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+          <li>
+            <button class="mnav__next" data-go="hpc-carbide-multi-material-end-mills"><span>HPC Carbide Multi Material End Mills</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+           <li>
+            <button class="mnav__next" data-go="aluminium-geometry-end-mills"><span>Aluminium Geometry End Mills</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+          <li>
+            <button class="mnav__next" data-go="high-speed-carbide-end-mills"><span>High Speed Carbide End Mills</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+          <li>
+            <button class="mnav__next" data-go="high-helix-end-mills"><span>6-8 Flute High Helix End Mills</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+          <li>
+            <button class="mnav__next" data-go="hpc-inox-exotics-end-mills"><span>HPC Inox & Exotics End Mills</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+          <li>
+            <button class="mnav__next" data-go="diamond-coated-carbide-end-mills"><span>Diamond Coated Carbide End Mills</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+          <li>
+            <button class="mnav__next" data-go="dlc-coated-carbide-end-mills"><span>DLC Coated Carbide End Mills</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+        </ul>
+      </section>
+
+      <section class="mnav__page" data-page="general-purpose-coated-carbide-end-mills" data-title="General Purpose Coated Carbide End Mills">
+        <ul class="mnav__list mnav__list--inner">
+          <li><a class="mnav__link" href="/collections/2-flute-square-end-general-purpose-milling-cutters">2 Flute (Square End)</a></li>
+          <li><a class="mnav__link" href="/collections/3-flute-square-end-general-purpose-carbide-milling-cutters">3 Flute (Square End)</a></li>
+          <li><a class="mnav__link" href="/collections/4-flute-square-end-general-purpose-carbide-milling-cutters">4 Flute (Square End)</a></li>
+          <li><a class="mnav__link" href="/collections/general-purpose-carbide-rippers-roughers">Rippers / Roughers</a></li>
+          <li><a class="mnav__link" href="/collections/2-flute-chamfer-prep-general-purpose-carbide-milling-cutters">2 Flute (Chamfer Prep)</a></li>
+          <li><a class="mnav__link" href="/collections/3-flute-chamfer-prep-general-purpose-carbide-milling-cutters">3 Flute (Chamfer Prep)</a></li>
+          <li><a class="mnav__link" href="/collections/4-flute-chamfer-prep-general-purpose-carbide-milling-cutters">4 Flute (Chamfer Prep)</a></li>
+          <li><a class="mnav__link" href="/collections/2-flute-corner-radius-general-purpose-carbide-milling-cutters">2 Flute (Corner Radius)</a></li>
+          <li><a class="mnav__link" href="/collections/4-flute-corner-radius-general-purpose-carbide-milling-cutters">4 Flute (Corner Radius)</a></li>
+          <li><a class="mnav__link" href="/collections/2-flute-ball-nose-general-purpose-carbide-milling-cutters">2 Flute (Ball Nose)</a></li>
+          <li><a class="mnav__link" href="/collections/4-flute-ball-nose-general-purpose-carbide-milling-cutters">4 Flute (Ball Nose)</a></li>
+          <li><a class="mnav__link mnav__viewall" href="/pages/general-purpose-coated-carbide-milling-cutters">View All</a></li>
+        </ul>
+      </section>
+
+            <section class="mnav__page" data-page="iso-turning" data-title="ISO Turning">
+        <ul class="mnav__list">
+          <li>
+            <button class="mnav__next" data-go="carbide-turning-inserts"><span>Carbide Turning Inserts</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+          </li>
+        </ul>
+      </section>
+
+      <section class="mnav__page" data-page="carbide-turning-inserts" data-title="Carbide Turning Inserts">
+        <ul class="mnav__list mnav__list--inner">
+          <li><a class="mnav__link" href="/collections/cc-insert-holder">CCMT / CCGT Turning Inserts</a></li>
+          <li><a class="mnav__link" href="/collections/cn-insert-holder">CNMG Turning Inserts</a></li>
+          <li><a class="mnav__link" href="/collections/dc-insert-holder">DCMT / DCGT Turning Inserts</a></li>
+          <li><a class="mnav__link" href="/collections/dn-insert-holder">DNMG Turning Inserts</a></li>
+          <li><a class="mnav__link" href="/collections/kn-insert-holder">KNUX Turning Inserts</a></li>
+          <li><a class="mnav__link" href="/collections/rc-insert-holder">RCMT / RCGT Turning Inserts</a></li>
+          <li><a class="mnav__link" href="/collections/sc-insert-holder">SCMT / SCGT Turning Inserts</a></li>
+          <li><a class="mnav__link" href="/collections/sn-insert-holder">SNMG Turning Inserts</a></li>
+          <li><a class="mnav__link" href="/collections/tc-insert-holder">TCMT / TCGT Turning Inserts</a></li>
+          <li><a class="mnav__link" href="/collections/tn-insert-holder">TNMG Turning Inserts</a></li>
+          <li><a class="mnav__link" href="/collections/vb-insert-holder">VBMT / VBGT Turning Inserts</a></li>
+          <li><a class="mnav__link" href="/collections/vc-insert-holder">VCMT / VCGT Turning Inserts</a></li>
+          <li><a class="mnav__link" href="/collections/vn-insert-holder">VNMG Turning Inserts</a></li>
+          <li><a class="mnav__link" href="/collections/wn-insert-holder">WNMG Turning Inserts</a></li>
+        </ul>
+      </section>
+
+      <!-- Handling -->
+      <section class="mnav__page" data-page="handling" data-title="Material Handling">
+        <ul class="mnav__list mnav__list--inner">
+          <li><a class="mnav__link" href="/pages/roller-tables">Heavy Duty Roller Tables</a></li>
+          <li><a class="mnav__link" href="/pages/heavy-duty-loading-and-storage-systems">Heavy-duty Loading &amp; Storage Systems</a></li>
+          <li><a class="mnav__link" href="/pages/heavy-duty-length-stops">Heavy-duty Digital Length Stops</a></li>
+          <li><a class="mnav__link mnav__viewall" href="/pages/material-handling-page">View All Material Handling</a></li>
+        </ul>
+      </section>
+
+      <!-- RESOURCES -->
+      <section class="mnav__page" data-page="resources" data-title="Resources">
+        <ul class="mnav__list">
+          <li><a class="mnav__link" href="/blogs/learning-centre">Learning Centre</a></li>
+          <li><a class="mnav__link" href="/pages/media-downloads">Videos</a></li>
+          <li><a class="mnav__link" href="/pages/product-overviews">Product Overviews</a></li>
+          <li><a class="mnav__link" href="/pages/material-and-safety-data-sheets">Material &amp; Safety Data Sheets</a></li>
+          <li><a class="mnav__link" href="/pages/coolant-concentration-calculator">Coolant Concentration Calculator</a></li>
+          <li><a class="mnav__link" href="/pages/bandsaw-blade-selector">Bandsaw Blade Selector</a></li>
+          <li><a class="mnav__link" href="/pages/bandsaw-speeds-and-feeds-calculator">Bandsaw Speeds &amp; Feeds Calculator</a></li>
+        </ul>
+      </section>
+
+      <!-- ABOUT -->
+      <section class="mnav__page" data-page="about" data-title="About">
+        <ul class="mnav__list">
+          <li><a class="mnav__link" href="/pages/contact-us">Contact Us</a></li>
+          <li><a class="mnav__link" href="/pages/company-information">Company Information</a></li>
+          <li><a class="mnav__link" href="/pages/our-team">Our Team</a></li>
+          <li><a class="mnav__link" href="/pages/store-locator">Find a Distributor</a></li>
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <!-- Footer (Login / Account) -->
+  <div class="mnav__footer">
+    {% if customer %}
+      <a class="mnav__cta" href="{{ routes.account_url }}">Account</a>
+    {% else %}
+      <a class="mnav__cta" href="{{ routes.account_login_url }}">Login</a>
+    {% endif %}
+  </div>
+</div>
+
+
+    {% comment %}{% include 'site-nav' %}{% endcomment %}
+  </div>
+</nav>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "header-section",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Custom logo",
+      "info": "400px wide .png recommended"
+    },
+    {
+      "type": "text",
+      "id": "logo_max_width",
+      "label": "Custom logo width",
+      "default": "305"
+    },
+    {
+      "type": "header",
+      "content": "Announcement bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_announcement",
+      "label": "Show announcement",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "announcement_text",
+      "label": "Text",
+      "default": "Announce something here"
+    },
+    {
+      "type": "url",
+      "id": "announcement_link",
+      "label": "Link",
+      "info": "Optional"
+    }
+  ]
+}
+{% endschema %}
+
+<script>
+  // Expose login state to JS (Liquid -> JS)
+  window.__isLoggedIn = {% if customer %}true{% else %}false{% endif %};
+
+  // Update all count badges (supports both #CartCount and .CartCount)
+  function setCartCount(n) {
+    document.querySelectorAll('#CartCount, .CartCount').forEach((el) => { el.textContent = String(n); });
+    updateCartVisibility(n);
+  }
+
+  // Show/hide all gateable cart UIs
+  function updateCartVisibility(count) {
+    const loggedIn = (window.__isLoggedIn === true || window.__isLoggedIn === 'true');
+const show = loggedIn || Number(count) > 0;
+
+
+    document.querySelectorAll('.cart-visibility-target').forEach((el) => {
+      if (show) {
+        el.style.display = el.dataset.display || '';
+        el.setAttribute('aria-hidden', 'false');
+      } else {
+        el.style.display = 'none';
+        el.setAttribute('aria-hidden', 'true');
+      }
+    });
+  }
+
+  // Fetch cart and refresh both count   visibility
+  async function refreshCartCount() {
+    try {
+      const res = await fetch('/cart.js', { credentials: 'same-origin' });
+      const cart = await res.json();
+      setCartCount(cart.item_count || 0);
+    } catch (e) {
+      // On error, stay hidden
+      updateCartVisibility(0);
+    }
+  }
+
+  // Initial run
+  document.addEventListener('DOMContentLoaded', refreshCartCount);
+
+  // OPTIONAL: if you add items via AJAX elsewhere, call refreshCartCount()
+  // after the add completes (you already call refreshCartCount() in showCartPopup()).
+</script>
+<style>
+
+  /* Make the fixed nav take the remaining screen on mobile and host its own scroll area */
+@media (max-width: 989px){
+  .nav-bar{
+    position: fixed;
+    top: 56px;            /* your mobile header height */
+    left: 0; right: 0; bottom: 0;
+    max-height: calc(100vh - 56px);
+    overflow: hidden;     /* the viewport below will scroll */
+  }
+
+  .mnav{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mnav__viewport{
+    /* was overflow:hidden; keep it but let page do the scrolling */
+    position: relative;
+    flex: 1 1 auto;       /* grow to fill */
+  }
+
+  /* Each drilldown "page" takes full viewport and scrolls */
+  .mnav__page{
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 88px; /* space so last items aren’t hidden under sticky footer */
+  }
+
+  /* Footer stays visible; height ~= padding-bottom above */
+  .mnav__footer{
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    /* keep your existing padding/background */
+  }
+}
+
+@media (max-width: 989px){
+  .mnav__title.is-clickable { cursor: pointer; }
+  .mnav__title[aria-disabled="true"] { cursor: default; }
+}
+
+  @media (max-width: 989px){
+  .mnav__viewport { min-height: 59.5vh; }
+}
+
+
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const btn     = document.querySelector('.mobile-header__menu');
+  const nav     = document.getElementById('navBar');
+  const overlay = document.querySelector('.menu-overlay');
+  if (!btn || !nav) return;
+
+  function setOpen(open){
+    nav.classList.toggle('is-open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('no-scroll', open);
+    if (overlay) overlay.style.display = open ? 'block' : 'none';
+  }
+
+  btn.addEventListener('click', () => {
+    setOpen(!nav.classList.contains('is-open'));
+  });
+
+  overlay?.addEventListener('click', () => setOpen(false));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+
+  // close on real navigation inside the menu
+  nav.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href]');
+    if (!a) return;
+    const href = (a.getAttribute('href') || '').trim().toLowerCase();
+    const isPseudo = !href || href === '#' || href.startsWith('#') || href.startsWith('javascript:');
+    if (!isPseudo) setTimeout(() => setOpen(false), 0);
+  });
+});
+</script>
+
+
+<script>
+  // Toggle any accordion panel
+  document.addEventListener('DOMContentLoaded', function(){
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (!mobileMenu) return;
+
+    // close helper (doesn't depend on previous scripts)
+    window.closeMobileMenu = function(){
+      const nav = document.getElementById('navBar');
+      const overlay = document.querySelector('.menu-overlay');
+      const btn = document.querySelector('.mobile-header__menu');
+      nav?.classList.remove('is-open');
+      btn?.setAttribute('aria-expanded','false');
+      if (overlay) overlay.style.display = 'none';
+      document.body.classList.remove('no-scroll');
+    };
+
+    mobileMenu.addEventListener('click', function(e){
+      const toggle = e.target.closest('.mnav__toggle');
+      if (toggle && mobileMenu.contains(toggle)){
+        const panelId = toggle.getAttribute('aria-controls');
+        const panel = document.getElementById(panelId);
+        if (!panel) return;
+        const open = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!open));
+        panel.hidden = open;
+        if (!open && getComputedStyle(panel).display === 'none'){ panel.style.display = 'block'; }
+        if (open){ panel.style.display = 'none'; }
+        e.preventDefault();
+        return;
+      }
+
+      // Close menu on real navigation clicks
+      const link = e.target.closest('a[href]');
+      if (link && mobileMenu.contains(link)){
+        const href = (link.getAttribute('href')||'').trim().toLowerCase();
+        if (href && href !== '#' && !href.startsWith('javascript:')){
+          setTimeout(window.closeMobileMenu, 0);
+        }
+      }
+    }, true);
+  });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const wrap  = document.getElementById('mnavSlide');
+  if (!wrap) return;
+
+  const pages = Array.from(wrap.querySelectorAll('.mnav__page'));
+  const back  = wrap.querySelector('.mnav__back');
+  const title = wrap.querySelector('.mnav__title');
+
+  if (!pages.length || !back || !title) return;
+
+  const pageById = Object.fromEntries(pages.map(p => [p.dataset.page, p]));
+  const stack = ['root'];
+  let currentId = stack[0];
+
+  // --- a11y helpers ---
+  function a11yFor(pageEl, active){
+    pageEl.toggleAttribute('inert', !active);
+    pageEl.setAttribute('aria-hidden', String(!active));
+  }
+
+  function setTitleClickable(){
+    const canGoBack = stack.length > 1;
+    title.classList.toggle('is-clickable', canGoBack);
+    title.setAttribute('aria-disabled', String(!canGoBack));
+  }
+
+  // --- core nav ---
+  function showPage(nextId, dir = 1){
+    if (nextId === currentId) return;
+    const cur  = pageById[currentId];
+    const next = pageById[nextId];
+    if (!next) return;
+
+    // Prepare next offscreen (right for forward, left for back)
+    next.style.transition = 'none';
+    next.style.transform  = `translateX(${dir > 0 ? 100 : -100}%)`;
+    next.style.opacity    = '0';
+    next.classList.add('is-active');
+    a11yFor(next, true);
+    void next.offsetHeight; // reflow
+    next.style.transition = ''; // enable animation
+
+    // Animate both
+    if (cur){
+      cur.style.transform = `translateX(${dir > 0 ? -100 : 100}%)`;
+      cur.style.opacity   = '0';
+    }
+    next.style.transform = 'translateX(0)';
+    next.style.opacity   = '1';
+
+    // Clean up after transition
+    const done = () => {
+      if (cur){
+        cur.classList.remove('is-active');
+        cur.style.transform = '';
+        cur.style.opacity   = '';
+        a11yFor(cur, false);
+      }
+      next.removeEventListener('transitionend', done);
+    };
+    next.addEventListener('transitionend', done, { once: true });
+
+    // State updates
+    currentId = nextId;
+    title.textContent = next.dataset.title || 'Menu';
+    back.hidden = stack.length <= 1;
+    setTitleClickable();
+  }
+
+  // --- init ---
+  pages.forEach(p => a11yFor(p, false));
+  if (pageById[currentId]) {
+    pageById[currentId].classList.add('is-active');
+    a11yFor(pageById[currentId], true);
+  }
+  title.textContent = (pageById[currentId]?.dataset.title) || 'Menu';
+  back.hidden = true;
+  setTitleClickable();
+
+  // --- event delegation (clicks) ---
+  wrap.addEventListener('click', function(e){
+    // Back via icon OR clickable title
+    const backTap = e.target.closest('.mnav__back, .mnav__title.is-clickable');
+    if (backTap && wrap.contains(backTap)){
+      e.preventDefault();
+      if (stack.length > 1){
+        stack.pop();
+        const prev = stack[stack.length - 1];
+        showPage(prev, -1);
+      }
+      return;
+    }
+
+    // Forward via drilldown buttons
+    const btn = e.target.closest('.mnav__next');
+    if (btn && wrap.contains(btn)){
+      const id = btn.getAttribute('data-go');
+      if (id && pageById[id]){
+        stack.push(id);
+        showPage(id, +1);
+        e.preventDefault();
+      }
+      return;
+    }
+
+    // Real navigation inside the menu closes the menu
+    const link = e.target.closest('a[href]');
+    if (link && wrap.contains(link)){
+      const href = (link.getAttribute('href') || '').trim().toLowerCase();
+      const isPseudo = !href || href === '#' || href.startsWith('#') || href.startsWith('javascript:');
+      if (!isPseudo) setTimeout(() => { window.closeMobileMenu && window.closeMobileMenu(); }, 0);
+    }
+  }, true);
+
+  // --- keyboard support for title ---
+  title.addEventListener('keydown', (e) => {
+    if ((e.key === 'Enter' || e.key === ' ') && stack.length > 1){
+      e.preventDefault();
+      stack.pop();
+      const prev = stack[stack.length - 1];
+      showPage(prev, -1);
+    }
+  });
+});
+</script>
+
+
+
+
+
+<style>
+
+
+  /* Hide the slide-out nav by default everywhere */
+#navBar { display: none; }
+
+/* Mobile: layout + only show when is-open */
+@media (max-width: 989px){
+  #navBar{
+    position: fixed;
+    top: 56px; left: 0; right: 0; bottom: 0;
+    max-height: calc(100vh - 56px);
+    overflow: hidden;        /* viewport handles its own scroll */
+    background: #fff;
+    z-index: 110;
+    box-shadow: 0 8px 24px rgba(0,0,0,.08);
+  }
+  #navBar.is-open{ display: block; }
+}
+
+
+  /* Custom mobile menu (<= 989px) */
+@media (max-width: 989px){
+  .mnav{ padding: 12px 0 24px; }
+  .mnav__list{ list-style:none; margin:0; padding:0; margin: 0px 20px 20px !important; }
+  .mnav__item{ border-bottom:2px solid #e8e8e8; }
+  .mnav__link,
+  .mnav__toggle{
+    width:100%; display:flex; align-items:center; justify-content:space-between;
+    padding:14px 16px; background:#fff; border:0; text-decoration:none; cursor:pointer;
+    font-family:'Humanist777BT-Bold'; font-size:16px; color:#111;
+  }
+  .mnav__toggle{ text-align:left; }
+  .mnav__chev{ width:22px; height:22px; flex:0 0 22px; fill:none; stroke:#222; stroke-width:2; }
+  .mnav__toggle[aria-expanded="true"] .mnav__chev{ transform:rotate(180deg); transition:transform .18s ease; }
+  .mnav__panel{ padding:0 0 8px; }
+  .mnav__list--inner .mnav__item{ border-bottom:0; }
+  .mnav__viewall{ font-weight:700; color:#e0592a; }
+}
+/* Drilldown menu UI */
+@media (max-width: 989px){
+  .mnav--slide{ padding:8px 0 20px; } /* space for footer */
+  .mnav__bar{
+    display:flex; align-items:center; gap:8px; padding:0px 25px ;
+  }
+  .mnav__title{ font-family:'Humanist777BT-Bold'; font-size:24px; color: #0069a7;}
+  .mnav__back{
+    display:flex; align-items:center; gap:6px; border:0; background:none; font:inherit; color:#111;
+  }
+  .mnav__back svg{ width:18px; height:18px; }
+
+  .mnav__viewport{ overflow:hidden; position:relative; }
+.mnav__track {
+  transform: none !important;
+  transition: none !important;
+  display: block; /* no horizontal strip */
+}
+
+  .mnav__page {
+  position: absolute; inset: 0;
+  width: 100%;
+  opacity: 0;
+  transform: translateX(100%);      /* default off-canvas */
+  pointer-events: none;
+  transition: transform .24s ease, opacity .24s ease;
+}
+.mnav__page.is-active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+  .mnav__list{ list-style:none; margin:0; padding:6px 0; }
+
+  .mnav__link, .mnav__next{
+    width:100%; display:flex; align-items:center; justify-content:space-between;
+    padding:15px 0px; background:#fff; border:0; border-bottom:2px solid #e8e8e8; text-decoration:none;
+    font-family:'Humanist777BT-Bold'; color: black !important;font-size:18px; text-align: left;
+  }
+  .mnav__next svg, .mnav__link svg{ width:20px; height:20px; stroke:#111; stroke-width:2; fill:none; }
+  .mnav__viewall{ color:#e0592a; }
+
+  .mnav__footer{
+    position:sticky; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #eee;
+    padding:12px; display:flex; justify-content:center;
+  }
+  .mnav__cta{
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:160px; padding:10px 16px; border-radius:999px; background:#e0592a; color:#fff !important;
+    text-decoration:none; font-family:'Humanist777BT-Bold'; font-size:16px;
+  }
+}
+
+.menu-overlay{ top:0; }
+@media (min-width:990px){ .menu-overlay{ top:84px; } }
+
+@media (max-width: 989px){
+  .mnav__title.is-clickable { cursor: pointer; pointer-events: auto; }
+}
+</style>
+
+<style>
+ /* Base */
+.search-bar-wrapper{
+  --base: 300px;
+  --exp: 760px;
+  width: var(--base);
+  position: relative;
+  z-index: 110;
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: none;
+  will-change: width, transform;
+}
+.search-bar-wrapper input[type="search"]{
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+}
+.site-header{ overflow: visible; }
+
+/* Expanded whenever body has the state. right edge stays put */
+body.is-search-active .search-bar-wrapper{
+  --exp: min(760px, calc(100vw - 32px));
+  width: var(--exp);
+  transform: translateX(
+    max(calc(var(--base) - var(--exp)), calc(-1 * var(--left-stop)))
+  );
+  transition: width .3s ease, transform .3s ease;
+}
+
+/* Mobile sizing */
+@media (max-width: 989px){
+  .search-bar-wrapper{ --base: 220px; }
+  body.is-search-active .search-bar-wrapper{ --exp: calc(100vw - 32px); }
+}
+
+/* Motion safety */
+@media (prefers-reduced-motion: reduce){
+  .search-bar-wrapper{ transition: none !important; }
+}
+
+/* Hide nav while active. do NOT depend on hover */
+:root{ --nav-return-delay: .25s; }
+
+body.is-search-active .site-header .site-header--meta-links.medium-down--hide:not(:has(.search-bar-wrapper)),
+body.is-search-active .site-header .primary-menu{
+  width: 0 !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .12s ease 0s, visibility 0s linear .12s;
+}
+
+body:not(.is-search-active) .site-header .site-header--meta-links.medium-down--hide:not(:has(.search-bar-wrapper)),
+body:not(.is-search-active) .site-header .primary-menu{
+  width: unset !important;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity .15s ease var(--nav-return-delay),
+              visibility .25s ease var(--nav-return-delay),
+              width .25s ease var(--nav-return-delay);
+}
+
+/* Keep the logo from shrinking when inactive */
+.header-logo{ min-width: 200px !important; }
+
+</style>
+
+<script>
+(() => {
+  const body    = document.body;
+  const wrapper = document.querySelector('.search-bar-wrapper');
+  const input   = wrapper?.querySelector('input[type="search"]');
+
+  if (!wrapper || !input) return;
+
+  const isVisible = (el) => {
+    if (!el) return false;
+    if (el.hasAttribute('hidden')) return false;
+    const cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0) return false;
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0;
+  };
+
+  const resultsEl = () => document.getElementById('cloud-search-results');
+
+  const isFocusedIn = (root) => {
+    const a = document.activeElement;
+    return !!(a && root && root.contains(a));
+  };
+
+  const update = () => {
+    const results = resultsEl();
+    const open = isVisible(results);
+    const focused = isFocusedIn(wrapper) || isFocusedIn(results);
+    const shouldBeActive = open || focused;
+    body.classList.toggle('is-search-active', shouldBeActive);
+  };
+
+  // Triggers that change state
+  ['focusin','focusout','input','pointerdown','keyup'].forEach(evt =>
+    document.addEventListener(evt, update, true)
+  );
+  window.addEventListener('resize', update);
+
+  // Watch results for open/close flips. handles inline style, class, hidden, content changes
+  const mo = new MutationObserver(update);
+  mo.observe(document.documentElement, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    attributeFilter: ['style','class','hidden','aria-hidden']
+  });
+
+  // First pass
+  update();
+})();
+</script>

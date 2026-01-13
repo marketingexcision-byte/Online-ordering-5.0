@@ -1,0 +1,997 @@
+{% liquid
+  assign heading = section.settings.heading | default: page.title
+  assign intro = section.settings.intro
+  assign show_page_content = section.settings.show_page_content and page and page.content != blank
+  assign button_label = section.settings.button_label | default: 'Shop collection'
+
+  # ---- Primary grid (Page metafield -> List of Collections) ----
+  assign mf = null
+  if page and page.metafields and page.metafields.custom and page.metafields.custom.collection_grid_collections
+    assign mf = page.metafields.custom.collection_grid_collections
+  endif
+
+  assign items = blank
+  assign handle_list = blank
+
+  if mf and mf.value and mf.value != blank
+    assign items = mf.value
+  elsif mf and mf.references and mf.references != blank
+    assign items = mf.references | map: 'value'
+  endif
+
+  # Fallback: parse handles out of HTML
+  if items == blank and mf
+    assign tag_html = mf | metafield_tag
+    if tag_html and tag_html != blank
+      assign pieces = tag_html | split: 'href="'
+      assign handles_csv = ''
+      for p in pieces
+        if forloop.index0 > 0
+          assign url = p | split: '"' | first
+          assign handle = url | split: '/collections/' | last | split: '?' | first | split: '/' | first
+          if handle != blank
+            if handles_csv == ''
+              assign handles_csv = handle
+            else
+              assign handles_csv = handles_csv | append: ',' | append: handle
+            endif
+          endif
+        endif
+      endfor
+      if handles_csv != ''
+        assign handle_list = handles_csv | split: ','
+      endif
+    endif
+  endif
+
+  assign have_items = items and items != blank and items.size > 0
+  assign have_handles = handle_list and handle_list != blank and handle_list.size > 0
+
+  # ---- View All (Page metafield -> single Collection) ----
+  assign view_all_url = null
+  if page and page.metafields and page.metafields.custom and page.metafields.custom.view_all_collection != blank
+    assign mf_va = page.metafields.custom.view_all_collection
+    if mf_va.value and mf_va.value.url
+      assign view_all_url = mf_va.value.url
+    else
+      assign view_all_url = mf_va | strip
+    endif
+  endif
+
+  # ---- Second grid: Browse by Product Range (Page metafield -> List of Collections) ----
+  assign pr_items = blank
+  assign pr_handle_list = blank
+  assign pr_have_items = false
+  assign pr_have_handles = false
+
+  if page and page.metafields and page.metafields.custom and page.metafields.custom.product_range_collections
+    assign pr_mf = page.metafields.custom.product_range_collections
+
+    if pr_mf and pr_mf.value and pr_mf.value != blank
+      assign pr_items = pr_mf.value
+    elsif pr_mf and pr_mf.references and pr_mf.references != blank
+      assign pr_items = pr_mf.references | map: 'value'
+    endif
+
+    if pr_items == blank
+      assign pr_tag_html = pr_mf | metafield_tag
+      if pr_tag_html and pr_tag_html != blank
+        assign pr_pieces = pr_tag_html | split: 'href="'
+        assign pr_handles_csv = ''
+        for p in pr_pieces
+          if forloop.index0 > 0
+            assign pr_url = p | split: '"' | first
+            assign pr_handle = pr_url | split: '/collections/' | last | split: '?' | first | split: '/' | first
+            if pr_handle != blank
+              if pr_handles_csv == ''
+                assign pr_handles_csv = pr_handle
+              else
+                assign pr_handles_csv = pr_handles_csv | append: ',' | append: pr_handle
+              endif
+            endif
+          endif
+        endfor
+        if pr_handles_csv != ''
+          assign pr_handle_list = pr_handles_csv | split: ','
+        endif
+      endif
+    endif
+
+    assign pr_have_items = pr_items and pr_items != blank and pr_items.size > 0
+    assign pr_have_handles = pr_handle_list and pr_handle_list != blank and pr_handle_list.size > 0
+  endif
+%}
+
+{%- if page.metafields.custom.header_image != blank -%}
+  <style>
+    .breadcrumb {
+      background: url({{ page.metafields.custom.header_image | file_url }});
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+      position: relative;
+    }
+  </style>
+{%- endif -%}
+
+
+<nav class="breadcrumb simple-lazyload" role="navigation" aria-label="breadcrumbs">
+  {%- if page.metafields.custom.header_image.value != blank -%}
+    <div class="header-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(30,29,34,0.4);"></div>
+  {%- endif -%}
+  <div class="breadcrumbs container dt-prl-30">
+    <div class="row" style="display:flex;align-items:flex-start;">
+      <div class="col-md-7 lazyload-element">
+{%- liquid
+  assign parent_ref = page.metafields.custom.parent_page2
+  assign parent = nil
+  if parent_ref and parent_ref.value != blank
+    assign parent = parent_ref.value
+  endif
+  assign home_label = 'general.breadcrumbs.home' | t | default: 'Home'
+-%}
+
+{%- if parent -%}
+  <div class="w-btn-wrapper lazyload-element">
+    <a class="w-btn icon_atleft"
+       href="{{ parent.url }}"
+       data-url="{{ parent.url }}">
+      <span class="w-btn-label font-bold">
+        <em>←</em> Back to {{ parent.title | escape }}
+      </span>
+    </a>
+  </div>
+{%- else -%}
+  <div class="w-btn-wrapper lazyload-element">
+    <a class="w-btn icon_atleft"
+       href="{{ routes.root_url }}"
+       data-url="{{ routes.root_url }}">
+      <span class="w-btn-label font-bold">
+        <em>←</em> Back to {{ home_label }}
+      </span>
+    </a>
+  </div>
+{%- endif -%}
+
+
+
+        <!-- Title -->
+        <h1 id="collection-grid-heading" class="section__title text-h2">{{ heading | escape }}</h1>
+
+        <!-- Optional short description (maps from page.short_description) -->
+        {%- if page.metafields.custom.short_description != blank -%}
+          <h2 class="short_description text-h2">{{ page.metafields.custom.short_description }}</h2>
+        {%- endif -%}
+
+
+        <!-- Rich content section (maps from page.content → use collection.description) -->
+          <section class="section section--page-intro" aria-label="Page content">
+            <div class="layout-constrained">
+              <div class="section__content">{{ page.content }}</div>
+            </div>
+          </section>
+
+        <!-- Performance rating → stars (self-contained, adapted to collection metafield) -->
+        {%- comment -%} Reads number from metafield `custom.performance` and renders 0–5 stars with partial fill. {%- endcomment -%}
+        {%- assign rating_str = page.metafields.custom.performance | metafield_text | strip -%}
+        {%- if rating_str != blank -%}
+          {%- assign rating = rating_str | replace: ',', '.' | plus: 0 -%}
+          {%- if rating > 0 -%}
+            {%- assign r = rating -%}
+            {%- if r > 5 -%}{%- assign r = 5 -%}{%- endif -%}
+            {%- if r < 0 -%}{%- assign r = 0 -%}{%- endif -%}
+            <div class="rating" aria-label="Performance rating: {{ r }} out of 5" style="margin-top:12px">
+              <div class="rating__stars" role="img" style="display:flex;gap:4px;position:relative">
+                {%- for s in (1..5) -%}
+                  {%- assign value = r | minus: forloop.index | plus: 1 -%}
+                  {%- if value >= 1 -%}
+                    {%- assign pct = 100 -%}
+                  {%- elsif value <= 0 -%}
+                    {%- assign pct = 0 -%}
+                  {%- else -%}
+                    {%- assign pct = value | times: 100 -%}
+                  {%- endif -%}
+                  <span class="rating__star" style="position:relative;display:inline-block;width:22px;height:22px">
+                    <!-- empty star -->
+                    <span class="is-bg" style="color:#e1e1e1;position:relative;display:block">
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22" >
+                        <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+                      </svg>
+                    </span>
+                    {%- if pct > 0 -%}
+                      <!-- filled portion -->
+                      <span class="is-fill" style="position:absolute;inset:0;overflow:hidden;width:{{ pct }}%">
+                        <span style="color:#f6b419;display:block">
+                          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22" >
+                            <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+                          </svg>
+                        </span>
+                      </span>
+                    {%- endif -%}
+                  </span>
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+
+        <!-- Existing work material icons -->
+        {% assign work_material_array = page.metafields.custom.work_material | remove: '[' | remove: ']' | remove: '"' | split: ',' %}
+        {%- if work_material_array contains 'P' or work_material_array contains 'P No' or work_material_array contains 'M' or work_material_array contains 'M No' or work_material_array contains 'K' or work_material_array contains 'K No' or work_material_array contains 'N' or work_material_array contains 'N No' or work_material_array contains 'S' or work_material_array contains 'S No' or work_material_array contains 'H' or work_material_array contains 'H No' -%}
+          <div class="collection-icon" style="display:flex;gap:10px;margin-top:30px;">
+            {% for m in work_material_array %}
+              {% case m %}
+                {% when 'P' %}{% assign color = '#0069a7' %}
+                {% when 'P No' %}{% assign color = '#e8e8e8' %}
+                {% when 'M' %}{% assign color = '#f6b519' %}
+                {% when 'M No' %}{% assign color = '#e8e8e8' %}
+                {% when 'K' %}{% assign color = '#e0592a' %}
+                {% when 'K No' %}{% assign color = '#e8e8e8' %}
+                {% when 'N' %}{% assign color = '#109954' %}
+                {% when 'N No' %}{% assign color = '#e8e8e8' %}
+                {% when 'S' %}{% assign color = '#f88d2b' %}
+                {% when 'S No' %}{% assign color = '#e8e8e8' %}
+                {% when 'H' %}{% assign color = '#666666' %}
+                {% when 'H No' %}{% assign color = '#e8e8e8' %}
+                {% else %}{% assign color = '#000000' %}
+              {% endcase %}
+              <div class="Graph-Icon" style="background:{{ color }};" data-debug-m="{{ m }}" data-debug-color="{{ color }}">
+                <p>{{ m | split: ' ' | first }}</p>
+              </div>
+            {% endfor %}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<div class="breadcrumbs container dt-prl-30">
+          {% render 'rating-cards', resource: page %}
+
+    {%- comment -%} === GRID #1 === {%- endcomment -%}
+    {% if have_items or have_handles %}
+      <div class="section__header">
+          <h2 id="pr-grid-heading" class="section__title text-h3">Browse the Range</h2>
+        </div>
+      <div class="collection-grid" role="list">
+
+        {% if have_items %}
+          {% for collection in items %}
+            {% liquid
+              assign summary = collection.metafields.custom.short_description | default: collection.description
+              assign collection_image = collection.image
+              assign image_alt = collection_image and collection_image.alt != blank ? collection_image.alt : collection.title
+            %}
+            <article class="collection-card" role="listitem">
+              <a href="{{ collection.url }}" class="collection-card__link">
+                <div class="collection-card__media">
+                  {% if collection_image %}
+                    {{
+                      collection_image
+                      | image_url: width: 1036             # ~2.5× 412px for crisp retina
+                      | image_tag:
+                      class: 'collection-card__image',
+                      loading: 'lazy',
+                      widths: '412, 568, 824, 1036',
+                      sizes: '(min-width: 1280px) 412px, (min-width: 1024px) 33vw, (min-width: 640px) 45vw, 90vw',
+                      alt: image_alt,
+                      decoding: 'async'
+                    }}
+
+                  {% else %}
+                    <div class="collection-card__placeholder">No image</div>
+                  {% endif %}
+                </div>
+                <div class="collection-card__body">
+                  <h3 class="collection-card__title">
+                    <strong>{{ collection.title }}</strong>
+                  </h3>
+                  {% if collection.metafields.custom.short_description != blank %}
+  <p class="collection-card__description text-p1">
+    {{ collection.metafields.custom.short_description.value | strip_html }}
+  </p>
+{% endif %}
+
+
+                  {%- comment -%} Work material chips (normalized + no parentheses) {%- endcomment -%}
+                  {%- assign work_material_array = collection.metafields.custom.work_material.value
+                    | default: collection.metafields.custom.work_material
+                  -%}
+
+                  {%- if work_material_array == blank -%}
+                    {%- comment -%} Fallback for legacy JSON strings {%- endcomment -%}
+                    {%- assign work_material_array = collection.metafields.custom.work_material
+                      | remove: '['
+                      | remove: ']'
+                      | remove: '"'
+                      | split: ','
+                    -%}
+                  {%- endif -%}
+
+                  {%- assign has_chip = false -%}
+                  {%- if work_material_array -%}
+                    {%- for _m in work_material_array -%}
+                      {%- assign m_clean = _m | strip -%}
+                      {%- if m_clean == 'P'
+                        or m_clean == 'P No'
+                        or m_clean == 'M'
+                        or m_clean == 'M No'
+                        or m_clean == 'K'
+                        or m_clean == 'K No'
+                        or m_clean == 'N'
+                        or m_clean == 'N No'
+                        or m_clean == 'S'
+                        or m_clean == 'S No'
+                        or m_clean == 'H'
+                        or m_clean == 'H No'
+                      -%}
+                        {%- assign has_chip = true -%}
+                        {%- break -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                  {%- endif -%}
+
+                  {%- if has_chip -%}
+                    <div class="work-mat" aria-label="Work materials">
+                      {%- for m in work_material_array -%}
+                        {%- assign m_clean = m | strip -%}
+                        {%- assign label = m_clean | split: ' ' | first -%}
+                        <div class="work-mat__chip" data-m="{{ m_clean }}" title="{{ m_clean }}">{{ label }}</div>
+                      {%- endfor -%}
+                    </div>
+                  {%- endif -%}
+
+                  {%- comment -%} Performance rating → stars (self-contained) {%- endcomment -%}
+                  {%- assign rating_str = collection.metafields.custom.performance_rating | metafield_text | strip -%}
+                  {%- if rating_str != blank -%}
+                    {%- assign rating = rating_str | replace: ',', '.' | plus: 0 -%}
+                    {%- if rating > 0 -%}
+                      {%- assign r = rating -%}
+                      {%- if r > 5 -%}{%- assign r = 5 -%}{%- endif -%}
+                      {%- if r < 0 -%}{%- assign r = 0 -%}{%- endif -%}
+
+                      <div class="rating" aria-label="Performance rating: {{ r }} out of 5">
+                        <div class="rating__stars" role="img" >
+                          {%- for s in (1..5) -%}
+                            {%- assign value = r | minus: forloop.index | plus: 1 -%}
+                            {%- if value >= 1 -%}
+                              {%- assign pct = 100 -%}
+                            {%- elsif value <= 0 -%}
+                              {%- assign pct = 0 -%}
+                            {%- else -%}
+                              {%- assign pct = value | times: 100 -%}
+                            {%- endif -%}
+                            <span class="rating__star">
+                              <!-- empty star -->
+                              <span class="is-bg" style="color:#e1e1e1;position:relative;display:block">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22" aria-hidden="true">
+                                  <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+                                </svg>
+                              </span>
+                              {%- if pct > 0 -%}
+                                <!-- filled portion -->
+                                <span
+                                  class="is-fill"
+                                  style="position:absolute;inset:0;overflow:hidden;width:{{ pct }}%"
+                                >
+                                  <span style="color:#f6b419;display:block">
+                                    <svg
+                                      viewBox="0 0 24 24"
+                                      fill="currentColor"
+                                      width="22"
+                                      height="22"
+                                      aria-hidden="true"
+                                    >
+                                      <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+                                    </svg>
+                                  </span>
+                                </span>
+                              {%- endif -%}
+                            </span>
+                          {%- endfor -%}
+                        </div>
+                      </div>
+                    {%- endif -%}
+                  {%- endif -%}
+
+                  <div class="collection-card__actions">
+                    <a class="btn btn-primary full-width" href="{{ collection.url }}">{{ button_label | escape }}</a>
+                  </div>
+                </div>
+              </a>
+            </article>
+          {% endfor %}
+        {% else %}
+          {% for handle in handle_list %}
+            {% assign collection = collections[handle] %}
+            {% if collection %}
+              {% liquid
+                assign summary = collection.metafields.custom.short_description | default: collection.description
+                assign collection_image = collection.image
+                assign image_alt = collection_image and collection_image.alt != blank ? collection_image.alt : collection.title
+              %}
+              <article class="collection-card" role="listitem">
+                <a href="{{ collection.url }}" class="collection-card__link">
+                  <div class="collection-card__media">
+                    {% if collection_image %}
+                      {{
+                        collection_image
+                        | image_url: width: 1036             # ~2.5× 412px for crisp retina
+                        | image_tag:
+                        class: 'collection-card__image',
+                        loading: 'lazy',
+                        widths: '412, 568, 824, 1036',
+                        sizes: '(min-width: 1280px) 412px, (min-width: 1024px) 33vw, (min-width: 640px) 45vw, 90vw',
+                        alt: image_alt,
+                        decoding: 'async'
+                      }}
+
+                    {% else %}
+                      <div class="collection-card__placeholder">No image</div>
+                    {% endif %}
+                  </div>
+                  <div class="collection-card__body">
+                    <h3 class="collection-card__title">
+                      <strong>{{ collection.title }}</strong>
+                    </h3>
+                    {% if collection.metafields.custom.short_description != blank %}
+  <p class="collection-card__description text-p1">
+    {{ collection.metafields.custom.short_description.value | strip_html }}
+  </p>
+{% endif %}
+
+
+                    {%- comment -%} Work material chips (normalized + no parentheses) {%- endcomment -%}
+                    {%- assign work_material_array = collection.metafields.custom.work_material.value
+                      | default: collection.metafields.custom.work_material
+                    -%}
+
+                    {%- if work_material_array == blank -%}
+                      {%- comment -%} Fallback for legacy JSON strings {%- endcomment -%}
+                      {%- assign work_material_array = collection.metafields.custom.work_material
+                        | remove: '['
+                        | remove: ']'
+                        | remove: '"'
+                        | split: ','
+                      -%}
+                    {%- endif -%}
+
+                    {%- assign has_chip = false -%}
+                    {%- if work_material_array -%}
+                      {%- for _m in work_material_array -%}
+                        {%- assign m_clean = _m | strip -%}
+                        {%- if m_clean == 'P'
+                          or m_clean == 'P No'
+                          or m_clean == 'M'
+                          or m_clean == 'M No'
+                          or m_clean == 'K'
+                          or m_clean == 'K No'
+                          or m_clean == 'N'
+                          or m_clean == 'N No'
+                          or m_clean == 'S'
+                          or m_clean == 'S No'
+                          or m_clean == 'H'
+                          or m_clean == 'H No'
+                        -%}
+                          {%- assign has_chip = true -%}
+                          {%- break -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+                    {%- endif -%}
+
+                    {%- if has_chip -%}
+                      <div class="work-mat" aria-label="Work materials">
+                        {%- for m in work_material_array -%}
+                          {%- assign m_clean = m | strip -%}
+                          {%- assign label = m_clean | split: ' ' | first -%}
+                          <div class="work-mat__chip" data-m="{{ m_clean }}" title="{{ m_clean }}">{{ label }}</div>
+                        {%- endfor -%}
+                      </div>
+                    {%- endif -%}
+
+                    {%- comment -%} Performance rating → stars (self-contained) {%- endcomment -%}
+                    {%- assign rating_str = collection.metafields.custom.performance_rating | metafield_text | strip -%}
+                    {%- if rating_str != blank -%}
+                      {%- assign rating = rating_str | replace: ',', '.' | plus: 0 -%}
+                      {%- if rating > 0 -%}
+                        {%- assign r = rating -%}
+                        {%- if r > 5 -%}{%- assign r = 5 -%}{%- endif -%}
+                        {%- if r < 0 -%}{%- assign r = 0 -%}{%- endif -%}
+
+                        <div class="rating" aria-label="Performance rating: {{ r }} out of 5">
+                          <div class="rating__stars" role="img" >
+                            {%- for s in (1..5) -%}
+                              {%- assign value = r | minus: forloop.index | plus: 1 -%}
+                              {%- if value >= 1 -%}
+                                {%- assign pct = 100 -%}
+                              {%- elsif value <= 0 -%}
+                                {%- assign pct = 0 -%}
+                              {%- else -%}
+                                {%- assign pct = value | times: 100 -%}
+                              {%- endif -%}
+                              <span class="rating__star">
+                                <!-- empty star -->
+                                <span class="is-bg" style="color:#e1e1e1;position:relative;display:block">
+                                  <svg
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    width="22"
+                                    height="22"
+                                    aria-hidden="true"
+                                  >
+                                    <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+                                  </svg>
+                                </span>
+                                {%- if pct > 0 -%}
+                                  <!-- filled portion -->
+                                  <span
+                                    class="is-fill"
+                                    style="position:absolute;inset:0;overflow:hidden;width:{{ pct }}%"
+                                  >
+                                    <span style="color:#f6b419;display:block">
+                                      <svg
+                                        viewBox="0 0 24 24"
+                                        fill="currentColor"
+                                        width="22"
+                                        height="22"
+                                        aria-hidden="true"
+                                      >
+                                        <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+                                      </svg>
+                                    </span>
+                                  </span>
+                                {%- endif -%}
+                              </span>
+                            {%- endfor -%}
+                          </div>
+                        </div>
+                      {%- endif -%}
+                    {%- endif -%}
+
+                    <div class="collection-card__actions">
+                      <a class="btn btn-primary full-width" href="{{ collection.url }}">{{ button_label | escape }}</a>
+                    </div>
+                  </div>
+                </a>
+              </article>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        {%- if view_all_url -%}
+          <article class="collection-card collection-card--view-all" role="listitem">
+            <a class="collection-card__media view-all" href="{{ view_all_url }}"><span>View All</span></a>
+          </article>
+        {%- endif -%}
+      </div>
+    {% else %}
+      <div class="collection-grid__empty text-p1">No collections have been assigned to this page yet.</div>
+    {% endif %}
+
+    {%- comment -%} === GRID #2: Browse by Product Range === {%- endcomment -%}
+    {% if pr_have_items or pr_have_handles %}
+      <section class="section" aria-labelledby="pr-grid-heading">
+        <div class="section__header">
+          <h2 id="pr-grid-heading" class="section__title text-h3">Browse by Product Range</h2>
+        </div>
+
+        <div class="collection-grid" role="list">
+          {% if pr_have_items %}
+            {% for collection in pr_items %}
+              {% liquid
+                assign summary = page.metafields.custom.short_description | default: collection.description
+                assign collection_image = collection.image
+                assign image_alt = collection_image and collection_image.alt != blank ? collection_image.alt : collection.title
+              %}
+              <article class="collection-card" role="listitem">
+                <a href="{{ collection.url }}" class="collection-card__link">
+                  <div class="collection-card__media">
+                    {% if collection_image %}
+                      {{
+                        collection_image
+                        | image_url: width: 1036             # ~2.5× 412px for crisp retina
+                        | image_tag:
+                        class: 'collection-card__image',
+                        loading: 'lazy',
+                        widths: '412, 568, 824, 1036',
+                        sizes: '(min-width: 1280px) 412px, (min-width: 1024px) 33vw, (min-width: 640px) 45vw, 90vw',
+                        alt: image_alt,
+                        decoding: 'async'
+                      }}
+
+                    {% else %}
+                      <div class="collection-card__placeholder">No image</div>
+                    {% endif %}
+                  </div>
+                  <div class="collection-card__body">
+                    <h3 class="collection-card__title">
+                      <strong>{{ collection.title }}</strong>
+                    </h3>
+                    {% if collection.metafields.custom.short_description != blank %}
+  <p class="collection-card__description text-p1">
+    {{ collection.metafields.custom.short_description.value | strip_html }}
+  </p>
+{% endif %}
+
+
+                    {%- comment -%} Work material chips (normalized + no parentheses) {%- endcomment -%}
+                    {%- assign work_material_array = collection.metafields.custom.work_material.value
+                      | default: collection.metafields.custom.work_material
+                    -%}
+
+                    {%- if work_material_array == blank -%}
+                      {%- comment -%} Fallback for legacy JSON strings {%- endcomment -%}
+                      {%- assign work_material_array = collection.metafields.custom.work_material
+                        | remove: '['
+                        | remove: ']'
+                        | remove: '"'
+                        | split: ','
+                      -%}
+                    {%- endif -%}
+
+                    {%- assign has_chip = false -%}
+                    {%- if work_material_array -%}
+                      {%- for _m in work_material_array -%}
+                        {%- assign m_clean = _m | strip -%}
+                        {%- if m_clean == 'P'
+                          or m_clean == 'P No'
+                          or m_clean == 'M'
+                          or m_clean == 'M No'
+                          or m_clean == 'K'
+                          or m_clean == 'K No'
+                          or m_clean == 'N'
+                          or m_clean == 'N No'
+                          or m_clean == 'S'
+                          or m_clean == 'S No'
+                          or m_clean == 'H'
+                          or m_clean == 'H No'
+                        -%}
+                          {%- assign has_chip = true -%}
+                          {%- break -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+                    {%- endif -%}
+
+                    {%- if has_chip -%}
+                      <div class="work-mat" aria-label="Work materials">
+                        {%- for m in work_material_array -%}
+                          {%- assign m_clean = m | strip -%}
+                          {%- assign label = m_clean | split: ' ' | first -%}
+                          <div class="work-mat__chip" data-m="{{ m_clean }}" title="{{ m_clean }}">{{ label }}</div>
+                        {%- endfor -%}
+                      </div>
+                    {%- endif -%}
+
+                    {%- comment -%} Performance rating → stars (self-contained) {%- endcomment -%}
+                    {%- assign rating_str = collection.metafields.custom.performance_rating | metafield_text | strip -%}
+                    {%- if rating_str != blank -%}
+                      {%- assign rating = rating_str | replace: ',', '.' | plus: 0 -%}
+                      {%- if rating > 0 -%}
+                        {%- assign r = rating -%}
+                        {%- if r > 5 -%}{%- assign r = 5 -%}{%- endif -%}
+                        {%- if r < 0 -%}{%- assign r = 0 -%}{%- endif -%}
+
+                        <div class="rating" aria-label="Performance rating: {{ r }} out of 5">
+                          <div class="rating__stars" role="img" >
+                            {%- for s in (1..5) -%}
+                              {%- assign value = r | minus: forloop.index | plus: 1 -%}
+                              {%- if value >= 1 -%}
+                                {%- assign pct = 100 -%}
+                              {%- elsif value <= 0 -%}
+                                {%- assign pct = 0 -%}
+                              {%- else -%}
+                                {%- assign pct = value | times: 100 -%}
+                              {%- endif -%}
+                              <span class="rating__star">
+                                <!-- empty star -->
+                                <span class="is-bg" style="color:#e1e1e1;position:relative;display:block">
+                                  <svg
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    width="22"
+                                    height="22"
+                                    aria-hidden="true"
+                                  >
+                                    <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+                                  </svg>
+                                </span>
+                                {%- if pct > 0 -%}
+                                  <!-- filled portion -->
+                                  <span
+                                    class="is-fill"
+                                    style="position:absolute;inset:0;overflow:hidden;width:{{ pct }}%"
+                                  >
+                                    <span style="color:#f6b419;display:block">
+                                      <svg
+                                        viewBox="0 0 24 24"
+                                        fill="currentColor"
+                                        width="22"
+                                        height="22"
+                                        aria-hidden="true"
+                                      >
+                                        <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+                                      </svg>
+                                    </span>
+                                  </span>
+                                {%- endif -%}
+                              </span>
+                            {%- endfor -%}
+                          </div>
+                        </div>
+                      {%- endif -%}
+                    {%- endif -%}
+
+                    <div class="collection-card__actions">
+                      <a class="btn btn-primary full-width" href="{{ collection.url }}">{{ button_label | escape }}</a>
+                    </div>
+                  </div>
+                </a>
+              </article>
+            {% endfor %}
+          {% else %}
+            {% for handle in pr_handle_list %}
+              {% assign collection = collections[handle] %}
+              {% if collection %}
+                {% liquid
+                  assign summary = page.metafields.custom.short_description | default: collection.description
+                  assign collection_image = collection.image
+                  assign image_alt = collection_image and collection_image.alt != blank ? collection_image.alt : collection.title
+                %}
+                <article class="collection-card" role="listitem">
+                  <a href="{{ collection.url }}" class="collection-card__link">
+                    <div class="collection-card__media">
+                      {% if collection_image %}
+                        {{
+                          collection_image
+                          | image_url: width: 1036             # ~2.5× 412px for crisp retina
+                          | image_tag:
+                          class: 'collection-card__image',
+                          loading: 'lazy',
+                          widths: '412, 568, 824, 1036',
+                          sizes: '(min-width: 1280px) 412px, (min-width: 1024px) 33vw, (min-width: 640px) 45vw, 90vw',
+                          alt: image_alt,
+                          decoding: 'async'
+                        }}
+
+                      {% else %}
+                        <div class="collection-card__placeholder">No image</div>
+                      {% endif %}
+                    </div>
+                    <div class="collection-card__body">
+                      <h3 class="collection-card__title">
+                        <strong>{{ collection.title }}</strong>
+                      </h3>
+                      {% if collection.metafields.custom.short_description != blank %}
+  <p class="collection-card__description text-p1">
+    {{ collection.metafields.custom.short_description.value | strip_html }}
+  </p>
+{% endif %}
+
+
+                      {%- comment -%} Work material chips (normalized + no parentheses) {%- endcomment -%}
+                      {%- assign work_material_array = collection.metafields.custom.work_material.value
+                        | default: collection.metafields.custom.work_material
+                      -%}
+
+                      {%- if work_material_array == blank -%}
+                        {%- comment -%} Fallback for legacy JSON strings {%- endcomment -%}
+                        {%- assign work_material_array = collection.metafields.custom.work_material
+                          | remove: '['
+                          | remove: ']'
+                          | remove: '"'
+                          | split: ','
+                        -%}
+                      {%- endif -%}
+
+                      {%- assign has_chip = false -%}
+                      {%- if work_material_array -%}
+                        {%- for _m in work_material_array -%}
+                          {%- assign m_clean = _m | strip -%}
+                          {%- if m_clean == 'P'
+                            or m_clean == 'P No'
+                            or m_clean == 'M'
+                            or m_clean == 'M No'
+                            or m_clean == 'K'
+                            or m_clean == 'K No'
+                            or m_clean == 'N'
+                            or m_clean == 'N No'
+                            or m_clean == 'S'
+                            or m_clean == 'S No'
+                            or m_clean == 'H'
+                            or m_clean == 'H No'
+                          -%}
+                            {%- assign has_chip = true -%}
+                            {%- break -%}
+                          {%- endif -%}
+                        {%- endfor -%}
+                      {%- endif -%}
+
+                      {%- if has_chip -%}
+                        <div class="work-mat" aria-label="Work materials">
+                          {%- for m in work_material_array -%}
+                            {%- assign m_clean = m | strip -%}
+                            {%- assign label = m_clean | split: ' ' | first -%}
+                            <div class="work-mat__chip" data-m="{{ m_clean }}" title="{{ m_clean }}">{{ label }}</div>
+                          {%- endfor -%}
+                        </div>
+                      {%- endif -%}
+
+                      {%- comment -%} Performance rating → stars (self-contained) {%- endcomment -%}
+                      {%- assign rating_str = collection.metafields.custom.performance_rating
+                        | metafield_text
+                        | strip
+                      -%}
+                      {%- if rating_str != blank -%}
+                        {%- assign rating = rating_str | replace: ',', '.' | plus: 0 -%}
+                        {%- if rating > 0 -%}
+                          {%- assign r = rating -%}
+                          {%- if r > 5 -%}{%- assign r = 5 -%}{%- endif -%}
+                          {%- if r < 0 -%}{%- assign r = 0 -%}{%- endif -%}
+
+                          <div class="rating" aria-label="Performance rating: {{ r }} out of 5">
+                            <div class="rating__stars" role="img" aria-hidden="true">
+                              {%- for s in (1..5) -%}
+                                {%- assign value = r | minus: forloop.index | plus: 1 -%}
+                                {%- if value >= 1 -%}
+                                  {%- assign pct = 100 -%}
+                                {%- elsif value <= 0 -%}
+                                  {%- assign pct = 0 -%}
+                                {%- else -%}
+                                  {%- assign pct = value | times: 100 -%}
+                                {%- endif -%}
+                                <span class="rating__star">
+                                  <!-- empty star -->
+                                  <span class="is-bg" style="color:#e1e1e1;position:relative;display:block">
+                                    <svg
+                                      viewBox="0 0 24 24"
+                                      fill="currentColor"
+                                      width="22"
+                                      height="22"
+                                      aria-hidden="true"
+                                    >
+                                      <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+                                    </svg>
+                                  </span>
+                                  {%- if pct > 0 -%}
+                                    <!-- filled portion -->
+                                    <span
+                                      class="is-fill"
+                                      style="position:absolute;inset:0;overflow:hidden;width:{{ pct }}%"
+                                    >
+                                      <span style="color:#f6b419;display:block">
+                                        <svg
+                                          viewBox="0 0 24 24"
+                                          fill="currentColor"
+                                          width="22"
+                                          height="22"
+                                          aria-hidden="true"
+                                        >
+                                          <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+                                        </svg>
+                                      </span>
+                                    </span>
+                                  {%- endif -%}
+                                </span>
+                              {%- endfor -%}
+                            </div>
+                          </div>
+                        {%- endif -%}
+                      {%- endif -%}
+
+                      <div class="collection-card__actions">
+                        <a class="btn btn-primary full-width" href="{{ collection.url }}">
+                          {{- button_label | escape -}}
+                        </a>
+                      </div>
+                    </div>
+                  </a>
+                </article>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </div>
+      </section>
+    {% endif %}
+  </div>
+  {% render 'feature-points' %}
+  {{ page.metafields.custom.extra_code | raw }}
+</div>
+
+
+
+<style>
+
+  .breadcrumb { min-height:500px;align-items:center;margin-bottom:20px; }
+
+  /* ---- VIEW ALL tile ---- */
+  .collection-card--view-all .collection-card__media {
+    display: grid;
+    place-items: center;
+    background: var(--color-primary-blue);
+    color: #fff;
+  }
+  .collection-card--view-all .collection-card__media > span {
+    font-family: var(--font-bold);
+    font-size: var(--fs-p1);
+    letter-spacing: .2px;
+  }
+  /* No footer/button on the special tile */
+  .collection-card--view-all .collection-card__body { display: none; }
+
+
+  /* Page-intro band just uses standard spacing; this narrows width slightly */
+  .section--page-intro .layout-constrained { max-width: 980px; }
+
+  .short_description.text-h2 {
+  color: white;
+  margin-bottom: var(--space-4) !important;
+  text-wrap: balance;
+}
+
+p.explainer {
+  font-size: 18px;
+    color: white !important;
+    text-wrap: balance;
+}
+
+    /* ----- COLLECTION GRID LAYOUT ----- */
+    .section--collections-grid .collection-grid{
+      display:grid;
+      gap:60px 40px;
+      grid-template-columns: repeat(3, 1fr);
+      max-width: 1320px; /* 3 x 412px + 2 x 32px gap (approx) */
+      margin-inline:auto;
+      justify-items:center; /* center cards in their tracks */
+      margin-bottom: 80px;
+    }
+    @media (max-width: 1024px){
+      .section--collections-grid .collection-grid{ grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px){
+      .section--collections-grid .collection-grid{ grid-template-columns: 1fr; }
+    }
+
+    /* ----- CARD ----- */
+    .section--collections-grid .collection-card{
+      width:100%;
+      max-width:412px;
+      display:flex;
+      flex-direction:column;
+    }
+    .section--collections-grid .collection-card__media{ width:100%; }
+    .section--collections-grid .collection-card__image{
+      width:100%;
+      display:block;
+      aspect-ratio:1/1;
+      object-fit:cover;
+      border-radius:15px;
+    }
+    /* Fallback for very old browsers without aspect-ratio */
+    @supports not (aspect-ratio: 1 / 1){
+      .section--collections-grid .collection-card__media{ position:relative; padding-top:100%; }
+      .section--collections-grid .collection-card__image{ position:absolute; inset:0; height:100%; border-radius:15px; object-fit:cover; }
+    }
+
+    .section--collections-grid .collection-card__title{
+      margin:16px 0 8px;
+      font-weight:700;     /* "strong" look */
+      line-height:1.3;
+    }
+    .section--collections-grid .collection-card__description{ margin:0 0 16px; }
+    .section--collections-grid .collection-card__actions{ margin-top:auto; }
+
+    .section--collections-grid .collection-card__button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      height:40px;
+      background:#0069a7;
+      color:#fff;
+      border-radius:9999px;  /* pill */
+      text-decoration:none;
+    }
+    .section--collections-grid .collection-card__button:hover{ opacity: 85%; }
+
+</style>

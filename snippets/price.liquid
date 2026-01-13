@@ -1,0 +1,50 @@
+{%- comment -%}
+Price renderer (always shows both Inc + Ex).
+Inputs:
+  price   = integer cents (required)
+  taxable = boolean (optional; defaults true)
+{%- endcomment -%}
+
+{%- assign is_taxable = taxable | default: true -%}
+{%- assign cents = price | default: 0 -%}
+
+{%- comment -%} Robust bi-directional ex/inc compute {%- endcomment -%}
+{%- assign ex_cents = cents -%}
+{%- assign inc_cents = cents -%}
+{%- if is_taxable -%}
+  {%- if shop.taxes_included -%}
+    {%- assign inc_cents = cents -%}
+    {%- assign ex_cents  = cents | times: 10 | divided_by: 11 -%}
+  {%- else -%}
+    {%- assign ex_cents  = cents -%}
+    {%- assign inc_cents = cents | times: 11 | divided_by: 10 -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- assign ex_money  = ex_cents  | money -%}
+{%- assign inc_money = inc_cents | money -%}
+
+{%- comment -%} Optional superscripted decimals (preserves your existing setting){%- endcomment -%}
+{%- unless shop.money_format contains 'money' or shop.money_format contains '.' -%}
+  {%- if settings.superscript_decimals -%}
+    {%- if shop.money_format contains '{{amount}}' or shop.money_format contains '{{ amount }}' -%}
+      {%- capture ex_money -%}{{ ex_money  | replace: '.', '<sup>' }}</sup>{%- endcapture -%}
+      {%- capture inc_money -%}{{ inc_money | replace: '.', '<sup>' }}</sup>{%- endcapture -%}
+    {%- elsif shop.money_format contains '{{amount_with_comma_separator}}' or shop.money_format contains '{{ amount_with_comma_separator }}' -%}
+      {%- capture ex_money -%}{{ ex_money  | replace: ',', '<sup>' }}</sup>{%- endcapture -%}
+      {%- capture inc_money -%}{{ inc_money | replace: ',', '<sup>' }}</sup>{%- endcapture -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endunless -%}
+
+<span class="ex-price ex-price--stack"
+      data-taxable="{{ is_taxable }}"
+      data-inc-cents="{{ inc_cents }}"
+      data-ex-cents="{{ ex_cents }}">
+  <strong class="ex-price__inc">{{ inc_money }}</strong>
+  <small class="ex-price__ex">{{ ex_money }} <span class="ex-price__label">Ex GST</span></small>
+</span>
+
+<span class="visually-hidden">
+  {{ inc_cents | money }} including GST; {{ ex_cents | money }} excluding GST.
+</span>

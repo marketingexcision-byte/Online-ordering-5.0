@@ -1,0 +1,35 @@
+{%- comment -%} Renders one label + stars from a Rating metafield number (1–5). {%- endcomment -%}
+{%- assign label = label | default: '' -%}
+{%- assign num = value.value | default: value | replace: ',', '.' | plus: 0 -%}
+{%- if num > 5 -%}{%- assign num = 5 -%}{%- endif -%}
+{%- if num < 0 -%}{%- assign num = 0 -%}{%- endif -%}
+
+<div class="rc-item" role="listitem" aria-label="{{ label }} {{ num }}/5">
+  <div class="rc-item__label text-ps"><strong>{{ label }}</strong></div>
+  <div class="rc-item__rule" aria-hidden="true"></div>
+
+  <div class="rating rating--sm">
+    <div class="rating__stars" role="img" aria-label="{{ num }} out of 5 stars">
+      {%- for s in (1..5) -%}
+        {%- assign value = num | minus: forloop.index | plus: 1 -%}
+        {%- if value >= 1 -%}{%- assign pct = 100 -%}
+        {%- elsif value <= 0 -%}{%- assign pct = 0 -%}
+        {%- else -%}{%- assign pct = value | times: 100 -%}{%- endif -%}
+        <span class="rating__star">
+          <span class="is-bg">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+            </svg>
+          </span>
+          {%- if pct > 0 -%}
+            <span class="is-fill" style="width:{{ pct }}%">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/>
+              </svg>
+            </span>
+          {%- endif -%}
+        </span>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>

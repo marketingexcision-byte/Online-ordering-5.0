@@ -1,0 +1,130 @@
+<div class="container small">
+  {%- assign grid_results = true -%}
+  
+  <!-- Search Filters -->
+  {% if search.all_tags and search.all_tags.size > 0 %}
+    <div class="search-filters grid-uniform">
+      {% for cat_item in cat_array %}
+        <div class="grid-item small--one-half medium--one-third toggle-filters sidebar-items-{{ cat_item }}">
+          <h2 class="accordion">
+            {{ cat_item }} <span><i class="fa fa-angle-down"></i></span>
+          </h2>
+          <ul id="matchKey-{{ cat_item }}" class="advanced-filters panel_1">
+            <div class="af-panel-body">
+              <input type="text" class="txtInput form-control" id="searchTheKey-{{ cat_item }}" placeholder="Search {{ cat_item }}">
+              <span class="af-filter-clear af_filter_clear-{{ cat_item }}" style="display:none;">×</span>
+            </div>
+            {% for tag in search.all_tags %}
+              {% assign cat = tag | split: '_' | first %}
+              {% if cat != tag and cat_item == cat %}
+                {% if current_tags contains tag %}
+                  <li class="advanced-filter active-filter" data-group="{{ cat_item }}" data-handle="{{ tag | handle }}">
+                    {{ tag | remove_first: cat_item | remove_first: '_' | link_to_remove_tag: tag }}
+                  </li>
+                {% else %}
+                  <li class="advanced-filter" data-group="{{ cat_item }}" data-handle="{{ tag | handle }}">
+                    {{ tag | remove_first: cat_item | remove_first: '_' | link_to_add_tag: tag }}
+                  </li>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+        
+        <script>
+          $("#searchTheKey-{{ cat_item }}").on('keyup', function(){      
+              var value = $(this).val().toLowerCase();
+              $("#matchKey-{{ cat_item }} li").each(function () {
+                  if ($(this).text().toLowerCase().indexOf(value) > -1) {
+                      $(this).show();
+                      $(".af_filter_clear-{{ cat_item }}").hide();
+                      $(this).prev('.subjectName').last().hide();
+                  } else {
+                      $(this).hide();
+                      $(".af_filter_clear-{{ cat_item }}").show();
+                  }
+              });
+          });
+           
+          $(document).ready(function() {
+             $(".af_filter_clear-{{ cat_item }}").on('click', function () {
+                 $("#matchKey-{{ cat_item }} li").show();        
+                 $("#searchTheKey-{{ cat_item }}").val('');
+                 $(this).hide();
+             });
+             var liCount = $("#matchKey-{{ cat_item }}").find("li").length;
+             if (liCount > 19){
+                $("#matchKey-{{ cat_item }}").addClass("af_overflow_scroll");
+             }
+             $("#matchKey-{{ cat_item }} li.active-filter").parents('ul').css("display", "block");
+             $("#matchKey-{{ cat_item }} li.active-filter").parents('ul').prev('h2').addClass("active");       
+          });
+        </script>
+        
+      {% endfor %}
+    </div>
+    
+    <script>
+      $(function() {
+        var filters = $('.advanced-filter'),
+            el, elGroup, elHandle, activeTagInGroup;
+      
+        filters.on('click', function(e) {
+          el = $(this);
+          elGroup = el.data('group');
+          elHandle = el.data('handle');
+          activeTagInGroup = $('.active-filter[data-group="'+ elGroup +'"]');
+          if ( !el.hasClass('active-filter') && activeTagInGroup.length ) {
+            e.preventDefault();
+            location.href = location.href
+              .replace(activeTagInGroup.data('handle'), elHandle)
+              .replace(/(&page=\d+)|(page=\d+&)|(\?page=\d+$)/, '');
+          }
+        });
+      });
+    </script>
+  {% endif %}
+  
+  <!-- Search Results -->
+  {% comment %}
+  <div data-section-id="{{ section.id }}" data-section-type="search-template">
+    <div class="grid">
+      <div class="grid-item"> 
+        {% if search.performed %}
+          {% paginate search.results by 50 %}
+            {% if search.results_count == 0 %}
+              <h1 class="h2 text-center">{{ 'general.search.no_results_html' | t: terms: search.terms }}</h1>
+              {% include 'search-bar' %}
+            {% else %}
+              {% if grid_results == false %}
+                {% for item in search.results %}
+                  {% include 'search-result' %}
+                {% endfor %}
+              {% else %}
+                <div class="grid-uniform products-collection">
+                  {% for item in search.results %}
+                    {% assign grid_item_width = 'grid-item small--one-half medium--one-quarter large--one-quarter' %}
+                    {% include 'search-result-grid' %}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endif %}
+            {% if paginate.pages > 1 %}
+              <div class="text-center">
+                {% include 'pagination-custom' %}
+              </div>
+            {% endif %}
+          {% endpaginate %}
+        {% else %}
+          <h1 class="text-center h2">{{ 'general.search.title' | t }}</h1>
+          {% include 'search-bar' %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endcomment %}
+<style>
+  .grid-item { padding: 0 !important; }
+  .container.small { max-width: 1060px; padding: 20px !important; }
+</style>

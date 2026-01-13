@@ -1,0 +1,37 @@
+<div class="row"> 
+  <div class="col-sm-12 lazyload-element">
+      {% if section.settings.section_top_title != blank %}
+        <h2>{{ section.settings.section_top_title }}</h2>
+      {% endif %}
+      {% if section.settings.section_top_info != blank %}
+        {{ section.settings.section_top_info }}
+      {% endif %}
+</div>
+
+{% schema %}
+  {
+    "name": "Top Info",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Top info"
+      },
+      {
+        "type": "text",
+        "id": "section_top_title",
+        "label": "Top title"
+      },
+      {
+        "type": "textarea",
+        "id": "section_top_info",
+        "label": "Info"
+      }      
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

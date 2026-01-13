@@ -1,0 +1,91 @@
+{% comment %}
+  product-features.liquid
+{% endcomment %}
+
+<section class="product-features-section">
+  <!-- Main Heading -->
+  {% if section.settings.heading != blank %}
+    <h2>{{ section.settings.heading }}</h2>
+  {% endif %}
+
+  <!-- Paragraph Text -->
+  {% if section.settings.paragraph != blank %}
+    <p>{{ section.settings.paragraph }}</p>
+  {% endif %}
+
+  <!-- Feature Image -->
+  {% if section.settings.feature_image != blank %}
+    <div class="feature-image">
+      <img src="{{ section.settings.feature_image | img_url: 'large' }}" alt="{{ section.settings.heading }}">
+    </div>
+  {% endif %}
+
+  <!-- Three Columns -->
+  <div class="feature-columns">
+    {% for block in section.blocks %}
+      <div class="feature-column">
+        {% if block.settings.column_image != blank %}
+          <img 
+            src="{{ block.settings.column_image | img_url: 'medium' }}" 
+            alt="{{ block.settings.column_subheading }}">
+        {% endif %}
+
+        <h3>{{ block.settings.column_subheading }}</h3>
+        <p>{{ block.settings.column_paragraph }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Schema Settings for Theme Editor -->
+{% schema %}
+{
+  "name": "Product Features Section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "textarea",
+      "id": "paragraph",
+      "label": "Paragraph"
+    },
+    {
+      "type": "image_picker",
+      "id": "feature_image",
+      "label": "Feature Image"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Column",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "column_image",
+          "label": "Column Image"
+        },
+        {
+          "type": "text",
+          "id": "column_subheading",
+          "label": "Column Subheading"
+        },
+        {
+          "type": "textarea",
+          "id": "column_paragraph",
+          "label": "Column Paragraph"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 3,
+  "presets": [
+    {
+      "name": "Product Features Section"
+    }
+  ]
+}
+{% endschema %}

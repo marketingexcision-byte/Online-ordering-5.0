@@ -1,0 +1,130 @@
+
+<section class="about-excision valign-wrapper">
+  {% comment %}
+  <!-- <a class="modal-video-trigger mask" href="#" data-video-id="ktCs2jFmwhk" onclick="return false;"></a> -->
+  {% endcomment %}
+   <div class="container">
+      <div class="row center-align">
+         <h2>About Us</h2>
+         <p>Excision is a supplier of premium industrial equipment and consumables, supplying a large network of distributors across Australia and beyond.</p>
+         <div class="play" data-toggle="modal" data-target="#myModal"></div>
+		{% comment %}
+        <!-- <p class="action">Watch Video</p>-->
+        {% endcomment %}
+      </div>
+   </div>
+</section>
+
+{%- comment -%}
+<!-- <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button> -->
+{%- endcomment -%}
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+   <div class="modal-dialog modal-lg">
+      <!-- Modal content-->
+      <div class="modal-content">
+         <div class="modal-body">
+          <div class="video-wrapper">
+            {%- comment -%}<iframe loading="lazy" width="100%" height="100%" src="https://www.youtube.com/embed/juPqLJJhMo8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>{%- endcomment -%}
+         </div>
+        </div>
+      </div>
+   </div>
+</div>
+
+<script>
+$('.play').on('click', function () {
+    var code="<iframe width='100%' height='100%' src='https://www.youtube.com/embed/juPqLJJhMo8' frameborder='0' allowfullscreen=''></iframe>";
+    $('.video-wrapper').append(code); 
+});
+</script>
+
+<style>
+  div.card.card-panel.white.contact-card.hoverable {
+    background: white;
+  }
+  </style>
+
+{% schema %}
+{
+  "name": "Home About Video",
+  "max_blocks": 9,
+  "blocks": [
+    {
+      "type": "html",
+      "name": "Custom HTML",
+      "settings": [
+        {
+          "type": "html",
+          "id": "code",
+          "label": "HTML",
+          "default": "<div style='text-align:center;'><h2>Use HTML to format your text so it can be easily read.</h2>This text can be used to share information about your brand with customers.</div>"
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "Container width",
+          "default": "100%",
+          "options": [
+            {
+              "value": "25%",
+              "label": "25%"
+            },
+            {
+              "value": "33%",
+              "label": "33%"
+            },
+            {
+              "value": "50%",
+              "label": "50%"
+            },
+            {
+              "value": "66%",
+              "label": "66%"
+            },
+            {
+              "value": "75%",
+              "label": "75%"
+            },
+            {
+              "value": "100%",
+              "label": "100%"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Vertical alignment",
+          "default": "top-middle",
+          "options": [
+            {
+              "value": "top-middle",
+              "label": "Top"
+            },
+            {
+              "value": "center",
+              "label": "Middle"
+            },
+            {
+              "value": "bottom-middle",
+              "label": "Bottom"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home About Video",
+      "category": "Advanced layout",
+      "blocks": [
+        {
+          "type": "html"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %} 

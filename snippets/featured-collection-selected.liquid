@@ -1,0 +1,44 @@
+{% unless featured_collection_width %}
+  {% assign featured_collection_width = 'small--one-half medium--one-third large--one-sixth' %}
+{% endunless %}
+
+{% unless featured_collection_size %}
+  {% assign featured_collection_size = '540x' %}
+{% endunless %}
+
+{% if collections[featured].image %}
+  {% assign collection_image = collections[featured].image %}
+{% else %}
+  {% assign collection_image = collections[featured].products.first.featured_image %}
+{% endif %}
+<div class="grid-item {{ featured_collection_width }}">
+  {% capture collection_title %}{{ block.settings.collection_name | escape }}{% endcapture %}
+  <a href="{{ block.settings.collection_url }}" title="{{ 'collections.general.link_title' | t: title: collection_title }}"{% if block.settings.collection_new_tab %} target="_blank" {% endif %}class="product-card card hoverable featured-box-none">
+    {% comment %}
+      <div class="featured-box--inner">
+      <div class="featured-box--image {% unless collection_image == blank %} vertical-middle{% endunless %}">
+    {% endcomment %}
+        {% if block.settings.image != blank %}
+            <img class="product-image" src="{{ block.settings.image | img_url: 'medium' }}" alt="{{ block.settings.image.alt }}" height="88"> 
+        {% else %}
+          {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+          {{ 'collection-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+        {% endif %}
+      {% comment %}</div>{% endcomment %}
+      {% unless collection_image == blank %}
+      <noscript>
+        <img src="{{ collection_image | img_url: '580x' }}"
+          srcset="{{ collection_image | img_url: '580x' }} 1x, {{ collection_image | img_url: '580x', scale: 2 }} 2x"
+          alt="{{ collection_image.alt }}" style="opacity:1;">
+      </noscript>
+      {% endunless %}
+    {% comment %}</div>{% endcomment %}
+    <div class="product-detail featured-box--title-none">
+      <h2 class="product-name">
+      {% if collection_title != blank %}{{ collection_title }}{% else %}{{ 'homepage.featured_collection_rows.heading' | t }}{% endif %}
+      </h2>
+    </div>
+    
+    <button class="btn view-all waves-effect waves-light z-depth-3">View All</button>
+  </a>
+</div>

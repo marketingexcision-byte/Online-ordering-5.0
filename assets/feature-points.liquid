@@ -1,0 +1,110 @@
+{% liquid
+  assign heading = section.settings.heading
+  assign intro   = section.settings.intro
+
+  # Pull metaobject list from page -> custom.feature_points  (list of entries)
+  assign fp_items = blank
+  if page and page.metafields and page.metafields.custom
+    assign fp_meta = page.metafields.custom.feature_points
+    if fp_meta
+      if fp_meta.value and fp_meta.value != blank
+        assign fp_items = fp_meta.value
+      elsif fp_meta.references and fp_meta.references != blank
+        assign fp_items = fp_meta.references | map: 'value'
+      endif
+    endif
+  endif
+
+  assign have_items = fp_items and fp_items != blank and fp_items.size > 0
+%}
+
+
+<section class="section section--feature-points" aria-labelledby="feature-points-heading-{{ section.id }}">
+  <div class="container layout-constrained">
+    {% if heading != blank or intro != blank %}
+      <header class="section__header">
+        {% if heading != blank %}
+          <h2 id="feature-points-heading-{{ section.id }}" class="section__title text-h3">
+            {{ heading | escape }}
+          </h2>
+        {% endif %}
+        {% if intro != blank %}
+          <div class="section__intro text-p1">{{ intro }}</div>
+        {% endif %}
+      </header>
+    {% endif %}
+
+    {% if have_items %}
+      <div class="fp-grid" role="list">
+        {% for obj in fp_items %}
+          {% liquid
+  # Match your metaobject field labels first, then fallbacks
+  assign icon  = obj.feature_point_icon | default: obj.icon | default: obj.image | default: obj.media | default: obj.file
+  assign title = obj.feature_point_title | default: obj.title | default: obj.name | default: obj.heading
+  assign body  = obj.feature_point_text | default: obj.text | default: obj.copy | default: obj.content | default: obj.description
+  assign body_rte = body.value | default: body
+%}
+
+          <article class="fp-card card" role="listitem">
+            <div class="fp-card__icon" aria-hidden="true">
+              {% if icon and icon != blank %}
+                {%- assign alt = title | default: 'Feature icon' -%}
+                {%- capture sizes -%}(min-width: 1024px) 80px, 64px{%- endcapture -%}
+                {{-
+                  icon
+                  | image_url: width: 160
+                  | image_tag:
+                    class: 'fp-card__img',
+                    loading: 'lazy',
+                    decoding: 'async',
+                    widths: '64,80,120,160',
+                    sizes: sizes,
+                    alt: alt
+                -}}
+              {% else %}
+                {%- comment -%} Fallback: bronze circle with a “+” {%- endcomment -%}
+                <svg class="fp-card__svg" viewBox="0 0 40 40" focusable="false" aria-hidden="true">
+                  <circle cx="20" cy="20" r="19" class="fp--bronze" />
+                  <path d="M20 10v20M10 20h20" class="fp--plus" />
+                </svg>
+              {% endif %}
+            </div>
+
+            {% if title %}
+              <h3 class="fp-card__title text-h4">{{ title }}</h3>
+            {% endif %}
+
+            {% if body_rte %}
+              <div class="fp-card__body text-p1 rte">{{ body_rte }}</div>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-p1 fp-empty">No feature points set for this page.</p>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Feature points (metaobject list)",
+  "class": "section--feature-points",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Key features"
+    },
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "Intro"
+    }
+  ],
+  "presets": [
+    { "name": "Feature points (metaobject list)" }
+  ]
+}
+{% endschema %}

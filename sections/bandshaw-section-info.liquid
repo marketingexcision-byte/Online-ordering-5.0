@@ -1,0 +1,168 @@
+<div class="container small">
+   {% if section.settings.enable_section_info %}
+   <div class="bandshaw_info">
+      <div class="bandshaw_inner_wrap">
+         <div class="bandshaw__htb lazyload-element">            
+            <h2>{{ section.settings.section_title_1 }}</h2>
+            <div>{{ section.settings.section_info_1 }}</div>
+            {% if section.settings.image_1 !=blank %}
+            <div class="bs_img_wrap">
+               <img src="{{ section.settings.image_1 | img_url:'' }}" alt="">
+            </div>
+            {% endif %}
+         </div>
+         <div class="bandshaw__bw lazyload-element">
+            <h2>{{ section.settings.section_title_2 }}</h2>
+            <p>{{ section.settings.section_info_2 }}</p>
+            <div class="bs_img_wrap">
+               <strong>{{ section.settings.small_title_2 }}</strong>
+               {% if section.settings.image_2 !=blank %}
+               <img src="{{ section.settings.image_2 | img_url:'' }}" alt="">
+               {% endif %}
+            </div>
+         </div>
+         <div class="bandshaw__mbl lazyload-element">
+            <h2>{{ section.settings.section_title_3 }}</h2>
+            <div>{{ section.settings.section_info_3 }}</div>
+            <div class="bs_img_wrap">
+               {% if section.settings.image_3 !=blank %}
+               <img src="{{ section.settings.image_3 | img_url:'' }}" alt="">
+               {% endif %}
+               <strong>{{ section.settings.small_title_3 }}</strong>
+               <span>{{ section.settings.small_title_3_1 }}</span>
+            </div>
+         </div>
+         <div class="bandshaw__tp lazyload-element">
+            <h2>{{ section.settings.section_title_4 }}</h2>
+            <p>{{ section.settings.section_info_4 }}</p>
+            <div class="tp_btm">
+               <div class="tp_btm_info">
+                  {{ section.settings.small_title_4 }}
+               </div>
+               <div class="tp_btm_img">
+                 {% if section.settings.image_4 !=blank %} 
+                 <img src="{{ section.settings.image_4 | img_url:'' }}" alt="">
+                 {% endif %}
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   {% endif %}
+</div>
+
+{% schema %} 
+  {
+    "name": "Page Info",
+    "settings": [
+     {
+        "type": "checkbox",
+        "id": "enable_section_info",
+        "label": "Show Info",
+        "default": false
+     },
+     {
+        "type": "header",
+        "content": "Section #1"
+     },
+     {
+        "type": "text",
+        "id": "section_title_1",
+        "label": "Section Title"
+     },
+     {
+        "type": "textarea",
+        "id": "section_info_1",
+        "label": "Info"
+     },
+     {
+        "type": "image_picker",
+        "id": "image_1",
+        "label": "Image"
+     },
+     {
+        "type": "header",
+        "content": "Section #2"
+     },
+     {
+        "type": "text",
+        "id": "section_title_2",
+        "label": "Section Title"
+     },
+     {
+        "type": "text",
+        "id": "small_title_2",
+        "label": "Small Text"
+     },
+     {
+        "type": "textarea",
+        "id": "section_info_2",
+        "label": "Info"
+     },
+     {
+        "type": "image_picker",
+        "id": "image_2",
+        "label": "Image"
+     },
+     {
+        "type": "header",
+        "content": "Section #3"
+     },
+     {
+        "type": "text",
+        "id": "section_title_3",
+        "label": "Section Title"
+     },
+     {
+        "type": "textarea",
+        "id": "section_info_3",
+        "label": "Info"
+     },
+     {
+        "type": "image_picker",
+        "id": "image_3",
+        "label": "Image"
+     },
+     {
+        "type": "text",
+        "id": "small_title_3",
+        "label": "Small Text 1"
+     },
+     {
+        "type": "text",
+        "id": "small_title_3_1",
+        "label": "Small Text 2"
+     },
+     {
+        "type": "header",
+        "content": "Section #4"
+     },
+     {
+        "type": "text",
+        "id": "section_title_4",
+        "label": "Section Title"
+     },
+     {
+        "type": "textarea",
+        "id": "section_info_4",
+        "label": "Info"
+     },
+     {
+        "type": "image_picker",
+        "id": "image_4",
+        "label": "Image" 
+     },
+     {
+        "type": "textarea",
+        "id": "small_title_4",
+        "label": "Small Text"
+     }
+   ]
+ }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

@@ -1,0 +1,166 @@
+{% comment %}
+  snippets/tab-snippets/Product Data.liquid
+  – Condenses Workpiece‐Material tags into one row (P,M,K,N,S,H)
+  – Groups other tag_value (_-tags) by key, joining values with ", "
+  – Shows fallback if nothing matches
+{% endcomment %}
+
+{% assign materials = '' %}
+{% assign handled_tags = '' %}
+{% assign has_specs = false %}
+
+{%- comment -%}
+  1) Collect all material codes & mark those tags handled
+{%- endcomment -%}
+{% for tag in product.tags %}
+  {% if tag == 'Carbon Steels_Good'
+    or tag == 'Carbon Steels_Great'
+    or tag == 'Carbon Steels_Excellent'
+    or tag == 'Alloy Steels_Good'
+    or tag == 'Alloy Steels_Great'
+    or tag == 'Alloy Steels_Excellent'
+    or tag == 'High Alloy Steels_Good'
+    or tag == 'High Alloy Steels_Great'
+    or tag == 'High Alloy Steels_Excellent'
+    or tag == 'High Carbon Steels_Good'
+    or tag == 'High Carbon Steels_Great'
+    or tag == 'High Carbon Steels_Excellent'
+    or tag == 'Prehardened Steels_Good'
+    or tag == 'Prehardened Steels_Great'
+    or tag == 'Prehardened Steels_Excellent'
+    or tag == 'Structural Steels_Good'
+    or tag == 'Structural Steels_Great'
+    or tag == 'Structural Steels_Excellent'
+    or tag == 'Mild & Free Machining_Good'
+    or tag == 'Mild & Free Machining_Great'
+    or tag == 'Mild & Free Machining_Excellent'
+    or tag == 'Tool Steels_Good'
+    or tag == 'Tool Steels_Great'
+    or tag == 'Tool Steels_Excellent'
+    or tag == 'High Alloyed_Good'
+    or tag == 'High Alloyed_Great'
+    or tag == 'High Alloyed_Excellent'
+  %}
+    {% unless materials contains 'P' %}
+      {% assign materials = materials | append: 'P,' %}
+    {% endunless %}
+    {% assign handled_tags = handled_tags | append: tag | append: ',' %}
+
+  {% elsif tag == 'Structural & Low Carbon Steels_Good'
+    or tag == 'Structural & Low Carbon Steels_Great'
+    or tag == 'Structural & Low Carbon Steels_Excellent'
+    or tag == 'Stainless Steels_Good'
+    or tag == 'Stainless Steels_Great'
+    or tag == 'Stainless Steels_Excellent'
+  %}
+    {% unless materials contains 'M' %}
+      {% assign materials = materials | append: 'M,' %}
+    {% endunless %}
+    {% assign handled_tags = handled_tags | append: tag | append: ',' %}
+
+  {% elsif tag == 'Cast Iron_Good' or tag == 'Cast Iron_Great' or tag == 'Cast Iron_Excellent' %}
+    {% unless materials contains 'K' %}
+      {% assign materials = materials | append: 'K,' %}
+    {% endunless %}
+    {% assign handled_tags = handled_tags | append: tag | append: ',' %}
+
+  {% elsif tag == 'Aluminium_Good'
+    or tag == 'Aluminium_Great'
+    or tag == 'Aluminium_Excellent'
+    or tag == 'Bronze_Good'
+    or tag == 'Bronze_Great'
+    or tag == 'Bronze_Excellent'
+    or tag == 'Brass Bronze_Good'
+    or tag == 'Brass Bronze_Great'
+    or tag == 'Brass Bronze_Excellent'
+    or tag == 'Copper_Good'
+    or tag == 'Copper_Great'
+    or tag == 'Copper_Excellent'
+    or tag == 'CFRP_Good'
+    or tag == 'CFRP_Great'
+    or tag == 'CFRP_Excellent'
+    or tag == 'Non-ferrous_Good'
+    or tag == 'Non-ferrous_Great'
+    or tag == 'Non-ferrous_Excellent'
+    or tag == 'Aluminum & Aluminum alloy_Good'
+    or tag == 'Aluminum & Aluminum alloy_Great'
+    or tag == 'Aluminum & Aluminum alloy_Excellent'
+    or tag == 'Magnesium & Magnesium Alloys_Good'
+    or tag == 'Magnesium & Magnesium Alloys_Great'
+    or tag == 'Magnesium & Magnesium Alloys_Excellent'
+    or tag == 'Plastic_Good'
+    or tag == 'Plastic_Great'
+    or tag == 'Plastic_Excellent'
+    or tag == 'Acrylic_Good'
+    or tag == 'Acrylic_Great'
+    or tag == 'Acrylic_Excellent'
+  %}
+    {% unless materials contains 'N' %}
+      {% assign materials = materials | append: 'N,' %}
+    {% endunless %}
+    {% assign handled_tags = handled_tags | append: tag | append: ',' %}
+
+  {% elsif tag == 'Inconel_Good'
+    or tag == 'Inconel_Great'
+    or tag == 'Inconel_Excellent'
+    or tag == 'Titanium_Good'
+    or tag == 'Titanium_Great'
+    or tag == 'Titanium_Excellent'
+    or tag == 'Nickel_Good'
+    or tag == 'Nickel_Great'
+    or tag == 'Nickel_Excellent'
+  %}
+    {% unless materials contains 'S' %}
+      {% assign materials = materials | append: 'S,' %}
+    {% endunless %}
+    {% assign handled_tags = handled_tags | append: tag | append: ',' %}
+
+  {% elsif tag == 'Hardened Steels (HRc40~45)_Good'
+    or tag == 'Hardened Steels (HRc40~45)_Great'
+    or tag == 'Hardened Steels (HRc40~45)_Excellent'
+    or tag == 'Hardened Steels(HRc30~45)_Good'
+    or tag == 'Hardened Steels(HRc30~45)_Great'
+    or tag == 'Hardened Steels(HRc30~45)_Excellent'
+    or tag == 'Hardened Steels(HRc45~)_Good'
+    or tag == 'Hardened Steels(HRc45~)_Great'
+    or tag == 'Hardened Steels(HRc45~)_Excellent'
+    or tag == 'Hardened Steels(HRc45~55)_Good'
+    or tag == 'Hardened Steels(HRc45~55)_Great'
+    or tag == 'Hardened Steels(HRc45~55)_Excellent'
+    or tag == 'High Hardened Steels(HRc55~70)_Good'
+    or tag == 'High Hardened Steels(HRc55~70)_Great'
+    or tag == 'High Hardened Steels(HRc55~70)_Excellent'
+  %}
+    {% unless materials contains 'H' %}
+      {% assign materials = materials | append: 'H,' %}
+    {% endunless %}
+    {% assign handled_tags = handled_tags | append: tag | append: ',' %}
+  {% endif %}
+{% endfor %}
+
+{% comment %} turn our comma-list into an array {% endcomment %}
+{% assign codes = materials | split: ',' %}
+  {% if materials != '' %}
+<label>Work Material</label>
+<div class="work-material-icons">
+    {% assign has_specs = true %}
+    <td style="display:flex; gap:7px; margin-bottom:-1px;">
+      {% assign ordered = 'P,M,K,N,S,H' | split: ',' %}
+      {% for code in ordered %}
+        {% if codes contains code %}
+          {% assign has_specs = true %}
+          <span class="material material-{{ code }}">{{ code }}</span>
+        {% endif %}
+      {% endfor %}
+    </td>
+</div>
+  {% endif %}
+  
+<style>
+div.work-material-icons {
+display: flex;
+gap: 7px;
+margin-bottom: 20px;
+}
+
+</style>

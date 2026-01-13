@@ -1,0 +1,77 @@
+{%- comment -%}
+Usage:
+  {% render 'rating-cards', resource: page %}
+  (You can also pass product/collection/article; defaults to page if omitted.)
+
+Reads these Page metafields (namespace: custom), all type = Rating (1–5):
+- metal_removal_rates
+- material_versatility
+- cutting_resistance
+- surface_finish
+- high_accuracy_machining
+- square_shoulder_milling
+- copy_milling
+- chip_control
+
+Optional text card (plain text): diameter_range_mm
+{%- endcomment -%}
+
+{%- liquid
+  assign res = resource
+  if res == blank
+    assign res = page
+  endif
+-%}
+{% if res and res.metafields and res.metafields.custom %}
+
+  <div class="rc-row" role="list">
+    {%- assign txt = res.metafields.custom.diameter_range_mm -%}
+    {% if txt != blank %}
+      <div class="rc-item" role="listitem">
+        <div class="rc-item__label text-p1"><strong>Diameter Range (mm)</strong></div>
+        <div class="rc-item__rule" aria-hidden="true"></div>
+        <div class="rc-item__text text-p1">{{ txt.value | default: txt }}</div>
+      </div>
+    {% endif %}
+
+    {%- assign _val = res.metafields.custom.metal_removal_rates -%}
+    {% if _val != blank %}
+      {% render 'rating-card-item', label: 'Metal Removal Rates', value: _val %}
+    {% endif %}
+
+    {%- assign _val = res.metafields.custom.material_versatility -%}
+    {% if _val != blank %}
+      {% render 'rating-card-item', label: 'Material Versatility', value: _val %}
+    {% endif %}
+
+    {%- assign _val = res.metafields.custom.cutting_resistance -%}
+    {% if _val != blank %}
+      {% render 'rating-card-item', label: 'Cutting Resistance', value: _val %}
+    {% endif %}
+
+    {%- assign _val = res.metafields.custom.surface_finish -%}
+    {% if _val != blank %}
+      {% render 'rating-card-item', label: 'Surface Finish', value: _val %}
+    {% endif %}
+
+    {%- assign _val = res.metafields.custom.high_accuracy_machining -%}
+    {% if _val != blank %}
+      {% render 'rating-card-item', label: 'High Accuracy Machining', value: _val %}
+    {% endif %}
+
+    {%- assign _val = res.metafields.custom.square_shoulder_milling -%}
+    {% if _val != blank %}
+      {% render 'rating-card-item', label: 'Square Shoulder Milling', value: _val %}
+    {% endif %}
+
+    {%- assign _val = res.metafields.custom.copy_milling -%}
+    {% if _val != blank %}
+      {% render 'rating-card-item', label: 'Copy Milling', value: _val %}
+    {% endif %}
+
+    {%- assign _val = res.metafields.custom.chip_control -%}
+    {% if _val != blank %}
+      {% render 'rating-card-item', label: 'Chip Control', value: _val %}
+    {% endif %}
+  </div>
+{% endif %}

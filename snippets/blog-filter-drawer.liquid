@@ -1,0 +1,203 @@
+<style>
+  .page-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    display: none;
+  }
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: -400px;
+    width: 400px;
+    height: 100vh;
+    background: white;
+    z-index: 10000;
+    transition: left 0.3s ease;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+  }
+
+  .overlay.open {
+    left: 0;
+  }
+  .overlay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+        padding: 30px 40px 0px 40px;
+    /* padding: 15px; */
+    /* background: #f5f5f5; */
+    /* border-bottom: 1px solid #ddd; */
+    /* box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1); */
+  }
+  .overlay-header img{
+        width: 14px;
+    height: 14px;
+  }
+  .overlay-content {
+    padding: 30px 40px;
+    padding-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+  }
+  .buyOnline-heading {
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  .product-buyNow-wrapper li a.customer_site_url_btn {
+    gap: 10px;
+  }
+  .stock-status span {
+    line-height: 1;
+  }
+  #filtersOverlay .overlay-content .grid-uniform h3{
+    padding: 15px 0;
+    margin-bottom: 0 !important;
+    background: #fff;
+    color: #000 !important;
+    text-transform: capitalize;
+    font-size: 22px !important;
+    border-top: 2px solid #f1f1f1;
+    margin: 0;
+    position: relative;
+  }
+</style>
+
+<div id="pageOverlay" class="page-overlay"></div>
+<div id="filtersOverlay" class="overlay">
+  <div class="overlay-header">
+    <h2 style="color: #e0592a;">Filters</h2>
+    <button id="closeOverlay" class="close-button"><img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Black_Cross_Thin.png?v=1738012931"></button>
+  </div>
+  <div class="overlay-content">
+    {% include 'blog-filter-sidebar' %} 
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // console.log('checking');
+
+    const filtersOverlay = document.querySelector('#filtersOverlay');
+    const pageOverlay = document.querySelector('#pageOverlay');
+    const openOverlayButton = document.querySelector('#show-filters');
+    const closeOverlayButton = document.querySelector('#closeOverlay');
+
+    // Open overlay
+    if (openOverlayButton) {
+      openOverlayButton.addEventListener('click', () => {
+        filtersOverlay.classList.add('open');
+        pageOverlay.style.display = 'block';
+      });
+    }
+
+    // Close overlay
+    if (closeOverlayButton) {
+      closeOverlayButton.addEventListener('click', () => {
+        filtersOverlay.classList.remove('open');
+        pageOverlay.style.display = 'none';
+      });
+    }
+
+    // Close when clicking the black background
+    if (pageOverlay) {
+      pageOverlay.addEventListener('click', () => {
+        filtersOverlay.classList.remove('open');
+        pageOverlay.style.display = 'none';
+      });
+    }
+
+ });
+</script>
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+      
+    let activeFilters = [];
+    let currentUrl = window.location.href;
+    
+    // Extract the filter part from the URL (after last '/')
+    let urlParts = currentUrl.split("/");
+    let filtersPart = urlParts[urlParts.length - 1]; // Extracts "diameter_14mm+bore_50mm"
+
+    if (filtersPart.includes("_")) {
+        let filters = filtersPart.split("+"); // Split filters by '+'
+
+        filters.forEach(filter => {
+            let [group, value] = filter.split("_"); // Split into group & value
+            if (group && value) {
+                activeFilters.push({ group, value, fullFilter: filter });
+            }
+        });
+    }
+      
+    const ultest = document.querySelectorAll('.advanced-filters');
+    // Select all ul elements containing filter items
+    // document.querySelectorAll(".advanced-filters").forEach(ul => {
+    //     ul.querySelectorAll("li.active-filter").forEach(li => {
+    //         let group = li.getAttribute("data-group");
+    //         let handle = li.getAttribute("data-handle");
+    //         let textContent = li.textContent.trim(); 
+    //         if (group && textContent) {
+    //             activeFilters.push(`${group}:${textContent}`);
+    //         }
+    //     });
+    // });
+
+    // Create a new ul element
+    let newUl = document.createElement("ul");
+    const showFilters = document.querySelector('.selectedFiltersCont');
+    newUl.classList.add("selected-filters");
+
+    // Populate the new ul with li items from active filters
+    activeFilters.forEach(filter => {
+        let li = document.createElement("li");
+         li.textContent = `${filter.group}: ${filter.value} `;
+
+      // Create the image element for the close icon
+        let img = document.createElement("img");
+        img.src = "https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Black_Cross_Thin.png?v=1738012931";
+        img.alt = "Remove filter";
+        img.style.cursor = "pointer";
+        img.style.width = "12px";
+        img.style.height = "12px";
+
+              // Add click event to remove filter and update URL
+        img.addEventListener("click", function () {
+            let updatedFilters = activeFilters
+                .filter(f => f.fullFilter !== filter.fullFilter) // Remove clicked filter
+                .map(f => f.fullFilter)
+                .join("+"); // Reconstruct URL path
+
+            let newUrl = urlParts.slice(0, -1).join("/") + (updatedFilters ? `/${updatedFilters}` : "");
+            
+            // Refresh page with the new URL
+            window.location.href = newUrl;
+        });
+
+      
+        // Append image to li
+        li.appendChild(img);
+        newUl.appendChild(li);
+    });
+      
+      console.log("activeFilters");
+     console.log(ultest);
+    // Append the new ul to the body or a specific container
+    showFilters.appendChild(newUl);
+   });
+
+</script>

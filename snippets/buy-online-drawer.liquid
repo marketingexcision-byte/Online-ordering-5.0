@@ -1,0 +1,563 @@
+<style>
+  .page-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    display: none;
+  }
+  .overlay {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100vh;
+    background: white;
+    z-index: 10000;
+    transition: right 0.3s ease;
+    overflow-y: auto;
+  }
+
+  .overlay.open {
+    right: 0;
+  }
+  .overlay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 40px 0px 40px;
+    color: #e0592a;
+    font-family: 'Humanist777BT-Black';
+    font-size: 28px;
+  }
+  .overlay-content {
+    padding: 15px 40px;
+    padding-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+  }
+  .buyOnline-heading {
+    margin-bottom: 15px;
+  }
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  .product-buyNow-wrapper li a.customer_site_url_btn {
+    gap: 10px;
+  }
+  .stock-status span {
+    line-height: 1;
+  }
+</style>
+
+<div id="pageOverlay" class="page-overlay"></div>
+<div id="distributorOverlay" class="overlay">
+  <div class="overlay-header">
+    <span>Buy Online</span>
+    <button style="width: 14px; height: 14px; padding: 0px;" id="closeOverlay" class="close-button">
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Black_Cross_Thin.png?v=1738012931">
+    </button>
+  </div>
+  <div class="overlay-content">
+    <div class="product-buyNow-wrapper">
+      <p class="buyOnline-heading">Buy now from our online retailers:</p>
+      <ul>
+        {% comment %}
+          {% for customer_site_url in product.metafields.custom.customerurls.value %}
+            <li><a target="_blank" class="btn customer_site_url_btn" href="{{ customer_site_url }}">Buy from {{ customer_site_url | remove: "https://" | split:"/" | first | remove: ".com" | remove: ".au" | split:"." | last | replace: "bstgroup", "BST Group" | replace: "sympaconline", "Sedl Agencies" | replace: "bendigosaw", "Bendigo Saw" | replace: "generaltools", "General Tools" | replace: "powermaxgroup", "Powermax Group" | replace: "rivsharp", "Riverina Sharpening" | replace: "aclconnect", "ACL Welding" | replace: "tradetools", "TradeTools" }}</a></li>
+          {% endfor %}
+        {% endcomment %}
+
+        {% comment %} -- National -- {% endcomment %}
+        {% if product.metafields.custom.blackwoods != blank or product.metafields.custom.total_tools != blank %}
+          <div class="state-cont">
+            {% if product.metafields.custom.blackwoods != blank or product.metafields.custom.total_tools != blank %}
+              <p class="buyOnline-state">National</p>
+            {% endif %}
+            {% if product.metafields.custom.blackwoods != blank %}
+              <li>
+                <a target="_blank" class="btn customer_site_url_btn" href="{{ product.metafields.custom.blackwoods }}"
+                  >Blackwoods<span class="stock-status"> </span>
+                </a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.blackwoods }}"
+                  >Visit site</a
+                >
+              </li>
+            {% endif %}
+
+            {% if product.metafields.custom.total_tools != blank %}
+              <li>
+                <a
+                  target="_blank"
+                  class="btn customer_site_url_btn"
+                  href="{{ product.metafields.custom.total_tools }}"
+                  >Total Tools<span class="stock-status"></span
+                ></a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.total_tools }}"
+                  >Visit site</a
+                >
+              </li>
+            {% endif %}
+          </div>
+        {% endif %}
+        {% comment %} -- State NSW -- {% endcomment %}
+        {% if product.metafields.custom.powermax_group != blank
+          or product.metafields.custom.riverina_sharpening != blank
+          or product.metafields.custom.national_welding != blank
+          or product.metafields.custom.aims_industrial != blank
+        %}
+          <div class="state-cont">
+            <p class="buyOnline-state">NSW</p>
+            {% if product.metafields.custom.powermax_group != blank %}
+              <li>
+                <a
+                  target="_blank"
+                  class="btn customer_site_url_btn"
+                  href="{{ product.metafields.custom.powermax_group }}"
+                  >Powermax Group<span class="stock-status"></span
+                ></a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.powermax_group }}"
+                  >Visit site</a
+                >
+              </li>
+            {% endif %}
+            {% if product.metafields.custom.riverina_sharpening != blank %}
+              <li>
+                <a
+                  target="_blank"
+                  class="btn customer_site_url_btn"
+                  href="{{ product.metafields.custom.riverina_sharpening }}"
+                  >Riverina Sharpening<span class="stock-status"></span
+                ></a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.riverina_sharpening }}"
+                  >Visit site</a
+                >
+              </li>
+            {% endif %}
+            {% if product.metafields.custom.national_welding != blank %}
+              <li>
+                <a
+                  target="_blank"
+                  class="btn customer_site_url_btn"
+                  href="{{ product.metafields.custom.national_welding }}"
+                >
+                  National Welding
+                  <span class="stock-status"></span>
+                </a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.national_welding }}"
+                  >Visit site</a
+                >
+              </li>
+            {% endif %}
+            {% if product.metafields.custom.aims_industrial != blank %}
+              <li>
+                <a
+                  target="_blank"
+                  class="btn customer_site_url_btn"
+                  href="{{ product.metafields.custom.aims_industrial }}"
+                  >Aims Industrial<span class="stock-status"></span
+                ></a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.aims_industrial }}"
+                  >Visit site</a
+                >
+              </li>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% comment %} -- State QLD -- {% endcomment %}
+        {% if product.metafields.custom.acl_welding != blank
+          or product.metafields.custom.sedl_agencies != blank
+          or product.metafields.custom.tradetools != blank
+        %}
+          <div class="state-cont">
+            <p class="buyOnline-state">QLD</p>
+            {% if product.metafields.custom.acl_welding != blank %}
+              <li>
+                <a target="_blank" class="btn customer_site_url_btn" href="{{ product.metafields.custom.acl_welding }}"
+                  >ACL Welding<span class="stock-status"></span>
+                </a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.acl_welding }}"
+                  >Visit site</a
+                >
+              </li>
+            {% endif %}
+            {% if product.metafields.custom.sedl_agencies != blank %}
+              <li>
+                <a
+                  target="_blank"
+                  class="btn customer_site_url_btn"
+                  href="{{ product.metafields.custom.sedl_agencies }}"
+                  >Sedl Agencies<span class="stock-status"></span
+                ></a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.sedl_agencies }}"
+                  >Visit site</a
+                >
+              </li>
+            {% endif %}
+            {% if product.metafields.custom.tradetools != blank %}
+              <li>
+                <a target="_blank" class="btn customer_site_url_btn" href="{{ product.metafields.custom.tradetools }}"
+                  >TradeTools<span class="stock-status"></span
+                ></a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.tradetools }}"
+                  >Visit site</a
+                >
+              </li>
+            {% endif %}
+          </div>
+        {% endif %}
+        {% comment %} -- State SA -- {% endcomment %}
+        {% if product.metafields.custom.general_tools != blank %}
+          <div class="state-cont">
+            <p class="buyOnline-state">SA</p>
+
+            {% if product.metafields.custom.general_tools != blank %}
+              <li>
+                <a
+                  target="_blank"
+                  class="btn customer_site_url_btn"
+                  href="{{ product.metafields.custom.general_tools }}"
+                  >General Tools<span class="stock-status"></span
+                ></a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.general_tools }}"
+                  >Visit site</a
+                >
+              </li>
+            {% endif %}
+          </div>
+        {% endif %}
+        {% comment %} -- State VIC -- {% endcomment %}
+        {% if product.metafields.custom.bst_group != blank
+          or product.metafields.custom.bendigo_saw != blank
+          or product.metafields.custom.orbimax != blank
+        %}
+          <div class="state-cont">
+            <p class="buyOnline-state">VIC</p>
+
+            {% if product.metafields.custom.bst_group != blank %}
+              <li>
+                <a target="_blank" class="btn customer_site_url_btn" href="{{ product.metafields.custom.bst_group }}"
+                  >BST Group<span class="stock-status"></span
+                ></a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.bst_group }}"
+                  >Visit site</a
+                >
+              </li>
+            {% endif %}
+            {% if product.metafields.custom.bendigo_saw != blank %}
+              <li>
+                <a target="_blank" class="btn customer_site_url_btn" href="{{ product.metafields.custom.bendigo_saw }}"
+                  >Bendigo Saw<span class="stock-status"></span
+                ></a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.bendigo_saw }}"
+                  >Visit site</a
+                >
+              </li>
+            {% endif %}
+            {% if product.metafields.custom.orbimax != blank %}
+              <li>
+                <a target="_blank" class="btn customer_site_url_btn" href="{{ product.metafields.custom.orbimax }}"
+                  >Orbimax<span class="stock-status"></span
+                ></a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.orbimax }}">Visit site</a>
+              </li>
+            {% endif %}
+          </div>
+        {% endif %}
+        {% comment %} -- State WA -- {% endcomment %}
+        {% if product.metafields.custom.alphaweld != blank
+          or product.metafields.custom.prime_supplies != blank
+          or product.metafields.custom.toolmart != blank
+          or product.metafields.custom.arc_i_welding != blank
+        %}
+          <div class="state-cont">
+            <p class="buyOnline-state">WA</p>
+            {% if product.metafields.custom.alphaweld != blank %}
+              <li>
+                <a target="_blank" class="btn customer_site_url_btn" href="{{ product.metafields.custom.alphaweld }}"
+                  >Alphaweld<span class="stock-status"></span
+                ></a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.alphaweld }}"
+                  >Visit site</a
+                >
+              </li>
+            {% endif %}
+            {% if product.metafields.custom.arc_i_welding != blank %}
+              <li>
+                <a target="_blank" class="btn customer_site_url_btn" href="{{ product.metafields.custom.arc_i_welding }}"
+                  >Arc-i Welding<span class="stock-status"></span>
+                </a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.arc_i_welding }}"
+                  >Visit site</a
+                >
+              </li>
+            {% endif %}
+            {% if product.metafields.custom.prime_supplies != blank %}
+              <li>
+                <a
+                  target="_blank"
+                  class="btn customer_site_url_btn"
+                  href="{{ product.metafields.custom.prime_supplies }}"
+                  >Prime Supplies<span class="stock-status"></span
+                ></a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.prime_supplies }}"
+                  >Visit site</a
+                >
+              </li>
+            {% endif %}
+            {% if product.metafields.custom.toolmart != blank %}
+              <li>
+                .overlay
+                <a target="_blank" class="btn customer_site_url_btn" href="{{ product.metafields.custom.toolmart }}"
+                  >Toolmart<span class="stock-status"></span
+                ></a>
+                <a class="visit_site_url" target="_blank" href="{{ product.metafields.custom.toolmart }}">Visit site</a>
+              </li>
+            {% endif %}
+          </div>
+        {% endif %}
+      </ul>
+      <p style="margin-top: 20px; font-size: 15px;">Select your preferred distributor:</p>
+      <select name="preferred-distributor" class="preferred-distributor" id="pf_distributor">
+        <option value="">Select</option>
+
+        {% if product.metafields.custom.blackwoods != blank or product.metafields.custom.total_tools != blank %}
+          <p class="buyOnline-state">National</p>
+        {% endif %}
+        {% if product.metafields.custom.blackwoods != blank %}
+          <option value="{{ product.metafields.custom.blackwoods }}" data-name="Blackwoods">Blackwoods</option>
+        {% endif %}
+        {% if product.metafields.custom.total_tools != blank %}
+          <option value="{{ product.metafields.custom.total_tools }}" data-name="Total Tools">Total Tools</option>
+        {% endif %}
+
+        {% comment %} -- State NSW -- {% endcomment %}
+        {% if product.metafields.custom.powermax_group != blank
+          or product.metafields.custom.riverina_sharpening != blank
+          or product.metafields.custom.national_welding != blank
+          or product.metafields.custom.aims_industrial != blank
+        %}
+          <p class="buyOnline-state">NSW</p>
+        {% endif %}
+        {% if product.metafields.custom.powermax_group != blank %}
+          <option value="{{ product.metafields.custom.powermax_group }}" data-name="Powermax Group">
+            Powermax Group
+          </option>
+        {% endif %}
+        {% if product.metafields.custom.riverina_sharpening != blank %}
+          <option value="{{ product.metafields.custom.riverina_sharpening }}" data-name="Riverina Sharpening">
+            Riverina Sharpening
+          </option>
+        {% endif %}
+        {% if product.metafields.custom.national_welding != blank %}
+          <option value="{{ product.metafields.custom.national_welding }}" data-name="National Welding">
+            National Welding
+          </option>
+        {% endif %}
+        {% if product.metafields.custom.aims_industrial != blank %}
+          <option value="{{ product.metafields.custom.aims_industrial }}" data-name="Aims Industrial">
+            Aims Industrial
+          </option>
+        {% endif %}
+
+        {% comment %} -- State QLD -- {% endcomment %}
+        {% if product.metafields.custom.acl_welding != blank
+          or product.metafields.custom.sedl_agencies != blank
+          or product.metafields.custom.tradetools != blank
+        %}
+          <p class="buyOnline-state">QLD</p>
+        {% endif %}
+        {% if product.metafields.custom.acl_welding != blank %}
+          <option value="{{ product.metafields.custom.acl_welding }}" data-name="ACL Welding">ACL Welding</option>
+        {% endif %}
+        {% if product.metafields.custom.sedl_agencies != blank %}
+          <option value="{{ product.metafields.custom.sedl_agencies }}" data-name="Sedl Agencies">Sedl Agencies</option>
+        {% endif %}
+        {% if product.metafields.custom.tradetools != blank %}
+          <option value="{{ product.metafields.custom.tradetools }}" data-name="TradeTools">TradeTools</option>
+        {% endif %}
+
+        {% comment %} -- State SA -- {% endcomment %}
+        {% if product.metafields.custom.general_tools != blank %}
+          <p class="buyOnline-state">SA</p>
+        {% endif %}
+        {% if product.metafields.custom.general_tools != blank %}
+          <option value="{{ product.metafields.custom.general_tools }}" data-name="General Tools">General Tools</option>
+        {% endif %}
+
+        {% comment %} -- State VIC -- {% endcomment %}
+        {% if product.metafields.custom.bst_group != blank
+          or product.metafields.custom.bendigo_saw != blank
+          or product.metafields.custom.orbimax != blank
+        %}
+          <p class="buyOnline-state">VIC</p>
+        {% endif %}
+        {% if product.metafields.custom.bst_group != blank %}
+          <option value="{{ product.metafields.custom.bst_group }}" data-name="BST Group">BST Group</option>
+        {% endif %}
+        {% if product.metafields.custom.bendigo_saw != blank %}
+          <option value="{{ product.metafields.custom.bendigo_saw }}" data-name="Bendigo Saw">Bendigo Saw</option>
+        {% endif %}
+        {% if product.metafields.custom.orbimax != blank %}
+          <option value="{{ product.metafields.custom.orbimax }}" data-name="Orbimax">Orbimax</option>
+        {% endif %}
+
+        {% comment %} -- State WA -- {% endcomment %}
+        {% if product.metafields.custom.alphaweld != blank
+          or product.metafields.custom.prime_supplies != blank
+          or product.metafields.custom.toolmart != blank
+          or product.metafields.custom.arc_i_welding != blank
+        %}
+          <p class="buyOnline-state">WA</p>
+        {% endif %}
+        {% if product.metafields.custom.alphaweld != blank %}
+          <option value="{{ product.metafields.custom.alphaweld }}" data-name="Alphaweld">Alphaweld</option>
+        {% endif %}
+        {% if product.metafields.custom.prime_supplies != blank %}
+          <option value="{{ product.metafields.custom.prime_supplies }}" data-name="Prime Supplies">
+            Prime Supplies
+          </option>
+        {% endif %}
+        {% if product.metafields.custom.toolmart != blank %}
+          <option value="{{ product.metafields.custom.toolmart }}" data-name="Toolmart">Toolmart</option>
+        {% endif %}
+        {% if product.metafields.custom.arc_i_welding != blank %}
+          <option value="{{ product.metafields.custom.arc_i_welding }}" data-name="Arc-i Welding">Arc-i Welding</option>
+        {% endif %}
+      </select>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // console.log('checking');
+
+    const distributorOverlay = document.querySelector('#distributorOverlay');
+    const pageOverlay = document.querySelector('#pageOverlay');
+    const openOverlayButton = document.querySelector('#openOverlay');
+    const closeOverlayButton = document.querySelector('#closeOverlay');
+
+    // Open overlay
+    if (openOverlayButton) {
+      openOverlayButton.addEventListener('click', () => {
+        distributorOverlay.classList.add('open');
+        pageOverlay.style.display = 'block';
+      });
+    }
+
+    // Close overlay
+    if (closeOverlayButton) {
+      closeOverlayButton.addEventListener('click', () => {
+        distributorOverlay.classList.remove('open');
+        pageOverlay.style.display = 'none';
+      });
+    }
+
+    // Close when clicking the black background
+    if (pageOverlay) {
+      pageOverlay.addEventListener('click', () => {
+        distributorOverlay.classList.remove('open');
+        pageOverlay.style.display = 'none';
+      });
+    }
+
+    // Update distributor selection
+    // const distributorSelect = document.querySelector('#pf_distributor');
+    // if (distributorSelect) {
+    //   distributorSelect.addEventListener('change', function () {
+    //     const selectedOption = this.options[this.selectedIndex];
+    //     const distributorName = selectedOption.getAttribute('data-name');
+    //     const distributorUrl = selectedOption.value;
+
+    //     if (distributorName && distributorUrl) {
+    //       alert(`You selected ${distributorName} at ${distributorUrl}`);
+    //     }
+    //   });
+    // }
+    window.addEventListener('DOMContentLoaded', () => {
+      // const savedDistributor = localStorage.getItem('preferredDistributor');
+      const distributorLinks = {
+        'Blackwoods': '{{ product.metafields.custom.blackwoods }}',
+        'Total Tools': '{{ product.metafields.custom.total_tools }}',
+        'Powermax Group': '{{ product.metafields.custom.powermax_group }}',
+        'Riverina Sharpening': '{{ product.metafields.custom.riverina_sharpening }}',
+        'National Welding': '{{ product.metafields.custom.national_welding }}',
+        'Aims Industrial': '{{ product.metafields.custom.aims_industrial }}',
+        'ACL Welding': '{{ product.metafields.custom.acl_welding }}',
+        'Sedl Agencies': '{{ product.metafields.custom.sedl_agencies }}',
+        'Trade Tools': '{{ product.metafields.custom.tradetools }}',
+        'General Tools': '{{ product.metafields.custom.general_tools }}',
+        'BST Group': '{{ product.metafields.custom.bst_group }}',
+        'Bendigo Saw': '{{ product.metafields.custom.bendigo_saw }}',
+        'Orbimax': '{{ product.metafields.custom.orbimax }}',
+        'Alphaweld': '{{ product.metafields.custom.alphaweld }}',
+        'Prime Supplies': '{{ product.metafields.custom.prime_supplies }}',
+        'Toolmart': '{{ product.metafields.custom.toolmart }}',
+        'Arc-i Welding': '{{product.metafields.custom.arc_i_welding }}'
+      };
+
+      const distributorName = localStorage.getItem('DistributorName');
+      const distributorUrl = localStorage.getItem('DistributorURL');
+      if (distributorName) {
+        const distributorContainer = document.querySelector('.pf-distributorMain');
+        const dropdown = document.querySelector('#pf_distributor');
+        const distributorURLElement = document.querySelector('.pf-distributor-container a');
+        const distributorNameElement = document.querySelector('.pf-distributor-name');
+        const distributorURLFromLinks = distributorLinks[distributorName];
+        const distributorStatus = document.querySelector('.pf-distributor-status');
+        const stockStatus = document.querySelector('.stock-status');
+        if (distributorContainer) {
+          distributorContainer.style.display = 'block';
+        console.log('working');
+          if (distributorURLFromLinks) {
+            distributorURLElement.href = distributorURLFromLinks;
+            dropdown.value = distributorURLFromLinks;
+          } else {
+            distributorStatus.innerText = '';
+            stockStatus.innerHTML = `<span style="display: flex; align-items: center; line-height: 0; margin-right: 10px; padding: 10px; background: #000; color: white; border-radius: 20px; height: 22px;">
+                          <span style="font-size: 14px;">Not Available</span>
+                          </span>`;
+          }
+
+          distributorNameElement.innerHTML = distributorName;
+          // console.log(`Distributor Name: ${distributorName}`);
+        }
+      }
+    });
+
+    document.querySelector('#pf_distributor').addEventListener('change', function () {
+      const selectedOption = this.options[this.selectedIndex];
+      const distributorName = selectedOption.getAttribute('data-name');
+      const distributorUrl = selectedOption.value;
+      // console.log('step in');
+
+      if (distributorName && distributorUrl) {
+        // console.log('working');
+        document.querySelector('.pf-distributor-name').innerText = distributorName;
+        document.querySelector('.pf-distributor-btn').href = distributorUrl;
+        localStorage.setItem('DistributorName', distributorName);
+        localStorage.setItem('DistributorURL', distributorUrl);
+      }
+    });
+    // Ensure links dynamically work correctly
+    document.addEventListener('click', function (event) {
+      if (event.target.classList.contains('customer_site_url_btn')) {
+        const href = event.target.getAttribute('href');
+        if (!href) {
+          event.preventDefault();
+          alert('Invalid link!');
+        }
+      }
+    });
+  });
+</script>

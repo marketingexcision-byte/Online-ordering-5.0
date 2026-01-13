@@ -1,0 +1,82 @@
+<div class="row xg-con">
+    <div class="col-sm-12 lazyload-element">
+      {% if section.settings.video_title != blank %}
+        <h2>{{ section.settings.video_title }}</h2>
+      {% endif %}
+      {% if section.settings.video_id != blank %}
+        <div id="xg-video">
+          <iframe width="560px" height="315px" src="https://www.youtube.com/embed/{{ section.settings.video_id }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen=""></iframe>
+        </div>
+      {% endif %}  
+    </div>
+      
+    <div class="col-sm-12 lazyload-element">
+      {% if section.settings.heading != blank %}
+        <h2>{{ section.settings.heading }}</h2>
+      {% endif %}
+      
+      {% if section.settings.sub_heading != blank %}
+        <h3>{{ section.settings.sub_heading }}</h3>
+      {% endif %} 
+      
+      {% if section.settings.info != blank %}
+         {{ section.settings.info }}
+      {% endif %}
+    
+      {% if section.settings.image != blank %}
+         <img src="{{ section.settings.image | img_url: 'master' }}" alt="">
+      {% endif %}
+    </div>
+</div>
+
+{% schema %}
+  {
+    "name": "Bottom Info",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Video Block"
+      },
+      {
+        "type": "text",
+        "id": "video_title",
+        "label": "Video title"
+      },
+      {
+        "type": "text",
+        "id": "video_id",
+        "label": "YouTube embed ID"
+      },
+      {
+        "type": "header",
+        "content": "Bottom Block"
+      },
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading"
+      },
+      {
+        "type": "text",
+        "id": "sub_heading",
+        "label": "Sub heading"
+      },
+      {
+        "type": "textarea",
+        "id": "info",
+        "label": "Info"
+      },
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

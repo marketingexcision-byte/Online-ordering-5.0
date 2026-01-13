@@ -1,0 +1,520 @@
+<div class="container dt-prl-30 simple-lazyload loaded">
+  {% comment %} Extract default filters from metafield (handles JSON or CSV) {% endcomment %}
+  {% assign default_filters_raw = collection.metafields.custom.list_default_filters.value | strip %}
+  {% assign default_filters_clean = default_filters_raw | remove: '[' | remove: ']' | replace: '"', '' %}
+  {% assign default_filters = default_filters_clean | split: ',' %}
+  {% assign parsed_filters = '' %}
+  {% for f in default_filters %}
+    {% assign trimmed = f | strip %}
+    {% unless trimmed == '' %}
+      {% assign parsed_filters = parsed_filters | append: trimmed | append: ',' %}
+    {% endunless %}
+  {% endfor %}
+  {% assign default_filters = parsed_filters | split: ',' | uniq %}
+
+  {% comment %} Map complex material tags to Workpiece Material_[code] {% endcomment %}
+  {% assign material_map = '
+Carbon Steels:P,
+Alloy Steels:P,
+High Alloy Steels:P,
+High Carbon Steels:P,
+Prehardened Steels:P,
+Structural Steels:P,
+Mild & Free Machining:P,
+Tool Steels:P,
+High Alloyed:P,
+Structural & Low Carbon Steels:M,
+Stainless Steels:M,
+Cast Iron:K,
+Graphite: K,
+Aluminium:N,
+Bronze:N,
+Brass Bronze:N,
+Copper:N,
+CFRP:N,
+Non-ferrous:N,
+Aluminum & Aluminum alloy:N,
+Magnesium & Magnesium Alloys:N,
+Plastic:N,
+Acrylic:N,
+Inconel:S,
+Titanium:S,
+Nickel:S,
+Hardened Steels(HRc40~45):H,
+Hardened Steels(HRc30~45):H,
+Hardened Steels(HRc45~):H,
+Hardened Steels(HRc45~55):H,
+High Hardened Steels(HRc55~70):H
+'
+    | strip_newlines
+    | split: ','
+  %}
+
+  {% assign all_tag_keys_string = '' %}
+  {% assign workpiece_values = '' %}
+
+  {% for product in collection.products %}
+    {% for tag in product.tags %}
+      {% assign base = tag | split: '_' | first %}
+      {% assign suffix = tag | split: '_' | last %}
+      {% assign mapped = false %}
+
+      {% for entry in material_map %}
+        {% assign pair = entry | split: ':' %}
+        {% assign source = pair[0] | strip %}
+        {% assign target = pair[1] | strip %}
+        {% if base == source %}
+          {% assign new_tag = 'Workpiece Material_' | append: target %}
+          {% unless all_tag_keys_string contains 'Workpiece Material' %}
+            {% assign all_tag_keys_string = all_tag_keys_string | append: 'Workpiece Material,' %}
+          {% endunless %}
+          {% unless workpiece_values contains target %}
+            {% assign workpiece_values = workpiece_values | append: target | append: ',' %}
+          {% endunless %}
+          {% assign mapped = true %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+
+      {% if mapped == false and tag contains '_' %}
+        {% assign key = tag | split: '_' | first | strip %}
+        {% unless all_tag_keys_string contains key %}
+          {% assign all_tag_keys_string = all_tag_keys_string | append: key | append: ',' %}
+        {% endunless %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+  {% assign all_tag_keys = all_tag_keys_string | split: ',' | uniq %}
+  {% assign workpiece_values = workpiece_values | split: ',' | uniq %}
+
+  <div id="product-list-view" class="overflow-x-auto">
+    {% paginate collection.products by 12 %}
+      <table class="min-w-full border-collapse">
+        <thead>
+          <tr class="bg-gray-100 text-left">
+            <th class="px-4 py-2" style="font-family:'Humanist777BT-Bold';">Product</th>
+            {% for filter in default_filters %}
+              <th class="px-4 py-2" style="padding:0rem !important;">
+                <select
+                  class="heading-filter-select text-xs font-medium"
+                  data-index="{{ forloop.index0 }}"
+                  style="padding: 1rem 2rem 1rem 1rem !important; border-bottom: 0px;"
+                >
+                  {% for option in all_tag_keys %}
+                    <option
+                      value="{{ option }}"
+                      {% if option == filter %}
+                        selected
+                      {% endif %}
+                    >
+                      {{ option }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in collection.products %}
+            {% assign all_tags = product.tags %}
+            {% assign material_tags = '' %}
+            {% for tag in product.tags %}
+              {% assign base = tag | split: '_' | first %}
+              {% for entry in material_map %}
+                {% assign pair = entry | split: ':' %}
+                {% assign source = pair[0] | strip %}
+                {% assign target = pair[1] | strip %}
+                {% if base == source %}
+                  {% assign material_tags = material_tags
+                    | append: 'Workpiece Material_'
+                    | append: target
+                    | append: ','
+                  %}
+                  {% break %}
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+            {% assign all_tags = all_tags | join: ',' | append: ',' | append: material_tags %}
+            <tr data-tags="{{ all_tags | strip_newlines }}" class="border-t">
+              <td class="px-4 py-3 flex items-center space-x-4">
+                <img
+                  src="{{ product.featured_image | img_url: '100x100' }}"
+                  alt="{{ product.title }}"
+                  class="w-16 h-16 object-cover"
+                >
+                <div>
+                  <a href="{{ product.url }}" class="font-bold">{{ product.title }}</a>
+                  {% if product.metafields.custom.title.value != blank %}
+                    <span class="secondary--product_title ">{{ product.metafields.custom.title }}</span>
+                  {% endif %}
+                          <div class="product-item--price">
+  <span class="medium--left">
+    {% if on_sale %}
+      <span class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+    {% else %}
+      <span class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+    {% endif %}
+
+{% if product.tags contains 'Custom Length' and product.metafields.custom.price_matrix %}
+  {%- assign raw = product.metafields.custom.price_matrix.value | default: product.metafields.custom.price_matrix -%}
+  {%- comment %}
+    Flatten everything to spaces, strip HTML, then pick the smallest decimal number.
+  {% endcomment -%}
+  {%- assign text = raw
+      | strip
+      | strip_html
+      | replace: '\r\n', ' '
+      | replace: '\n', ' '
+      | replace: '\r', ' '
+      | replace: '\t', ' '
+  -%}
+
+  {%- comment %} collapse multiple spaces {% endcomment -%}
+  {%- assign last = '' -%}
+  {%- assign flat = text -%}
+  {%- for i in (1..6) -%}
+    {%- assign flat = flat | replace: '  ', ' ' -%}
+  {%- endfor -%}
+
+  {%- assign tokens = flat | split: ' ' -%}
+  {%- assign min_price_cents = nil -%}
+
+  {%- for tok in tokens -%}
+    {%- assign s = tok | strip -%}
+    {%- if s contains '.' -%}
+      {%- comment %}
+        Token looks like a decimal price (e.g. 68.24). Convert to cents.
+      {% endcomment -%}
+      {%- assign cents = s | replace: ',', '.' | times: 100 -%}
+      {%- if cents > 0 -%}
+        {%- if min_price_cents == nil or cents < min_price_cents -%}
+          {%- assign min_price_cents = cents -%}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- if min_price_cents -%}
+<span class="from-price">
+  From  {% render 'price', price: min_price_cents, taxable: product.selected_or_first_available_variant.taxable %}
+</span>
+  {%- else -%}
+    {%- comment %} Fallback if nothing parsable {% endcomment -%}
+    {% include 'price' with wcp_price %}
+  {%- endif -%}
+{% else %}
+  {%- assign min_price_cents = nil -%}
+  {%- assign max_price_cents = nil -%}
+
+  {%- for v in product.variants -%}
+    {%- comment -%}
+      Include only real prices (> 0). If you want to include sold-out variants,
+      remove “and v.available” below.
+    {%- endcomment -%}
+    {%- if v.price > 0 -%}
+      {%- if min_price_cents == nil or v.price < min_price_cents -%}
+        {%- assign min_price_cents = v.price -%}
+      {%- endif -%}
+      {%- if max_price_cents == nil or v.price > max_price_cents -%}
+        {%- assign max_price_cents = v.price -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- if min_price_cents -%}
+    {%- if min_price_cents == max_price_cents -%}
+      {% render 'price', price: min_price_cents, taxable: product.selected_or_first_available_variant.taxable %}
+    {%- else -%}
+<span class="from-to-price">
+  {% render 'price', price: min_price_cents, taxable: product.selected_or_first_available_variant.taxable %}
+   – 
+  {% render 'price', price: max_price_cents, taxable: product.selected_or_first_available_variant.taxable %}
+</span>
+
+    {%- endif -%}
+  {%- endif -%}
+{% endif %}
+
+
+
+{% if on_sale and section.settings.product_show_compare_at_price %}
+  <s>
+    <span class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+    {% render 'price', price: wcp_compare_at_price, taxable: product.selected_or_first_available_variant.taxable %}
+  </s>
+{% endif %}
+
+  </span>
+
+        <style>
+          .product-item--price small {
+            font-size: 18px;
+          }
+          .product-item--price small:hover {
+            color: black;
+          }
+          div.product-item--price {
+            text-align: left;
+          }
+          .product-item--price span {
+            display: flex;
+            line-height: unset;
+          }
+          a:hover {
+            color: unset;
+          }
+          /* default: no footprint */
+.icon-container{
+  min-height: 0;
+  position: absolute;
+}
+
+/* show + space only when it actually has element children */
+.icon-container:has(> *){
+  position: relative;
+}
+
+/* fallback for older browsers; may miss whitespace-only nodes */
+.icon-container:empty{ display:none; }
+.ex-card-badge{
+  display:flex; align-items:center; gap:15px;
+}
+.ex-card-badge::before{content:"";width:10px;height:10px;border-radius:50%}
+.ex-card-badge[data-status="green"]::before{background:#109954}
+.ex-card-badge[data-status="orange"]::before{background:#f88d2b}
+.ex-card-badge[data-status="red"]::before{background:#d52e30}
+.ex-card-badge[data-status="blue"]::before{background:#3995e6}
+.ex-card-badge[data-status="grey"]::before{background:#666}
+.card-variants {
+  margin-bottom: 15px;
+}
+
+.card-variants-label {
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    color: #666666;
+    margin-bottom: 7px !important;
+    text-align: start;
+}
+
+.card-variants-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.variant-chip {
+    padding: 8px 12px;
+    border: 2px solid #e8e8e8;
+    border-radius: 99px;
+    white-space: nowrap;
+    line-height: 1;
+    min-height: 40px;
+    align-content: center;
+}
+
+.variant-chip--more {
+    color: #666666;
+    border: 2px solid #f1f1f1;
+}
+
+        </style>
+
+        {%- if product.selected_or_first_available_variant.available
+          and product.selected_or_first_available_variant.unit_price_measurement
+        -%}
+          {% include 'product-unit-price', variant: product.selected_or_first_available_variant %}
+        {%- endif -%}
+      </div>
+                  {% if product.variants.first.sku %}
+                    <p style="padding-top: 0; font-size: 17px; padding-top: 8px;">{{ product.variants.first.sku }}</p>
+                  {% endif %}
+                </div>
+              </td>
+              {% for filter in default_filters %}
+                {% assign values = '' %}
+                {% for tag in product.tags %}
+                  {% assign base = tag | split: '_' | first %}
+                  {% assign suffix = tag | split: '_' | last %}
+                  {% assign mapped = false %}
+
+                  {% for entry in material_map %}
+                    {% assign pair = entry | split: ':' %}
+                    {% assign source = pair[0] | strip %}
+                    {% assign target = pair[1] | strip %}
+                    {% if base == source and filter == 'Workpiece Material' %}
+                      {% unless values contains target %}
+                        {% assign values = values | append: target | append: ' ' %}
+                      {% endunless %}
+                      {% assign mapped = true %}
+                      {% break %}
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if mapped == false %}
+                    {% assign parts = tag | split: '_' %}
+                    {% if parts.size == 2 and parts[0] == filter %}
+                      {% assign val = parts[1] %}
+                      {% unless values contains val %}
+                        {% assign values = values | append: val | append: ' ' %}
+                      {% endunless %}
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+
+                {% assign values_array = values | split: ' ' | uniq | sort %}
+                {% assign all_numeric = true %}
+                {% for val in values_array %}
+                  {% assign numeric_val = val | plus: 0 | string %}
+                  {% if val != numeric_val %}
+                    {% assign all_numeric = false %}
+                    {% break %}
+                  {% endif %}
+                {% endfor %}
+
+                {% if all_numeric and values_array.size > 1 %}
+                  {% assign display_value = values_array.first | append: ' - ' | append: values_array.last %}
+                {% else %}
+                  {% assign display_value = values_array | join: ' ' %}
+                {% endif %}
+
+                {% if filter == 'Workpiece Material' %}
+                  {% assign ordered = 'P,M,K,N,S,H' | split: ',' %}
+                  <td class="px-4 py-3 tag-cell" data-filter="{{ filter }}">
+                    <div style="display:flex; gap:6px;">
+                      {% for code in ordered %}
+                        {% if display_value contains code %}
+                          <span class="material material-{{ code }}">{{ code }}</span>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </td>
+                {% else %}
+                  <td class="px-4 py-3 tag-cell" data-filter="{{ filter }}">{{ display_value }}</td>
+                {% endif -%}
+              {%- endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endpaginate %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const selects = document.querySelectorAll('.heading-filter-select');
+    const rows = document.querySelectorAll('#product-list-view tbody tr');
+
+    function updateColumn(index, filterName) {
+      selects[index].value = filterName;
+
+      rows.forEach(row => {
+        const tagString = row.getAttribute('data-tags') || '';
+        const tags = tagString.split(',');
+        let values = [];
+
+        tags.forEach(tag => {
+          const parts = tag.split('_');
+          if (parts.length === 2 && parts[0] === filterName) {
+            values.push(parts[1]);
+          }
+        });
+
+        values = [...new Set(values)].sort((a, b) => {
+          const aNum = parseFloat(a);
+          const bNum = parseFloat(b);
+          return isNaN(aNum) || isNaN(bNum) ? a.localeCompare(b) : aNum - bNum;
+        });
+
+        const cells = row.querySelectorAll('.tag-cell');
+        if (cells[index]) {
+          cells[index].setAttribute('data-filter', filterName);
+
+          // Check if all values are numeric
+          const allNumeric = values.length > 1 && values.every(val => !isNaN(val));
+          let displayValue = '-';
+
+          if (values.length === 0) {
+            displayValue = '-';
+          } else if (filterName === 'Workpiece Material') {
+            const ordered = ['P', 'M', 'K', 'N', 'S', 'H'];
+            const wrapper = document.createElement('div');
+            wrapper.style.display = 'flex';
+            wrapper.style.gap = '6px';
+
+            ordered.forEach(code => {
+              if (values.includes(code)) {
+                const span = document.createElement('span');
+                span.className = `material material-${code}`;
+                span.textContent = code;
+                wrapper.appendChild(span);
+              }
+            });
+
+            cells[index].textContent = '';
+            cells[index].appendChild(wrapper);
+            return;
+          } else if (allNumeric) {
+            displayValue = `${values[0]} - ${values[values.length - 1]}`;
+          } else {
+            displayValue = values.join(', ');
+          }
+
+          cells[index].textContent = displayValue;
+        }
+      });
+    }
+
+    selects.forEach((select, i) => {
+      select.addEventListener('change', e => {
+        updateColumn(i, e.target.value);
+      });
+    });
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('select.heading-filter-select').forEach(select => {
+      new Selectr(select, {
+        searchable: false,
+        width: 120,
+        customClass: 'custom-selectr'
+      });
+    });
+  });
+</script>
+
+<style>
+  .material {
+    font-family: 'Humanist777BT-Bold';
+    border-radius: 5px;
+    color: white;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .material-P { background: #0069a7; }
+  .material-M { background: #f6b519; }
+  .material-K { background: #e0592a; }
+  .material-N { background: #109954; }
+  .material-S { background: #f88d2b; }
+  .material-H { background: #666666; }
+
+  td.px-4.py-3.flex.items-center.space-x-4 {
+    display: inline-flex;
+    gap: 20px;
+    margin-bottom: -1px;
+    width: 100%;
+  }
+
+  .px-4 {
+    padding: 1rem !important;
+    border-bottom: 2px solid #f1f1f1 !important;
+    border: 0px;
+  }
+</style>

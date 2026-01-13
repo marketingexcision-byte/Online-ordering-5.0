@@ -1,0 +1,97 @@
+{% if page.handle  == 'register' %}
+  <script>
+   window.location.replace("https://www.myexcision.com.au/register");
+  </script>
+{% endif %}
+<div class="project__page simple-lazyload">
+  <section class="hero-banner light-bg">
+     <div class="container dt-prl-30">
+        <div class="row ">
+           <div class="col-md-5 lazyload-element">
+              <div class="placeholder">
+                 <img src={{ page.metafields.custom.project_logo | image_url }} style="max-height: 45px; margin-top: 20px;">
+                 <h1 class="page_title">{{ page.title }}</h1>
+                 <p class="project_location font-bold">{{ page.metafields.custom.project_location }}</p>
+              </div>
+           </div>
+        </div>
+     </div>
+  </section>
+  <div class="container">
+     <div class="grid project__content">
+        <div class="grid-item large--four-sixths lazyload-element">
+           <div class="project__body rte">
+              {{ page.content }}
+           </div>
+        </div>
+        <div class="grid-item large--two-sixths lazyload-element">
+            <div class="project__scope">
+               <p class="project_scope_subtitle font-bold">Scope</p>
+               <div>{{ page.metafields.custom.project_scope }}</div>
+            </div>
+        </div>
+     </div>
+
+     {% if page.metafields.custom.project_video %}
+      <div class="plyr__video-embed lazyload-element" id="player">
+        <iframe src="{{ page.metafields.custom.project_video }}origin=https://yourdomain.com&modestbranding=1&playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      
+      <script src="https://cdn.plyr.io/3.6.8/plyr.js"></script>
+      <script>
+        const player = new Plyr('#player', {
+          controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'], // Customize Plyr controls
+          settings: [], // Remove the settings menu
+          youtube: {
+            noCookie: true, // Use YouTube's no-cookie domain
+            playsinline: true, // Ensure the video plays inline on mobile
+          },
+        });
+      </script>
+     {% endif %}
+    
+     {% if page.metafields.custom.project_gallery.value != blank %}
+     {% assign custom_project_gallery = page.metafields.custom.project_gallery.value %}
+    <div class="project__gallery">
+      {% if custom_project_gallery %}
+        {% for c_project_gallery in custom_project_gallery %}
+          <div class="lazyload-element">
+            <a href="{{ c_project_gallery | image_url }}" data-lightbox="gallery" data-title="{{ c_project_gallery.alt }}">
+              <img src="{{ c_project_gallery | image_url }}" alt="{{ c_project_gallery.alt }}" class="fade-in" />
+            </a>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+     {% endif %}
+  </div>
+  <div class="container lazyload-element">
+      <div class="australian-made">
+        <h3>Certified Australian Made</h3>
+        <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/amo-2021-logo-rgb-full-colour-clear.png?v=1722892941">
+      </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/imagesloaded/4.1.4/imagesloaded.pkgd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var grid = document.querySelector('.project__gallery');
+    imagesLoaded(grid, function() {
+      var msnry = new Masonry(grid, {
+        itemSelector: 'div',
+        columnWidth: '.project__gallery > div',
+        percentPosition: true,
+        gutter: 16
+      });
+    });
+  });
+</script>
+
+<!-- Lightbox2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
+
+<!-- Lightbox2 JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+

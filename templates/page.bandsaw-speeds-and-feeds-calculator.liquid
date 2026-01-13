@@ -1,0 +1,593 @@
+<div class="contact_us_outer_wrapper simple-lazyload"> 
+  <div class="container dt-prl-30 content">
+   <div class="row">
+      <div class="col-md-12">
+         <div class="row contact-details">
+            <div class="col-12 col-sm-6 left-main-div lazyload-element">
+               <section class="inner-wrapper">
+                  <h1>Bandsaw Speeds and Feeds Calculator</h1>
+                  <p class="font-bold">Use this calculator to determine the optimal bandsaw speeds and feeds to use when cutting different sized materials with Bimetal bandsaw blades. Not to be used for TCT or other types of bandsaw blades..</p>
+                  <ul>
+                     <p>Need more information on bandsaw speeds and feeds? <a href="https://excision.com.au/blogs/learning-centre/what-speed-and-feed-should-i-run-my-bandsaw-at">Learn more here.</a></p>
+                  </ul>                 
+               </section>              
+            </div>
+            <div class="col-12 col-sm-6 lazyload-element">
+      <div class="rte">
+         {% comment %}{{ page.content }}{% endcomment %}
+         <div class="coolant_concentration_calculater">
+            <div class="row">
+              <div class="col-6 col-sm-6">
+                  <p>Material Type</p>
+               </div>
+               <div class="col-6 col-sm-6">
+                  <label>
+                     <select name="typeOfMaterial" id="typeOfMaterial">
+                        <option value="0">Structural Steel, Deep Drawing, Free Cutting Steel</option>
+                        <option value="1">Structural Steel, Heat Treatable Steel</option>
+                        <option value="2">Case Hardened, Spring Steels</option>
+                        <option value="3">Low Alloyed Steels, Working Tool Steels</option>
+                        <option value="4">High alloyed hot working tool steels, nitriding steels</option>
+                        <option value="5">Carbon tool steels, bearing steels</option>
+                        <option value="6">Cold working steels</option>
+                        <option value="7">High speed steels</option>
+                        <option value="8">Tool Steel, Stainless Steel</option>
+                        <option value="9">Stainless Steels (High)</option>
+                        <option value="10">Heat Resistant Steels</option>
+                        <option value="11">Nickel-based alloys</option>
+                        <option value="12">Cast Iron</option>
+                        <option value="13">Aluminium, Aluminium Alloys</option>
+                        <option value="14">Aluminium, Aluminium Alloys - without band twist</option>
+                        <option value="15">Copper</option>
+                        <option value="16">Brass</option>
+                        <option value="17">Aluminium-Bronze, Copper-Nickel alloys</option>                      
+                     </select>
+                  </label>
+            </div>
+               <div class="col-6 col-sm-6">
+                  <p>Cross Section</p> 
+               </div>
+               <div class="col-6 col-sm-6">
+                  <label>
+                     <select name="typeOfMaterialDimensions" id="typeOfMaterialDimensions"> <option value="77-104" data="221-285">10</option> <option value="77-104" data="127-172">30</option> <option value="77-104" data="105-143">50</option> <option value="72-98" data="90-121">75</option> <option value="72-98" data="83-112">100</option> <option value="70-94" data="58-78">150</option> <option value="68-92" data="44-60">200</option> <option value="64-86" data="25-34">300</option> <option value="60-81" data="19-26">400</option> <option value="54-74" data="14-19">500</option> <option value="48-66" data="10-14">600</option> <option value="46-62" data="8.8-12">700</option> <option value="43-58" data="6.4-8.6">800</option> <option value="38-52" data="5-6.7">900</option> <option value="34-46" data="4.2-5.6">1000</option> <option value="32-44" data="3.3-4.5">1200</option> <option value="30-40" data="2.6-3.5">1500</option> <option value="28-38" data="1.8-2.4">2000</option> </select>
+                     <select name="typeOfMaterialDimensions1" id="typeOfMaterialDimensions1" style="display: none;"> <option value="64-86" data="181-245">10</option> <option value="64-86" data="108-146">30</option> <option value="60-82" data="74-100">50</option> <option value="59-79" data="69-94">75</option> <option value="56-76" data="63-85">100</option> <option value="52-70" data="40-54">150</option> <option value="48-64" data="30-40">200</option> <option value="46-62" data="19-26">300</option> <option value="44-60" data="14-19">400</option> <option value="43-58" data="10-14">500</option> <option value="41-55" data="8.2-11">600</option> <option value="38-52" data="6.7-9.1">700</option> <option value="36-48" data="5.2-7.0">800</option> <option value="33-45" data="4.2-5.7">900</option> <option value="31-43" data="3.5-4.7">1000</option> <option value="30-40" data="2.6-3.5">1200</option> <option value="28-38" data="2-2.7">1500</option> <option value="26-36" data="1.3-1.8">2000</option> </select>
+                     <select name="typeOfMaterialDimensions2" id="typeOfMaterialDimensions2" style="display: none;"> <option value="60-81" data="155-209">10</option> <option value="60-81" data="94-128">30</option> <option value="57-77" data="67-91">50</option> <option value="53-71" data="59-80">75</option> <option value="53-71" data="57-77">100</option> <option value="48-66" data="37-50">150</option> <option value="44-60" data="27-37">200</option> <option value="43-58" data="18-24">300</option> <option value="41-55" data="12-17">400</option> <option value="39-53" data="9.7-13">500</option> <option value="37-49" data="7.4-10">600</option> <option value="36-48" data="6.3-8.5">700</option> <option value="33-45" data="7.8-6.5">800</option> <option value="31-43" data="4-5.4">900</option> <option value="30-40" data="3.4-4.6">1000</option> <option value="28-38" data="2.7-3.6">1200</option> <option value="26-36" data="2-2.7">1500</option> <option value="25-33" data="1.4-1.8">2000</option> </select>
+                     <select name="typeOfMaterialDimensions3" id="typeOfMaterialDimensions3" style="display: none;"> <option value="44-60" data="84-113">10</option> <option value="43-58" data="61-82">30</option> <option value="41-55" data="43-59">50</option> <option value="37-51" data="27-36">75</option> <option value="37-51" data="25-33">100</option> <option value="36-48" data="22-29">150</option> <option value="32-44" data="17-23">200</option> <option value="29-39" data="11-15">300</option> <option value="27-37" data="7.1-9.6">400</option> <option value="26-35" data="5.6-7.6">500</option> <option value="25-33" data="4.1-5.5">600</option> <option value="24-32" data="3.5-4.8">700</option> <option value="23-31" data="2.8-3.8">800</option> <option value="22-30" data="2.3-3.1">900</option> <option value="21-29" data="2-2.7">1000</option> <option value="20-28" data="1.6-2.2">1200</option> <option value="19-25" data="1.3-1.7">1500</option> <option value="17-23" data="0.9-1.2">2000</option> </select>
+                     <select name="typeOfMaterialDimensions4" id="typeOfMaterialDimensions4" style="display: none;"> <option value="43-58" data="80-109">10</option> <option value="39-53" data="56-76">30</option> <option value="37-51" data="40-54">50</option> <option value="34-46" data="24-33">75</option> <option value="34-46" data="23-32">100</option> <option value="31-41" data="19-26">150</option> <option value="27-37" data="14-20">200</option> <option value="27-37" data="9.6-13">300</option> <option value="26-35" data="6.5-8.8">400</option> <option value="24-32" data="4.9-6.7">500</option> <option value="22-30" data="3.8-5.1">600</option> <option value="21-29" data="3.1-4.1">700</option> <option value="20-28" data="2.6-3.5">800</option> <option value="20-26" data="2.1-2.8">900</option> <option value="19-25" data="1.9-2.6">1000</option> <option value="18-24" data="1.5-2">1200</option> <option value="16-22" data="1.1-1.5">1500</option> <option value="14-20" data="0.9-1.2">2000</option> </select>
+                     <select name="typeOfMaterialDimensions5" id="typeOfMaterialDimensions5" style="display: none;"> <option value="51-69" data="100-135">10</option> <option value="48-64" data="73-99">30</option> <option value="44-60" data="51-68">50</option> <option value="41-55" data="45-61">75</option> <option value="41-55" data="43-59">100</option> <option value="37-51" data="26-35">150</option> <option value="36-48" data="20-27">200</option> <option value="32-44" data="12-16">300</option> <option value="31-41" data="8.4-11">400</option> <option value="29-39" data="6.4-8.6">500</option> <option value="27-37" data="4.8-6.5">600</option> <option value="27-37" data="4.1-5.5">700</option> <option value="26-35" data="3.2-4.3">800</option> <option value="25-33" data="2.8-3.8">900</option> <option value="24-32" data="2.3-3.2">1000</option> <option value="23-31" data="1.8-2.4">1200</option> <option value="21-29" data="1.4-1.9">1500</option> <option value="20-26" data="1-1.4">2000</option> </select> 
+                     <select name="typeOfMaterialDimensions6" id="typeOfMaterialDimensions6" style="display: none;"> <option value="38-52" data="70-95">10</option> <option value="36-48" data="55-68">30</option> <option value="34-46" data="35-47">50</option> <option value="31-41" data="21-29">75</option> <option value="34-41" data="19-26">100</option> <option value="28-38" data="15-21">150</option> <option value="26-35" data="12-16">200</option> <option value="24-32" data="8.4-11">300</option> <option value="23-31" data="6.2-8.3">400</option> <option value="22-30" data="4.6-6.2">500</option> <option value="20-28" data="3.5-4.7">600</option> <option value="20-26" data="2.7-3.6">700</option> <option value="19-25" data="2.2-3">800</option> <option value="18-24" data="2-2.7">900</option> <option value="17-23" data="1.7-2.3">1000</option> <option value="16-22" data="1.4-1.9">1200</option> <option value="14-20" data="0.9-1.2">1500</option> <option value="13-17" data="0.7-0.9">2000</option> </select>
+                     <select name="typeOfMaterialDimensions7" id="typeOfMaterialDimensions7" style="display: none;"> <option value="44-60" data="84-113">10</option> <option value="43-58" data="61-82">30</option> <option value="41-55" data="43-59">50</option> <option value="37-51" data="27-36">75</option> <option value="37-51" data="25-33">100</option> <option value="36-48" data="22-29">150</option> <option value="32-44" data="17-23">200</option> <option value="29-39" data="11-15">300</option> <option value="27-37" data="7.1-9.6">400</option> <option value="26-35" data="5.6-7.6">500</option> <option value="25-33" data="4.1-5.5">600</option> <option value="24-32" data="3.5-4.8">700</option> <option value="23-31" data="2.8-3.8">800</option> <option value="22-30" data="2.3-3.1">900</option> <option value="21-29" data="2-2.7">1000</option> <option value="20-28" data="1.6-2.2">1200</option> <option value="19-25" data="1.3-1.7">1500</option> <option value="17-23" data="0.9-1.2">2000</option> </select> 
+                     <select name="typeOfMaterialDimensions8" id="typeOfMaterialDimensions8" style="display: none;"> <option value="43-58" data="80-109">10</option> <option value="39-53" data="56-76">30</option> <option value="37-51" data="40-54">50</option> <option value="34-46" data="24-33">75</option> <option value="34-46" data="23-32">100</option> <option value="31-41" data="19-26">150</option> <option value="27-37" data="14-20">200</option> <option value="27-37" data="9.6-13">300</option> <option value="26-35" data="6.5-8.8">400</option> <option value="24-32" data="4.9-6.7">500</option> <option value="22-30" data="3.8-5.1">600</option> <option value="21-29" data="3.1-4.1">700</option> <option value="20-28" data="2.6-3.5">800</option> <option value="20-26" data="2.1-2.8">900</option> <option value="19-25" data="1.9-2.6">1000</option> <option value="18-24" data="1.5-2">1200</option> <option value="16-22" data="1.1-1.5">1500</option> <option value="14-20" data="0.9-1.2">2000</option> </select>
+                     <select name="typeOfMaterialDimensions9" id="typeOfMaterialDimensions9" style="display: none;"> <option value="38-52" data="70-98">10</option> <option value="36-48" data="50-68">30</option> <option value="34-46" data="35-47">50</option> <option value="31-41" data="21-29">75</option> <option value="31-41" data="19-26">100</option> <option value="28-38" data="15-21">150</option> <option value="26-35" data="12-16">200</option> <option value="24-32" data="8.4-11">300</option> <option value="23-31" data="6.2-8.3">400</option> <option value="22-30" data="4.6-6.2">500</option> <option value="20-28" data="3.5-4.7">600</option> <option value="20-26" data="2.7-3.6">700</option> <option value="19-25" data="2.2-3">800</option> <option value="18-24" data="2-2.7">900</option> <option value="17-23" data="1.7-2.3">1000</option> <option value="16-22" data="1.4-1.9">1200</option> <option value="14-20" data="0.9-1.2">1500</option> <option value="13-17" data="0.7-0.9">2000</option> </select> 
+                     <select name="typeOfMaterialDimensions10" id="typeOfMaterialDimensions10" style="display: none;"> <option value="34-46" data="59-80">10</option> <option value="31-43" data="42-57">30</option> <option value="30-40" data="29-40">50</option> <option value="27-37" data="24-33">75</option> <option value="27-37" data="17-23">100</option> <option value="25-33" data="11-15">150</option> <option value="21-29" data="8-10.8">200</option> <option value="20-26" data="5-6.8">300</option> <option value="18-24" data="3.7-5">400</option> <option value="16-22" data="2.9-3.9">500</option> <option value="14-20" data="2.2-2.9">600</option> <option value="14-18" data="1.6-2.2">700</option> <option value="13-17" data="1.4-1.9">800</option> <option value="12-16" data="1.2-1.6">900</option> <option value="11-15" data="1-1.4">1000</option> </select> 
+                     <select name="typeOfMaterialDimensions11" id="typeOfMaterialDimensions11" style="display: none;"> <option value="27-37" data="36-49">10</option> <option value="26-35" data="26-35">30</option> <option value="24-32" data="18-24">50</option> <option value="20-28" data="12-16">75</option> <option value="20-28" data="9-12">100</option> <option value="19-25" data="6.7-9.1">150</option> <option value="16-22" data="4.8-6.5">200</option> <option value="14-20" data="3.1-4.2">300</option> <option value="14-18" data="2.3-3.2">400</option> <option value="13-17" data="1.8-2.4">500</option> <option value="10-14" data="1.2-1.6">600</option> <option value="9-13" data="0.8-1.1">700</option> <option value="9-12" data="0.7-0.9">800</option> <option value="8-10" data="0.5-0.7">900</option> <option value="7-9" data="0.4-0.6">1000</option> </select>  
+                     <select name="typeOfMaterialDimensions12" id="typeOfMaterialDimensions12" style="display: none;"> <option value="55-75" data="196-265">10</option> <option value="54-72" data="123-167">30</option> <option value="50-68" data="89-120">50</option> <option value="46-62" data="77-104">75</option> <option value="46-62" data="86-116">100</option> <option value="42-56" data="49-67">150</option> <option value="37-51" data="36-49">200</option> <option value="36-48" data="24-32">300</option> <option value="32-44" data="17-23">400</option> <option value="29-39" data="12-16">500</option> <option value="28-38" data="8.2-11">600</option> <option value="27-37" data="6-8.1">700</option> <option value="26-36" data="5.2-7">800</option> <option value="26-35" data="4-5.4">900</option> <option value="25-33" data="2.9-3.9">1000</option> <option value="23-31" data="2.1-2.8">1200</option> <option value="21-29" data="1.3-1.7">1500</option> <option value="20-26" data="0.8-1.1">2000</option> </select> 
+                     <select name="typeOfMaterialDimensions13" id="typeOfMaterialDimensions13" style="display: none;"> <option value="102-138" data="482-652">10</option> <option value="102-138" data="366-495">30</option> <option value="102-138" data="281-381">50</option> <option value="102-138" data="190-257">75</option> <option value="102-138" data="183-247">100</option> <option value="102-138" data="126-170">150</option> <option value="102-138" data="121-163">200</option> <option value="102-138" data="84-114">300</option> <option value="102-138" data="70-95">400</option> <option value="102-138" data="54-73">500</option> <option value="102-138" data="43-59">600</option> <option value="102-138" data="37-50">700</option> <option value="102-138" data="32-43">800</option> <option value="102-138" data="28-38">900</option> <option value="102-138" data="24-33">1000</option> <option value="102-138" data="20-27">1200</option> <option value="102-138" data="16-22">1500</option> <option value="102-138" data="12-16">2000</option> </select> 
+                     <select name="typeOfMaterialDimensions14" id="typeOfMaterialDimensions14" style="display: none;"> <option value="2125-2875" data="10047-13593">10</option> <option value="2125-2875" data="4354-5890">30</option> <option value="2125-2875" data="2930-3965">50</option> <option value="2125-2875" data="2051-2775">75</option> <option value="2125-2875" data="1905-2577">100</option> <option value="1955-2645" data="1348-1824">150</option> <option value="1870-2530" data="1068-1445">200</option> <option value="1785-2415" data="738-999">300</option> <option value="1700-2300" data="527-714">400</option> <option value="1530-2070" data="326-440">500</option> <option value="1275-1725" data="217-297">600</option> <option value="1105-1495" data="126-171">700</option> <option value="1105-1495" data="109-147">800</option> <option value="935-1265" data="92-125">900</option> <option value="850-1150" data="67-91">1000</option> <option value="765-1035" data="54-73">1200</option> <option value="595-805" data="30-41">1500</option> <option value="510-690" data="12-16">2000</option> </select> 
+                     <select name="typeOfMaterialDimensions15" id="typeOfMaterialDimensions15" style="display: none;"> <option value="102-138" data="257-348">10</option> <option value="102-138" data="183-247">30</option> <option value="102-138" data="121-163">50</option> <option value="95-129" data="75-101">75</option> <option value="95-129" data="72-98">100</option> <option value="92-124" data="66-89">150</option> <option value="88-120" data="51-68">200</option> <option value="82-110" data="36-49">300</option> <option value="75-101" data="21-28">400</option> <option value="68-92" data="13-17">500</option> <option value="61-83" data="10-14">600</option> <option value="58-78" data="8-10.8">700</option> <option value="54-74" data="6.4-8.7">800</option> <option value="51-69" data="5.4-7.3">900</option> <option value="48-64" data="4.7-6.3">1000</option> <option value="46-62" data="3.6-4.9">1200</option> <option value="44-60" data="2.6-3.5">1500</option> <option value="43-58" data="1.7-2.3">2000</option> </select> 
+                     <select name="typeOfMaterialDimensions16" id="typeOfMaterialDimensions16" style="display: none;"> <option value="136-184" data="450-609">10</option> <option value="136-184" data="258-349">30</option> <option value="138-184" data="171-232">50</option> <option value="131-177" data="126-171">75</option> <option value="131-177" data="108-147">100</option> <option value="126-170" data="69-94">150</option> <option value="119-161" data="45-60">200</option> <option value="107-145" data="32-43">300</option> <option value="97-131" data="20-27">400</option> <option value="88-120" data="14-19">500</option> <option value="82-110" data="11-15">600</option> <option value="78-106" data="8.3-11">700</option> <option value="75-101" data="7.4-10">800</option> <option value="71-97" data="6.5-8.8">900</option> <option value="68-92" data="5.6-7.6">1000</option> <option value="64-86" data="4.5-6.1">1200</option> <option value="60-81" data="4-5.4">1500</option> <option value="55-75" data="2.8-3.8">2000</option> </select> 
+                     <select name="typeOfMaterialDimensions17" id="typeOfMaterialDimensions17" style="display: none;"> <option value="40-54" data="69-94">10</option> <option value="38-52" data="51-69">30</option> <option value="36-48" data="35-45">50</option> <option value="32-44" data="20-27">75</option> <option value="32-44" data="19-25">100</option> <option value="31-41" data="14-19">150</option> <option value="28-38" data="12-16">200</option> <option value="25-33" data="7-9.5">300</option> <option value="24-32" data="5.1-6.9">400</option> <option value="23-31" data="4-5.4">500</option> <option value="21-29" data="3.2-4.3">600</option> <option value="20-28" data="2.4-3.3">700</option> <option value="20-26" data="2.2-2.9">800</option> <option value="19-25" data="1.8-2.5">900</option> <option value="18-24" data="1.5-2.1">1000</option> </select>
+                     <span><b class="font-bold">mm</b></span>
+                  </label>
+               </div>
+            </div>
+           
+            <div class="row">
+               <div class="col-6 col-sm-6">
+                  <p><b class="font-bold">Recommended Cutting Speed</b></p>
+               </div>
+               <div class="col-6 col-sm-6">
+                  <label><div id="cuttingSpeed" class="cs_label"></div><div id="cuttingSpeed1" class="cs_label" style="display: none;"></div><div id="cuttingSpeed2" class="cs_label" style="display: none;"></div><div id="cuttingSpeed3" class="cs_label" style="display: none;"></div><div id="cuttingSpeed4" class="cs_label" style="display: none;"></div><div id="cuttingSpeed5" class="cs_label" style="display: none;"></div><div id="cuttingSpeed6" class="cs_label" style="display: none;"></div><div id="cuttingSpeed7" class="cs_label" style="display: none;"></div><div id="cuttingSpeed8" class="cs_label" style="display: none;"></div><div id="cuttingSpeed9" class="cs_label" style="display: none;"></div><div id="cuttingSpeed10" class="cs_label" style="display: none;"></div><div id="cuttingSpeed11" class="cs_label" style="display: none;"></div><div id="cuttingSpeed12" class="cs_label" style="display: none;"></div><div id="cuttingSpeed13" class="cs_label" style="display: none;"></div><div id="cuttingSpeed14" class="cs_label" style="display: none;"></div><div id="cuttingSpeed15" class="cs_label" style="display: none;"></div><div id="cuttingSpeed16" class="cs_label" style="display: none;"></div><div id="cuttingSpeed17" class="cs_label" style="display: none;"></div><span><b class="font-bold">m/min</b></span></label>
+               </div>
+               <div class="col-6 col-sm-6">
+                  <p><b class="font-bold">Recommended Feed Rate</b></p>
+               </div>
+               <div class="col-6 col-sm-6">
+                  <label><div id="feedRate" class="fr_label"></div><div id="feedRate1" class="fr_label" style="display: none;"></div><div id="feedRate2" class="fr_label" style="display: none;"></div><div id="feedRate3" class="fr_label" style="display: none;"></div><div id="feedRate4" class="fr_label" style="display: none;"></div><div id="feedRate5" class="fr_label" style="display: none;"></div><div id="feedRate6" class="fr_label" style="display: none;"></div><div id="feedRate7" class="fr_label" style="display: none;"></div><div id="feedRate8" class="fr_label" style="display: none;"></div><div id="feedRate9" class="fr_label" style="display: none;"></div><div id="feedRate10" class="fr_label" style="display: none;"></div><div id="feedRate11" class="fr_label" style="display: none;"></div><div id="feedRate12" class="fr_label" style="display: none;"></div><div id="feedRate13" class="fr_label" style="display: none;"></div><div id="feedRate14" class="fr_label" style="display: none;"></div><div id="feedRate15" class="fr_label" style="display: none;"></div><div id="feedRate16" class="fr_label" style="display: none;"></div><div id="feedRate17" class="fr_label" style="display: none;"></div><span><b class="font-bold">mm/min</b></span></label>
+               </div>
+            </div> 
+           
+            <div class="btn-wrapper">
+               <button id="btn" class="btn" onclick="calculateBMI()">Calculate</button>
+               <!--button id="clearBtn" class="btn" onclick="ClearFields()">Clear</button-->
+            </div>
+            <div class="contact_us_call font-bold"> <i class="fa fa-phone" aria-hidden="true"></i> Having trouble? Call us on <a href="tel:+61355514555">+61 (03) 5551 4555</a></div>
+            </div>
+            </div> 
+         </div>
+       </div>
+     </div>
+    </div>
+  </div>
+</div>
+ 
+<div class="template-product cc-calculator-page-sec simple-lazyload">
+  <div class="grid grid-border">
+    <div class="related-article__outer-wrapper">
+       <div class="sppbp__outer-wrapper">
+        <div class="container dt-prl-30 single-product-page-blog-posts lazyload-element">
+         <div class="sppbp__inner">
+            <h2 class="related_article_heading">Resources</h2>
+             <div class="grid-uniform_none blog-items rla_regular">
+              {% for article in blogs.learning-centre.articles limit:44 %}
+                {% if article.tags contains "Bandsaw Blades" %} 
+                  {% include 'product-articles-by-tag' %}     
+                  {% endif %}
+              {% endfor %}
+             </div>
+           </div>
+         </div>
+       </div>
+    </div>
+  </div>
+</div> 
+
+<script>
+  document.getElementById('typeOfMaterial').addEventListener('change', function () {
+    var style = this.value == 0 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions').style.display = style;
+    document.getElementById('cuttingSpeed').style.display = style;
+    document.getElementById('feedRate').style.display = style;
+    
+    var style1 = this.value == 1 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions1').style.display = style1;
+    document.getElementById('cuttingSpeed1').style.display = style1;
+    document.getElementById('feedRate1').style.display = style1;
+    
+    var style2 = this.value == 2 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions2').style.display = style2;
+    document.getElementById('cuttingSpeed2').style.display = style2;
+    document.getElementById('feedRate2').style.display = style2;
+    
+    var style3 = this.value == 3 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions3').style.display = style3;
+    document.getElementById('cuttingSpeed3').style.display = style3;
+    document.getElementById('feedRate3').style.display = style3; 
+
+    var style4 = this.value == 4 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions4').style.display = style4;
+    document.getElementById('cuttingSpeed4').style.display = style4;
+    document.getElementById('feedRate4').style.display = style4;
+    
+    var style5 = this.value == 5 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions5').style.display = style5;
+    document.getElementById('cuttingSpeed5').style.display = style5;
+    document.getElementById('feedRate5').style.display = style5;
+    
+    var style6 = this.value == 6 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions6').style.display = style6;
+    document.getElementById('cuttingSpeed6').style.display = style6;
+    document.getElementById('feedRate6').style.display = style6;
+    
+    var style7 = this.value == 7 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions7').style.display = style7;
+    document.getElementById('cuttingSpeed7').style.display = style7;
+    document.getElementById('feedRate7').style.display = style7;
+    
+    var style8 = this.value == 8 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions8').style.display = style8;
+    document.getElementById('cuttingSpeed8').style.display = style8;
+    document.getElementById('feedRate8').style.display = style8;
+    
+    var style9 = this.value == 9 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions9').style.display = style9;
+    document.getElementById('cuttingSpeed9').style.display = style9;
+    document.getElementById('feedRate9').style.display = style9;
+    
+    var style10 = this.value == 10 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions10').style.display = style10;
+    document.getElementById('cuttingSpeed10').style.display = style10;
+    document.getElementById('feedRate10').style.display = style10;
+    
+    var style11 = this.value == 11 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions11').style.display = style11;
+    document.getElementById('cuttingSpeed11').style.display = style11;
+    document.getElementById('feedRate11').style.display = style11;
+    
+    var style12 = this.value == 12 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions12').style.display = style12;
+    document.getElementById('cuttingSpeed12').style.display = style12;
+    document.getElementById('feedRate12').style.display = style12;
+    
+    var style13 = this.value == 13 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions13').style.display = style13;
+    document.getElementById('cuttingSpeed13').style.display = style13;
+    document.getElementById('feedRate13').style.display = style13;
+    
+    var style14 = this.value == 14 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions14').style.display = style14;
+    document.getElementById('cuttingSpeed14').style.display = style14;
+    document.getElementById('feedRate14').style.display = style14;
+    
+    var style15 = this.value == 15 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions15').style.display = style15;
+    document.getElementById('cuttingSpeed15').style.display = style15;
+    document.getElementById('feedRate15').style.display = style15;
+    
+    var style16 = this.value == 16 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions16').style.display = style16;
+    document.getElementById('cuttingSpeed16').style.display = style16;
+    document.getElementById('feedRate16').style.display = style16;
+    
+    var style17 = this.value == 17 ? 'block' : 'none';
+    document.getElementById('typeOfMaterialDimensions17').style.display = style17;
+    document.getElementById('cuttingSpeed17').style.display = style17;
+    document.getElementById('feedRate17').style.display = style17;
+});
+  
+/*function ClearFields() {
+     document.getElementById("typeOfMaterial").value = "0";
+     document.getElementById("typeOfMaterialDimensions").value = "0";
+     document.getElementById("cuttingSpeed").innerHTML = "";
+     document.getElementById("feedRate").innerHTML = "";
+     document.getElementById("typeOfMaterialDimensions1").value = "1";
+     document.getElementById("cuttingSpeed1").innerHTML = "";
+     document.getElementById("feedRate1").innerHTML = "";
+     document.getElementById("typeOfMaterialDimensions2").value = "2";
+     document.getElementById("cuttingSpeed2").innerHTML = "";
+     document.getElementById("feedRate2").innerHTML = "";
+     document.getElementById("typeOfMaterialDimensions3").value = "3";
+     document.getElementById("cuttingSpeed3").innerHTML = "";
+     document.getElementById("feedRate3").innerHTML = "";
+     document.getElementById("typeOfMaterialDimensions4").value = "4";
+     document.getElementById("cuttingSpeed4").innerHTML = "";
+     document.getElementById("feedRate4").innerHTML = "";
+     document.getElementById("typeOfMaterialDimensions5").value = "5";
+     document.getElementById("cuttingSpeed5").innerHTML = "";
+     document.getElementById("feedRate5").innerHTML = "";
+     document.getElementById("typeOfMaterialDimensions6").value = "6";
+     document.getElementById("cuttingSpeed6").innerHTML = "";
+     document.getElementById("feedRate6").innerHTML = "";
+       document.getElementById("typeOfMaterialDimensions7").value = "7";
+     document.getElementById("cuttingSpeed7").innerHTML = "";
+     document.getElementById("feedRate7").innerHTML = "";
+       document.getElementById("typeOfMaterialDimensions8").value = "8";
+     document.getElementById("cuttingSpeed8").innerHTML = "";
+     document.getElementById("feedRate8").innerHTML = "";
+       document.getElementById("typeOfMaterialDimensions9").value = "9";
+     document.getElementById("cuttingSpeed9").innerHTML = "";
+     document.getElementById("feedRate9").innerHTML = "";
+       document.getElementById("typeOfMaterialDimensions10").value = "10";
+     document.getElementById("cuttingSpeed10").innerHTML = "";
+     document.getElementById("feedRate10").innerHTML = "";
+       document.getElementById("typeOfMaterialDimensions11").value = "11";
+     document.getElementById("cuttingSpeed11").innerHTML = "";
+     document.getElementById("feedRate11").innerHTML = "";
+       document.getElementById("typeOfMaterialDimensions12").value = "12";
+     document.getElementById("cuttingSpeed12").innerHTML = "";
+     document.getElementById("feedRate12").innerHTML = "";
+       document.getElementById("typeOfMaterialDimensions13").value = "13";
+     document.getElementById("cuttingSpeed13").innerHTML = "";
+     document.getElementById("feedRate13").innerHTML = "";
+       document.getElementById("typeOfMaterialDimensions14").value = "14";
+     document.getElementById("cuttingSpeed14").innerHTML = "";
+     document.getElementById("feedRate14").innerHTML = "";
+       document.getElementById("typeOfMaterialDimensions15").value = "15";
+     document.getElementById("cuttingSpeed15").innerHTML = "";
+     document.getElementById("feedRate15").innerHTML = "";
+       document.getElementById("typeOfMaterialDimensions16").value = "16";
+     document.getElementById("cuttingSpeed16").innerHTML = "";
+     document.getElementById("feedRate16").innerHTML = "";
+       document.getElementById("typeOfMaterialDimensions17").value = "17";
+     document.getElementById("cuttingSpeed17").innerHTML = "";
+     document.getElementById("feedRate17").innerHTML = "";
+}*/
+
+function calculateBMI() {
+    let typeOfMaterialDimensions = document.getElementById("typeOfMaterialDimensions");    
+    let typeOfMaterialDimensionsVal = typeOfMaterialDimensions.value;    
+    let cuttingSpeed = document.querySelector("#cuttingSpeed");    
+    cuttingSpeed.innerHTML = typeOfMaterialDimensionsVal;  
+    let feedRate = document.querySelector("#feedRate");
+    feedRate.innerHTML = typeOfMaterialDimensions.options[typeOfMaterialDimensions.selectedIndex].getAttribute("data");
+   
+    let typeOfMaterialDimensions1 = document.getElementById("typeOfMaterialDimensions1");    
+    let typeOfMaterialDimensionsVal1 = typeOfMaterialDimensions1.value;    
+    let cuttingSpeed1 = document.querySelector("#cuttingSpeed1");    
+    cuttingSpeed1.innerHTML = typeOfMaterialDimensionsVal1;  
+    let feedRate1 = document.querySelector("#feedRate1");
+    feedRate1.innerHTML = typeOfMaterialDimensions1.options[typeOfMaterialDimensions1.selectedIndex].getAttribute("data");
+
+    let typeOfMaterialDimensions2 = document.getElementById("typeOfMaterialDimensions2");    
+    let typeOfMaterialDimensionsVal2 = typeOfMaterialDimensions2.value;    
+    let cuttingSpeed2 = document.querySelector("#cuttingSpeed2");    
+    cuttingSpeed2.innerHTML = typeOfMaterialDimensionsVal2;  
+    let feedRate2 = document.querySelector("#feedRate2");
+    feedRate2.innerHTML = typeOfMaterialDimensions2.options[typeOfMaterialDimensions2.selectedIndex].getAttribute("data");
+
+    let typeOfMaterialDimensions3 = document.getElementById("typeOfMaterialDimensions3");    
+    let typeOfMaterialDimensionsVal3 = typeOfMaterialDimensions3.value;    
+    let cuttingSpeed3 = document.querySelector("#cuttingSpeed3");    
+    cuttingSpeed3.innerHTML = typeOfMaterialDimensionsVal3;  
+    let feedRate3 = document.querySelector("#feedRate3");
+    feedRate3.innerHTML = typeOfMaterialDimensions3.options[typeOfMaterialDimensions3.selectedIndex].getAttribute("data");
+ 
+    let typeOfMaterialDimensions4 = document.getElementById("typeOfMaterialDimensions4");    
+    let typeOfMaterialDimensionsVal4 = typeOfMaterialDimensions4.value;    
+    let cuttingSpeed4 = document.querySelector("#cuttingSpeed4");    
+    cuttingSpeed4.innerHTML = typeOfMaterialDimensionsVal4;  
+    let feedRate4 = document.querySelector("#feedRate4");
+    feedRate4.innerHTML = typeOfMaterialDimensions4.options[typeOfMaterialDimensions4.selectedIndex].getAttribute("data");
+
+    let typeOfMaterialDimensions5 = document.getElementById("typeOfMaterialDimensions5");    
+    let typeOfMaterialDimensionsVal5 = typeOfMaterialDimensions5.value;    
+    let cuttingSpeed5 = document.querySelector("#cuttingSpeed5");    
+    cuttingSpeed5.innerHTML = typeOfMaterialDimensionsVal5;  
+    let feedRate5 = document.querySelector("#feedRate5");
+    feedRate5.innerHTML = typeOfMaterialDimensions5.options[typeOfMaterialDimensions5.selectedIndex].getAttribute("data");
+
+    let typeOfMaterialDimensions6 = document.getElementById("typeOfMaterialDimensions6");    
+    let typeOfMaterialDimensionsVal6 = typeOfMaterialDimensions6.value;    
+    let cuttingSpeed6 = document.querySelector("#cuttingSpeed6");    
+    cuttingSpeed6.innerHTML = typeOfMaterialDimensionsVal6;  
+    let feedRate6 = document.querySelector("#feedRate6");
+    feedRate6.innerHTML = typeOfMaterialDimensions6.options[typeOfMaterialDimensions6.selectedIndex].getAttribute("data");
+
+    let typeOfMaterialDimensions7 = document.getElementById("typeOfMaterialDimensions7");    
+    let typeOfMaterialDimensionsVal7 = typeOfMaterialDimensions7.value;    
+    let cuttingSpeed7 = document.querySelector("#cuttingSpeed7");    
+    cuttingSpeed7.innerHTML = typeOfMaterialDimensionsVal7;  
+    let feedRate7 = document.querySelector("#feedRate7");
+    feedRate7.innerHTML = typeOfMaterialDimensions7.options[typeOfMaterialDimensions7.selectedIndex].getAttribute("data");
+
+    let typeOfMaterialDimensions8 = document.getElementById("typeOfMaterialDimensions8");    
+    let typeOfMaterialDimensionsVal8 = typeOfMaterialDimensions8.value;    
+    let cuttingSpeed8 = document.querySelector("#cuttingSpeed8");    
+    cuttingSpeed8.innerHTML = typeOfMaterialDimensionsVal8;  
+    let feedRate8 = document.querySelector("#feedRate8");
+    feedRate8.innerHTML = typeOfMaterialDimensions8.options[typeOfMaterialDimensions8.selectedIndex].getAttribute("data");
+
+    let typeOfMaterialDimensions9 = document.getElementById("typeOfMaterialDimensions9");    
+    let typeOfMaterialDimensionsVal9 = typeOfMaterialDimensions9.value;    
+    let cuttingSpeed9 = document.querySelector("#cuttingSpeed9");    
+    cuttingSpeed9.innerHTML = typeOfMaterialDimensionsVal9;  
+    let feedRate9 = document.querySelector("#feedRate9");
+    feedRate9.innerHTML = typeOfMaterialDimensions9.options[typeOfMaterialDimensions9.selectedIndex].getAttribute("data");
+
+    let typeOfMaterialDimensions10 = document.getElementById("typeOfMaterialDimensions10");    
+    let typeOfMaterialDimensionsVal10 = typeOfMaterialDimensions10.value;    
+    let cuttingSpeed10 = document.querySelector("#cuttingSpeed10");    
+    cuttingSpeed10.innerHTML = typeOfMaterialDimensionsVal10;  
+    let feedRate10 = document.querySelector("#feedRate10");
+    feedRate10.innerHTML = typeOfMaterialDimensions10.options[typeOfMaterialDimensions10.selectedIndex].getAttribute("data");
+
+    let typeOfMaterialDimensions11 = document.getElementById("typeOfMaterialDimensions11");    
+    let typeOfMaterialDimensionsVal11 = typeOfMaterialDimensions11.value;    
+    let cuttingSpeed11 = document.querySelector("#cuttingSpeed11");    
+    cuttingSpeed11.innerHTML = typeOfMaterialDimensionsVal11;  
+    let feedRate11 = document.querySelector("#feedRate11");
+    feedRate11.innerHTML = typeOfMaterialDimensions11.options[typeOfMaterialDimensions11.selectedIndex].getAttribute("data");
+
+    let typeOfMaterialDimensions12 = document.getElementById("typeOfMaterialDimensions12");    
+    let typeOfMaterialDimensionsVal12 = typeOfMaterialDimensions12.value;    
+    let cuttingSpeed12 = document.querySelector("#cuttingSpeed12");    
+    cuttingSpeed12.innerHTML = typeOfMaterialDimensionsVal12;  
+    let feedRate12 = document.querySelector("#feedRate12");
+    feedRate12.innerHTML = typeOfMaterialDimensions12.options[typeOfMaterialDimensions12.selectedIndex].getAttribute("data");
+
+    let typeOfMaterialDimensions13 = document.getElementById("typeOfMaterialDimensions13");    
+    let typeOfMaterialDimensionsVal13 = typeOfMaterialDimensions13.value;    
+    let cuttingSpeed13 = document.querySelector("#cuttingSpeed13");    
+    cuttingSpeed13.innerHTML = typeOfMaterialDimensionsVal13;  
+    let feedRate13 = document.querySelector("#feedRate13");
+    feedRate13.innerHTML = typeOfMaterialDimensions13.options[typeOfMaterialDimensions13.selectedIndex].getAttribute("data");
+
+    let typeOfMaterialDimensions14 = document.getElementById("typeOfMaterialDimensions14");    
+    let typeOfMaterialDimensionsVal14 = typeOfMaterialDimensions14.value;    
+    let cuttingSpeed14 = document.querySelector("#cuttingSpeed14");    
+    cuttingSpeed14.innerHTML = typeOfMaterialDimensionsVal14;  
+    let feedRate14 = document.querySelector("#feedRate14");
+    feedRate14.innerHTML = typeOfMaterialDimensions14.options[typeOfMaterialDimensions14.selectedIndex].getAttribute("data");
+
+    let typeOfMaterialDimensions15 = document.getElementById("typeOfMaterialDimensions15");    
+    let typeOfMaterialDimensionsVal15 = typeOfMaterialDimensions15.value;    
+    let cuttingSpeed15 = document.querySelector("#cuttingSpeed15");    
+    cuttingSpeed15.innerHTML = typeOfMaterialDimensionsVal15;  
+    let feedRate15 = document.querySelector("#feedRate15");
+    feedRate15.innerHTML = typeOfMaterialDimensions15.options[typeOfMaterialDimensions15.selectedIndex].getAttribute("data");
+
+    let typeOfMaterialDimensions16 = document.getElementById("typeOfMaterialDimensions16");    
+    let typeOfMaterialDimensionsVal16 = typeOfMaterialDimensions16.value;    
+    let cuttingSpeed16 = document.querySelector("#cuttingSpeed16");    
+    cuttingSpeed16.innerHTML = typeOfMaterialDimensionsVal16;  
+    let feedRate16 = document.querySelector("#feedRate16");
+    feedRate16.innerHTML = typeOfMaterialDimensions16.options[typeOfMaterialDimensions16.selectedIndex].getAttribute("data");
+
+    let typeOfMaterialDimensions17 = document.getElementById("typeOfMaterialDimensions17");    
+    let typeOfMaterialDimensionsVal17 = typeOfMaterialDimensions17.value;    
+    let cuttingSpeed17 = document.querySelector("#cuttingSpeed17");    
+    cuttingSpeed17.innerHTML = typeOfMaterialDimensionsVal17;  
+    let feedRate17 = document.querySelector("#feedRate17");
+    feedRate17.innerHTML = typeOfMaterialDimensions17.options[typeOfMaterialDimensions17.selectedIndex].getAttribute("data");
+}
+</script> 
+ 
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.5.9/slick.min.css'>
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.5.9/slick-theme.min.css'>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js'></script> 
+<script> 
+    $(document).ready(function(){  
+      $(".rla_regular").slick({
+        dots: false,
+        arrows: true,
+        infinite: false,
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        nextArrow: '<i class="fa fa-angle-right slick-next"></i>',
+        prevArrow: '<i class="fa fa-angle-left slick-prev"></i>',
+        responsive: [
+        {
+          breakpoint: 1024,
+          settings: {
+            slidesToShow: 2,
+            slidesToScroll: 1,
+            dots: true,
+            arrows: false
+          }
+        },
+        {
+          breakpoint: 600,
+          settings: {
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            dots: true,
+            arrows: false
+          }
+        }
+      ]
+      });
+    });
+</script>
+
+<style>
+div.grid {margin: 0px !important;}
+  
+  .coolant_concentration_calculater {
+      width: 100%;
+      padding: 40px 40px 20px;
+      background: white;
+      border-radius: 15px;
+  }
+  .coolant_concentration_calculater label{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+  .coolant_concentration_calculater label input {
+      margin-bottom: 0;
+      border-bottom: 2px solid #f1f1f1;
+      background: transparent;
+  }
+  #topUpAmount {
+      width: 100%;
+      background: #f1f1f1;
+      padding: 5px 10px;
+      height: 36px;
+      font-weight: 600;  
+      overflow: hidden;
+      border-radius: 10px;
+    
+  }
+  #actualConcentration {
+      width: 100%;
+      background: #f1f1f1;
+      padding: 5px 10px;
+      height: 36px;
+      font-weight: 600;  
+      overflow: hidden;
+      border-radius: 10px;
+    
+  }
+  #topUpRatio {
+      width: 100%;
+      background: #f1f1f1;
+      padding: 5px 10px;
+      height: 36px;
+      font-weight: 600; 
+      overflow: hidden;
+      border-radius: 10px;
+    
+  }
+  #concentrateAmount{
+      width: 100%;
+      background: #f1f1f1;
+      padding: 5px 10px;
+      height: 36px;
+      font-size: 18px;
+      font-weight: 700;  
+      overflow: hidden;
+      border-radius: 10px;
+      
+  }
+  #waterAmount {
+      width: 100%;
+      background: #f1f1f1;
+      padding: 5px 10px;
+      height: 36px;
+      font-size: 18px;
+      font-weight: 700;  
+      overflow: hidden;
+      border-radius: 10px;
+  }
+  .col-sm-8 p {
+    color: black;
+  }
+  .coolant_concentration_calculater label span {
+      width: auto;
+      text-align: left;
+      padding-left: 5px;
+  }
+  .coolant_concentration_calculater .col-sm-4 select{
+      text-align: left;
+  }
+  .coolant_concentration_calculater .col-sm-4,
+  .coolant_concentration_calculater .col-sm-4 input {
+      text-align: right; 
+  }
+  .main-content h1 {
+    color: white;
+  }
+  #error_msg p {
+      color: red;
+      font-weight: 500;
+      line-height: 20px;
+      padding: 10px 0 0;
+  }
+  .row.hidden_val {
+      display: none;
+  }
+  .row.hidden_val > div{
+      display: block;
+      width:100%;
+  }
+  .coolant_concentration_calculater .btn-wrapper {
+      width: 100%;
+      text-align: center;
+      margin-top: 40px;
+      margin-bottom: 40px;
+  }
+  .coolant_concentration_calculater .btn {
+      background-color: #e0592a;
+      color: #fff;
+      min-width: 150px;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 1rem;
+  }
+  .coolant_concentration_calculater .btn:hover {
+      background-color: #e3693f;
+      color: #fff;
+  }
+  p a {
+    border-bottom: 2px solid #e0592a;
+  }
+  #clearBtn{
+     margin-left: 15px;
+    background: transparent;
+    border: 2px solid #f1f1f1;
+    color: black;
+  }
+  #clearBtn:hover {
+     margin-left: 15px;
+    background: #f1f1f1;
+    border: 2px solid #f1f1f1;
+  }
+  .cs_label, .fr_label{
+    width:100%;
+    text-align: left;
+    padding: 0 14px;  
+  }
+  @media (max-width: 350px) {
+    .coolant_concentration_calculater .btn-wrapper button {
+        width: 85%;
+        margin: 0 0 15px 0 !importa;
+    } 
+  }
+  
+  @media (min-width: 768px) {
+    .coolant_concentration_calculater{
+        margin: 0 auto;
+    }
+  }
+</style>
+

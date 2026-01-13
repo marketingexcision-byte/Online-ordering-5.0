@@ -1,0 +1,198 @@
+<section class="hero-banner simple-lazyload">
+  <div class="breadcrumbs-wrapper">
+    <div class="breadcrumbs container dt-prl-30">
+      <div class="row">
+        <div class="col-md-12 lazyload-element">
+          <div class="w-btn-wrapper">
+            <a class="w-btn icon_atleft" href="javascript:history.back();" id="back-button">
+              <span class="w-btn-label font-bold"><em>←</em> Back</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container dt-prl-30">
+    <div class="row ">
+      <div class="col-md-7 lazyload-element">
+        <div class="placeholder">
+          <h1>{{ page.title }}</h1>
+          <p></p>
+        </div>
+      </div>
+      <div class="col-md-1"></div>
+      <div class="col-md-4 animated fadeIn"></div>
+    </div>
+  </div>
+</section>
+
+<div class="container dt-prl-30">
+  <div id="compare-table">
+    <p>Loading comparison...</p>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  const container = document.getElementById("compare-table");
+  let handles = JSON.parse(localStorage.getItem("compareList")) || [];
+
+  const render = async () => {
+    if (!handles.length) {
+      container.innerHTML = "<p>No products selected for comparison.</p>";
+      return;
+    }
+
+    const products = await Promise.all(
+      handles.map(handle =>
+        fetch(`/products/${handle}.js`).then(res => res.ok ? res.json() : null)
+      )
+    );
+    const validProducts = products.filter(Boolean);
+
+    const allAttributes = new Set();
+    const productAttributes = validProducts.map(p => {
+      const attributes = {};
+      p.tags.forEach(tag => {
+        const parts = tag.split("_");
+        if (parts.length === 2) {
+          const [key, value] = parts;
+          attributes[key] = value;
+          allAttributes.add(key);
+        }
+      });
+      return attributes;
+    });
+
+    // Build table
+    let html = '<div style="overflow-x: auto;"><table border="1" cellspacing="0" cellpadding="8"><thead><tr><th style="font-family: \'Humanist777Bt-Bold\'; font-size: x-large;">Attribute</th>';
+
+    validProducts.forEach((p, i) => {
+      html += `<th style="text-align:center; width: 25%;">
+        <div style="display: flex; justify-content: space-between; flex-direction: column; align-items: center; margin-bottom: 20px; min-height: 535px;">
+          <img src="${p.featured_image}" style="max-width: 100%; background: #f1f1f1; border-radius: 10px; margin-bottom: 20px;">
+          <strong style="font-size: x-large; margin-bottom: 20px;">${p.title}</strong>
+          <a href="${p.url}" target="_blank" class="button" style="margin-bottom: 20px; color: black; justify-content: center; border: 2px solid #e0592a; font-weight: 400;">View Product</a>
+          <button data-index="${i}" class="remove-compare" style="background: white; border: none; border-bottom: 2px solid black;">Remove from comparison</button>
+        </div>
+      </th>`;
+    });
+
+    html += '</tr></thead><tbody>';
+
+Array.from(allAttributes).sort().forEach(attr => {
+  html += `<tr><td><strong >${attr}</strong></td>`;
+  const values = productAttributes.map(attrs => attrs[attr] || '-');
+  const allSame = values.every(v => v === values[0]);
+  values.forEach(value => {
+    const style = allSame ? '' : ' style="background: #f1f1f1;"';
+    const valueStr = String(value);
+    let icon = '';
+
+    if (valueStr.includes('Excellent')) {
+      icon = '<img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Black_Excellent.png?v=1737001898" alt="Excellent" style="height: 16px; margin-right: 8px; vertical-align: middle; margin-top: -2px;">';
+    } else if (valueStr.includes('Great')) {
+      icon = '<img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Black_Great.png?v=1737001899" alt="Great" style="height: 16px; margin-right: 8px; vertical-align: middle; margin-top: -2px;">';
+    } else if (valueStr.includes('Good')) {
+      icon = '<img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Black_Good.png?v=1737001888" alt="Good" style="height: 16px; margin-right: 8px; vertical-align: middle; margin-top: -2px;">';
+    }
+
+    html += `<td${style}>${icon}${valueStr}</td>`;
+  });
+
+  // ✅ ADD THIS LINE:
+  html += '</tr>';
+});
+
+
+
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+
+    // Attach remove buttons
+    document.querySelectorAll('.remove-compare').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const index = parseInt(this.dataset.index);
+        handles.splice(index, 1);
+        localStorage.setItem("compareList", JSON.stringify(handles));
+        render();
+      });
+    });
+  };
+
+  // Attach clear all button listener here
+  const clearBtn = document.getElementById("clear-compare");
+  if (clearBtn) {
+    clearBtn.addEventListener("click", function () {
+      localStorage.removeItem("compareList");
+      handles = [];
+      render();
+    });
+  }
+
+  render();
+});
+</script>
+
+<div class="container dt-prl-30" style="text-align: right; margin-bottom: 20px;">
+  <button class="button" id="clear-compare" style="background: white; border: 2px solid black;">Clear All</button>
+</div>
+
+<style>
+  td {
+    border: 0px solid white;
+    border-bottom: 2px solid #e8e8e8 !important;
+  }
+
+  th {
+    border-bottom: 2px solid #e8e8e8 !important;
+  }
+
+  #compare-table {
+    margin-bottom: 40px;
+  }
+
+  #compare-table table {
+    min-width: 800px;
+    border-collapse: collapse;
+    border: 0px;
+  }
+
+  #compare-table::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  #compare-table::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+  }
+
+  button.button {
+    padding: 10px 15px;
+    border-radius: 25px;
+    font-weight: 400;
+        line-height: 1;
+    display: flex;
+    height: 40px;
+    align-items: center;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const referrer = document.referrer;
+    if (referrer) {
+      fetch(referrer)
+        .then(response => response.text())
+        .then(html => {
+          const doc = new DOMParser().parseFromString(html, "text/html");
+          const titleElement = doc.querySelector("title");
+          if (titleElement) {
+            let title = titleElement.textContent.trim();
+            title = title.replace("– Excision Pty Ltd", "").trim();
+            document.querySelector("#back-button .w-btn-label").innerHTML = `<em>←</em> Back to ${title}`;
+          }
+        });
+    }
+  });
+</script>

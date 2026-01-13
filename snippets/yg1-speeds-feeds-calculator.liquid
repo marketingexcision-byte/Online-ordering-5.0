@@ -1,0 +1,22 @@
+{{ tables | metafield_tag }}
+
+<div id="feeds-calculator">
+  <label>Material:</label>
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <select id="material-select"></select>
+    <span id="material-icon" class="material" style="display: none;"></span>
+  </div>
+
+  <label style="margin-top: 10px;">Diameter (mm):</label>
+  <select id="diameter-select"></select>
+
+  <div id="feeds-output" style="margin-top: 10px;">
+    <p><strong>RPM:</strong> <span id="rpm">–</span></p>
+    <p><strong>FEED:</strong> <span id="feed">–</span></p>
+    <p><strong>Vc:</strong> <span id="vc">–</span></p>
+    <p><strong>Fz:</strong> <span id="fz">–</span></p>
+    <p id="operation-line" style="margin-top:10px; display: none;">
+      <strong>Operation:</strong> <span id="operation"></span>
+    </p>
+  </div>
+</div>

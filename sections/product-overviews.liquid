@@ -1,0 +1,176 @@
+<!-- Modal -->
+<div class="modal fade downloadKeyModalForm" id="myModal" role="dialog">
+   <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+         <div class="modal-body">
+            <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
+              <script>
+                hbspt.forms.create({
+                  region: "na1",
+                  portalId: "2595431",
+                  formId: "28b0e3f3-c392-4474-b7f6-a7e712e0dbc6",
+                  onFormSubmit: function ($form) {
+                    // Get the value of the first name input
+                    var firstName = $('input[name="firstname"]').val();              
+                    // Add a delay of 2 seconds (2000 milliseconds) before reloading the page
+                    setTimeout(function () {
+                      location.reload();
+                    }, 2000);
+                  },
+                });
+              </script>
+         </div>
+      </div>
+   </div>
+</div>
+
+<div class="container dt-prl-30">
+   <div class="row">      
+      <div class="col-sm-12 {{ section.settings.align_text }} lazyload-element">
+          <h2 class="section-title">{{ section.settings.title }}</h2> 
+      </div>     
+      {% if section.blocks.size > 0 %}
+        {% for block in section.blocks %}
+         <div class="col-12 col-sm-6 lazyload-element">
+           <div class="card-2 card hoverable card-product-overview">
+             {% if block.settings.image != blank %}
+              <div class="card-image">
+                <a href="{{ block.settings.card_url }}">                  
+                  	<img src="{{ block.settings.image | img_url:'grande' }}" alt="{{ block.settings.image.alt }}">                  
+                </a>
+               </div>
+              {% endif %}
+              <div class="card-content" style="min-height: 92px;">
+                 <h2>{{ block.settings.card_title }} </h2>
+                 {% if block.settings.card_text != blank %}
+                   <div class="item-info">
+                     {{ block.settings.card_text }}
+                   </div>
+                 {% endif %}
+              </div>
+              <a class="card-action setCookie" target="_blank"  style="display:none;" href="{{ block.settings.card_url }}" rel="29" onclick="downloads.openFile('{{ block.settings.card_url }}', 1); return false;" title="{{ block.settings.card_title }}">
+                 <p class="action font-bold">Download <em>→</em></p>
+              </a>
+              <a class="card-action createCookie" id="downloadKeyModalBtn" href="javascript:void(0)" onclick="saveCookie()" data-toggle="modal" data-target="#myModal" title="{{ section.settings.card_title }}">
+                <p class="action font-bold">Download <em>→</em></p>
+             </a>
+           </div>
+         </div>
+        {% endfor %}
+      {% endif %} 
+   </div>
+</div>
+
+<script>
+function setCookie(cname,cvalue,exdays) {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  let expires = "expires=" + d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+function checkCookie() {
+  let user = getCookie("username");
+  if (user != "") {
+    $('.createCookie').css("display", "none");
+    $('.setCookie').css("display", "block"); 
+  } 
+}
+function saveCookie() {
+  let user = getCookie("username");
+  if (user != "") {
+    $('.createCookie').css("display", "none");
+    $('.setCookie').css("display", "block"); 
+  } else {
+     //user = prompt("Do you want to Download this File?","Yes");
+     user = confirm("Do you want to Download this File?", "Yes");
+     if (user != "" && user != null) {
+       setCookie("username", user, 365);       
+       $('.createCookie').css("display", "block");
+       $('.setCookie').css("display", "none");
+     } else {
+       $('#myModal').css('opacity', '0'); 
+       location.reload();
+     }
+  }
+}
+</script> 
+
+{% schema %}
+  {
+    "name": "Product Overviews Page",
+    "max_blocks": 20,
+    "settings": [     
+      {
+        "type": "text",
+        "id": "section_title",
+        "label": "Section title"
+      },
+      {
+        "type": "select",
+        "id": "align_text",
+        "label": "Text alignment",
+        "default": "center",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Centered"
+          }
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "type": "product-overview",
+        "name": "Product Overview",
+        "settings": [          
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "type": "text",
+            "id": "card_title",
+            "label": "Title",
+            "default": "Title"
+          },
+          {
+            "type": "richtext",
+            "id": "card_text",
+            "label": "Text"
+          },
+          {
+            "type": "url",
+            "id": "card_url",
+            "label": "Download url"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

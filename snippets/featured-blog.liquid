@@ -1,0 +1,98 @@
+<h2 class="h3"><a href="{{ article.url }}">{{ article.title }}</a></h2>
+{% if section.settings.blog_show_date or section.settings.blog_show_author %}
+  <div class="featured-blog__meta">
+    {% if section.settings.blog_show_date %}
+      {% capture date %}<strong><time pubdate datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}">{{ article.published_at | date: format: 'date' }}</time></strong>{% endcapture %}
+    {% endif %}
+    {% if section.settings.blog_show_author %}
+      {% capture author %}<strong>{{ article.author }}</strong>{% endcapture %}
+    {% endif %}
+    {% if section.settings.blog_show_date and section.settings.blog_show_author %}
+      <p class="text-light">
+        {{ 'blogs.article.author_on_date_html' | t: author: author, date: date }}
+      </p>
+    {% elsif section.settings.blog_show_author %}
+       <p class="text-light">
+        {{ 'blogs.article.author_html' | t: author: author }}
+      </p>
+    {% elsif section.settings.blog_show_date %}
+      <p class="text-light">
+        {{ date }}
+      </p>
+    {% endif %}
+  </div>
+{% endif %}
+
+<p><a href="{{ article.url }}">{{ 'blogs.article.read_more' | t }} &rarr;</a></p>
+
+<section class="form" style="padding: 40px;">
+  <div class="form-vertical">
+    <h3 class="text-center">Subscribe To Our Newsletter</h3>
+    <p class="text-center">Promotions, new products, and sales. Directly to your inbox.</p>
+  </div>
+  <div>
+    {% form 'customer' %}
+      {{ form.errors | default_errors }}
+      {% if form.posted_successfully? %}
+        <p class="note form-success">{{ 'layout.footer.newsletter_confirmation' | t }}</p>
+      {% else %}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <div class="input-group">
+          <div class="input-with-button">
+            <input
+              type="email"
+              value="{% if customer %}{{ customer.email }}{% endif %}"
+              placeholder="{{ 'layout.footer.newsletter_email_placeholder' | t }}"
+              name="contact[email]"
+              id="Email"
+              class="input-group-field"
+              aria-label="{{ 'layout.footer.newsletter_email_placeholder' | t }}"
+              autocorrect="off"
+              autocapitalize="off"
+            >
+            <button
+              type="submit"
+              class="btn{% if button == 'secondary' %}-secondary{% endif %} btn--small"
+              name="commit"
+              id="subscribe"
+            >
+              {{ 'layout.footer.newsletter_sign_up' | t }}
+            </button>
+          </div>
+        </div>
+      {% endif %}
+    {% endform %}
+  </div>
+</section>
+
+
+<style>
+  .input-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .input-with-button {
+    display: flex;
+    align-items: center;
+    max-width: 700px; /* Increase width of input container */
+    margin: 0 auto; /* Center horizontally */
+  }
+
+  .input-group-field {
+    padding-right: 20px; /* Add padding between button and input */
+    width: 100%;
+  }
+
+  .btn {
+    margin-left: -20px; /* Compensate for the input padding */
+    background-color: #0069a7; /* Set default background color for the button */
+    color: white; /* Set text color for the button */
+    transition: background-color 0.3s; /* Add transition for smooth color change */
+  }
+
+  .btn:hover {
+    background-color: #e0592a; /* Change background color on hover */
+  }
+</style>

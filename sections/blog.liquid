@@ -1,0 +1,354 @@
+{% paginate blog.articles by 15 %}
+<section class="hero-banner light-bg simple-lazyload">
+  {% comment %}
+  <div class="breadcrumbs-wrapper">
+    <div class="breadcrumbs container dt-prl-30">
+      <div class="row">
+        <div class="col-md-12">
+                 <div class="w-btn-wrapper">
+                    <a class="w-btn icon_atleft" href="{{ shop.url }}"><span class="w-btn-label font-bold"><em>←</em> Back to Home</span></a>
+                 </div>
+               </div>
+      </div>
+    </div>
+  </div>
+  {% endcomment %}
+   <div class="container dt-prl-30">
+      <div class="row ">
+         <div class="col-md-12 text-center lazyload-element">
+            <div class="placeholder">
+               <h1 class="lazyload-element">{{ section.settings.section_title_1 }}</h1>
+               <p>{{ section.settings.head_section_info }}</p>
+            </div>
+           
+           <div class="blog-search-bar lazyload-element">
+              <form action="{{ routes.search_url }}" method="get" class="search-bar font-bold" role="search">
+                <input type="hidden" name="type" value="article">
+                <input type="search" name="q" value="{{ search.terms | escape }}" class="font-bold" placeholder="{{ 'What would you like to learn about today?' }}" aria-label="{{ 'layout.search_bar.placeholder' | t }}">
+                <button type="submit" class="search-bar--submit icon-fallback-text">
+                  <span class="icon icon-search" aria-hidden="true"></span>
+                  <span class="fallback-text">{% comment %}{{ 'layout.search_bar.submit' | t }}{% endcomment %}</span>
+                </button>
+              </form>
+            </div>
+         </div>
+         <div class="col-md-1"></div>
+         <div class="col-md-4 animated fadeIn">
+         </div>
+      </div>
+   </div>
+  </div>
+</section>
+
+<div class="grid grid-border simple-lazyload">
+  {% if section.settings.sidebar_enable %}
+        {% assign has_sidebar = true %}
+  {% endif %}
+
+        {% include 'blog-filter-drawer' %} 
+
+      <div class="filters">
+      <div class="filtersCont">
+        <span id="show-filters">Filters</span>
+        <div class="selectedFiltersCont"></div>
+      </div>
+      <div class="productCountCont">
+        <span class="total-products-count">{{ blog.articles_count }} Articles</span>
+      </div>
+    </div>
+  
+  <div class="grid-item {% if section.settings.sidebar_enable %} large--four-fifths{% else %} large--one-whole{% endif %}">
+    <div class="grid blog-grid-outer lazyload-element">
+        {% comment %}
+          {% if current_tags %}
+            <h1>{{ blog.title | link_to: blog.url }} &mdash; {{ current_tags.first }}</h1>
+          {% else %}
+            <h1>{{ blog.title }}</h1>
+          {% endif %}
+        {% endcomment %}
+
+        {% for article in blog.articles %}          
+          {% unless article.id == 588937396453 %}
+          <div class="grid-item medium--one-half large--one-third article-{{ article.id }} blog-grid" animate-rise-in">     
+          <div class="rte blog-content-wrapper lazyload-element">            
+          {% if article.image %}
+            {% assign image_alt = article.title | escape %}
+            {%- assign image = article.image -%}
+            {% comment %}{{ article | img_url: '1024x1024' | img_tag: image_alt, 'article__image' | link_to: article.url }}{% endcomment %}
+              <a href="{{ article.url }}" alt="{{ image_alt }}">
+              {%- assign width = 350 -%} 
+              {%- assign height = 600 -%}
+              {%- include 'image-logic' with width: width, height: height -%}
+              {%- assign img_url = article.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+              <div class="lazyload__image-wrapper" data-image-id="{{ image.id }}" style="max-width: {{ max_width }}px">
+                <div class="lazyload__image-wrapper no-js" style="padding-top:{{ 1 | divided_by: article.image.aspect_ratio | times: 100}}%;">
+                  <img class="lazyload js article__image"
+                  src="{{ article.image | img_url: '300x' }}"
+                  data-src="{{ img_url }}"
+                  data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                  data-aspectratio="{{ article.image.aspect_ratio }}"
+                  data-sizes="auto"
+                  alt="{{ image_alt }}">
+                </div>
+              </div>
+              <noscript>
+                <img src="{{ image | img_url: '580x' }}"
+                  srcset="{{ image | img_url: '580x' }} 1x, {{ image | img_url: '580x', scale: 2 }} 2x"
+                  alt="{{ image.alt }}" style="opacity:1;">
+              </noscript>
+              </a>
+          {% endif %}
+            
+          <div class="article-info">
+           {% comment %} 
+             <p class="text-dark article-meta">              
+                {% capture author %}<span class="article_author">{{ article.author }}</span>{% endcapture %}
+                {% capture date %}<span class="article_date"><time pubdate datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}">{{ article.published_at | date: format: 'date' }}</time></span>{% endcapture %}
+                {{ 'blogs.article.author_on_date_html' | t: author: author, date: date }}               
+            
+                {% if article.metafields.global.author %} 
+                   <span class="article_author">By {{ article.metafields.global.author }} </span>
+  			    {% else %}
+                   <span class="article_author">By {{ article.author }} </span>
+                {% endif %}  
+              
+              <span class="article_date font-bold"><time pubdate datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}">{{ article.published_at | date: format: 'date' }}</time></span>
+           </p>  
+           {% endcomment %}
+           <a href="{{ article.url }}">
+              <h3>{{ article.title }}</h3>
+          </a>
+          <div class="article_divider"></div>
+                             <span class="article_date"><a href="{{ article.url }}"><time pubdate datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}">{{ article.published_at | date: format: 'date' }}</time></a></span>
+                             <div class="article_author_meta">                   
+                               {%- if article.metafields.global.author.value != blank -%}
+                               <a href="/pages/{{ article.metafields.global.author | handle }}">
+                                 <img class="article_img" src="{{ article.metafields.global.author | handle | file_url | split: "?" | first }}.jpg" alt="{{ article.metafields.global.author }}">
+                               </a>                   
+                               <a href="/pages/{{ article.metafields.global.author | handle }}">
+                                 <span class="article_author font-bold">{{ article.metafields.global.author }} </span>
+                               </a>
+                               {%- endif -%}
+                             </div>
+                             {%- if article.metafields.custom.type.value != blank -%}
+                                <p class="article_type_items">                  
+                                  {% assign article_type = article.metafields.custom.type.value %}
+                                  {%- for a_type in article_type -%}                    
+                                      <span class="article_type at_{{ a_type | handle }}">{{ a_type }}</span>
+                                  {%- endfor -%}                              
+                                </p>
+                             {%- endif -%}
+           {% comment %}
+            <ul>
+              {% if blog.comments_enabled? %}
+              <li>
+                <a href="{{ article.url }}#comments">
+                  {{ 'blogs.comments.with_count' | t: count: article.comments_count }}
+                </a>
+              </li>
+              {% endif %}  
+              {% include 'tags-article' %}
+            </ul>
+           {% endcomment %}                 
+           {% comment %}<div class="read__more-btn-wrapper"><a class="read__more" href="{{ article.url }}">{{ 'blogs.article.read_more' | t }} <span style="font-family: monospace;">→</span></a></div>{% endcomment %}
+           </div>
+           </div>
+          </div>
+         {% endunless %}
+        {% endfor %}        
+     </div>
+  </div>
+  
+  {% if paginate.pages > 1 %}
+     <div class="text-center blog-pagination">
+        {% include 'pagination-custom' %}
+     </div>
+  {% endif %}
+
+  <script>
+   document.addEventListener('DOMContentLoaded', function () {
+    const filtersOverlay = document.querySelector('#filtersOverlay');
+    const pageOverlay = document.querySelector('#pageOverlay');
+    const openOverlayButton = document.querySelector('#show-filters');
+    const closeOverlayButton = document.querySelector('#closeOverlay');
+    const blogFilterDrawer = document.querySelector('.blog-filter-drawer'); // Sidebar reference
+
+    // Open sidebar and overlay
+    if (openOverlayButton) {
+        openOverlayButton.addEventListener('click', () => {
+            if (filtersOverlay) filtersOverlay.classList.add('open');
+            if (pageOverlay) pageOverlay.style.display = 'block';
+            if (blogFilterDrawer) {
+                blogFilterDrawer.style.left = '0'; // Move into view
+                blogFilterDrawer.style.display = 'block'; // Ensure it's visible
+            }
+        });
+    }
+
+    // Function to close sidebar and overlay
+    function closeOverlay() {
+        if (filtersOverlay) filtersOverlay.classList.remove('open');
+        if (pageOverlay) pageOverlay.style.display = 'none';
+        if (blogFilterDrawer) {
+            blogFilterDrawer.style.left = '-400px'; // Slide it out of view
+            setTimeout(() => {
+                blogFilterDrawer.style.display = 'none'; // Hide after animation
+            }, 300); // Match transition duration
+        }
+    }
+
+    // Close when clicking close button
+    if (closeOverlayButton) {
+        closeOverlayButton.addEventListener('click', closeOverlay);
+    }
+
+    // Close when clicking outside on the dark overlay
+    if (pageOverlay) {
+        pageOverlay.addEventListener('click', closeOverlay);
+    }
+});
+
+  </script>
+ 
+<style>
+  .blog-content-wrapper .article-info {
+      min-height: 360px;
+  }
+  .blog-content-wrapper .lazyload__image-wrapper {
+      height: 250px;
+  }
+  .input-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+  .input-with-button {
+      display: flex;
+      align-items: center;
+      max-width: 700px; /* Increase width of input container */
+      margin: 0 auto; /* Center horizontally */
+   }
+  .input-group-field {
+      padding-right: 20px; /* Add padding between button and input */
+      width: 100%;
+  }
+  .btn {
+      margin-left: 15px; /* Compensate for the input padding */
+      background-color: #0069a7; /* Set default background color for the button */
+      color: white; /* Set text color for the button */
+      transition: background-color 0.3s; /* Add transition for smooth color change */
+  }
+  .btn:hover {
+      background-color: #e0592a; /* Change background color on hover */
+  }
+  @media (min-width: 481px) {    
+    input.ns-name-field {
+        margin-right: 15px;
+    }
+  }
+  @media (max-width: 480px) {    
+    .blog-ns-form input.ns-name-field {
+        margin-right: 15px;
+    }
+    .blog-ns-form .input-with-button {
+        display: block;
+        text-align: center;
+    }
+    .blog-ns-form input {
+        margin-bottom: 15px !important;
+        display: block;
+    }
+    .blog-ns-form button.btn{
+        width: 100%;
+        margin: 0 auto; 
+    }
+  }
+  .menu {
+     list-style-type: none;
+     padding: 0;
+     margin: 0;
+     background-color: #f1f1f1;
+     overflow: hidden;
+     text-align: center; /* Center the menu items */
+  }
+  .menu li {
+     display: inline-block; /* Display the menu items horizontally */
+  }
+  .menu li a {
+     display: block;
+     color: #333;
+     text-align: center;
+     padding: 14px 20px; /* Adjust padding as needed */
+     text-decoration: none;
+     position: relative; /* Position relative for the pseudo-element */
+     transition: color 0.3s; /* Transition for smooth color change */
+  }
+  .menu li a:hover {
+     color: #333; /* Keep the color unchanged on hover */
+  }
+  .menu li a::after {
+     content: "";
+     position: absolute;
+     left: 50%;
+     bottom: 0;
+     width: 0;
+     height: 2px;
+     background-color: #333;
+     transition: width 0.3s, left 0.3s; /* Transition for smooth effect */
+     transform: translateX(-50%); /* Center the pseudo-element horizontally */
+  }
+  .menu li a:hover::after {
+     width: calc(100% - 40px); /* Expand the border to full width minus padding */
+     left: 20px; /* Align the border with padding */
+  }
+  /* Offset for target */
+  :target:before {
+     content: "";
+     display: block;
+     height: 40px; /* Adjust this value to your desired offset */
+     margin-top: -40px; /* Negative value of height */
+     visibility: hidden;
+  }
+  div.card.card-panel.white.contact-card.hoverable {
+     background: white;
+  }
+</style>
+
+</div>
+{% endpaginate %}
+{% schema %}
+  {
+    "name": "Blog",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Blog Sidebar"
+      },
+      {
+        "type": "checkbox",
+        "id": "sidebar_enable",
+        "label": "Sidebar Enable"
+      },
+      {
+        "type": "header",
+        "content": "Blog Page"
+      },
+      {
+        "type": "text",
+        "id": "section_title_1",
+        "label": "Section title"
+      },
+      {
+        "type": "textarea",
+        "id": "head_section_info",
+        "label": "Section info"
+      }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

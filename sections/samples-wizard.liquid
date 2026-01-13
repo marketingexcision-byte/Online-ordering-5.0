@@ -1,0 +1,637 @@
+<section id="samples-wizard" class="section">
+  <div class="container layout-constrained">
+    <div class="section__header">
+      <h1 class="section__title" style="color: white;">Your YG-1 Trial Pack</h1>
+      <p style="color: white;">Fill out the form with your details and desired products, and we'll get your sample pack on the way!</p>
+    </div>
+
+    <div id="sw-app">
+      <div class="tabs" role="tablist" aria-label="Progress">
+        <button aria-selected="true" data-step="1">1. Your details</button>
+        <button aria-selected="false" data-step="2">2. Pick samples</button>
+        <button aria-selected="false" data-step="3">3. Review & submit</button>
+      </div>
+
+      <!-- Step 1 -->
+<article class="card" data-panel="1">
+  <div class="sw-grid">
+    <div class="sw-field">
+      <label class="visually-hidden" for="sw-firstname">First name</label>
+      <input class="form-input" id="sw-firstname" name="firstname" placeholder="First name*" autocomplete="given-name" required>
+    </div>
+
+    <div class="sw-field">
+      <label class="visually-hidden" for="sw-lastname">Last name</label>
+      <input class="form-input" id="sw-lastname" name="lastname" placeholder="Last name*" autocomplete="family-name" required>
+    </div>
+
+    <div class="sw-field">
+      <label class="visually-hidden" for="sw-email">Email</label>
+      <input class="form-input" id="sw-email" name="email" type="email" placeholder="Email*" autocomplete="email" required>
+    </div>
+
+    <div class="sw-field">
+      <label class="visually-hidden" for="sw-mobilephone">Mobile phone number</label>
+      <input class="form-input" id="sw-mobilephone" name="mobilephone" type="tel" inputmode="tel"
+             placeholder="Mobile phone number*" autocomplete="tel" required>
+    </div>
+
+    <div class="sw-field">
+      <label class="visually-hidden" for="sw-address">Full Street Address</label>
+      <input class="form-input" id="sw-address" name="address" placeholder="Full Street Address*" autocomplete="street-address" required>
+    </div>
+
+    <div class="sw-field">
+      <label class="visually-hidden" for="sw-company">Company name</label>
+      <input class="form-input" id="sw-company" name="company" placeholder="Company name*" autocomplete="organization" required>
+    </div>
+
+    <div class="sw-field">
+      <label class="visually-hidden" for="sw-machines">Number of Machines</label>
+      <input class="form-input" id="sw-machines" name="machines" type="number" min="0" inputmode="numeric"
+             placeholder="Number of machines*" required>
+    </div>
+
+    <div class="sw-field sw-field--full">
+      <label class="visually-hidden" for="sw-metals_machining">Materials Commonly Machined</label>
+      <textarea class="form-input" id="sw-metals_machining" name="metals_machining" rows="3"
+                placeholder="Materials commonly machined"></textarea>
+    </div>
+  </div>
+
+  <div class="w-btn-wrapper">
+    <button class="btn btn-primary" id="sw-next-1">Next</button>
+  </div>
+  <div id="sw-error-1" style="color:#b00020"></div>
+</article>
+
+
+      <!-- Step 2 (grouped by category . one pick per category) -->
+      <article class="card" data-panel="2" hidden>
+        {% assign cat_blocks = 'alu_power_endmill|Alu-Power Endmill|alu-power-1-flute-30-helix-end-mill-e5e47|ALU1_ROWS,
+   alu_power_endmill|Alu-Power Endmill|alu-power-2-flute-45-helix-long-end-mill-e5522|ALU2_ROWS,
+   alu_power_endmill|Alu-Power Endmill|alu-power-3-flute-45-helix-long-end-mill-e5e49|ALU3_ROWS,
+   k_2_carbide_endmill|K-2 Carbide Endmill|k-2-carbide-2-flute-30-helix-short-end-mill-g9424|K2_2F_ROWS,
+   k_2_carbide_endmill|K-2 Carbide Endmill|k-2-carbide-3-flute-30-helix-short-end-mill-g9425|K2_3F_ROWS,
+   k_2_carbide_endmill|K-2 Carbide Endmill|k-2-carbide-4-flute-30-helix-short-end-mill-g9432|K2_4F_ROWS,
+   combo_tap|Combo Tap|din371-din376-combo-spiral-flute-bright-tc804|TC804_ROWS,
+   combo_tap|Combo Tap|din371-din376-combo-spiral-point-bright-tc814|TC814_ROWS,
+   gold_p_jobber_drill|Gold-P Jobber Drill|gold-p-drills-jobber-din338-dlgp195|GOLDP_ROWS,
+   iso_inserts|ISO Inserts|tnmg-uf-finishing-turning-insert-60-negative|TNMG_ROWS,
+   iso_inserts|ISO Inserts|wnmg-uf-finishing-turning-insert-80-trigonal-negative|WNMG_ROWS,
+   iso_inserts|ISO Inserts|cnmg-uf-finishing-turning-insert-80-negative|CNMG_ROWS,
+   iso_inserts|ISO Inserts|dnmg-uf-finishing-turning-insert-55-negative|DNMG_ROWS'
+          | split: ','
+        %}
+
+        {%- comment -%} Delims: row = ¶ . col = ‖ {%- endcomment -%}
+
+        {% capture ALU1_ROWS -%}
+  alu-power-1-flute-30-helix-end-mill-e5e47~3‖Ø3.0‖Alu-Power 1 Flute | 30° Helix | 3 x 3 x 12 x 50mm (E5E47030)¶
+  alu-power-1-flute-30-helix-end-mill-e5e47~4‖Ø4.0‖Alu-Power 1 Flute | 30° Helix | 4 x 4 x 15 x 60mm (E5E47040)¶
+  alu-power-1-flute-30-helix-end-mill-e5e47~6‖Ø6.0‖Alu-Power 1 Flute | 30° Helix | 6 x 6 x 20 x 65mm (E5E47060)¶
+  alu-power-1-flute-30-helix-end-mill-e5e47~8‖Ø8.0‖Alu-Power 1 Flute | 30° Helix | 8 x 8 x 22 x 65mm (E5E47080)
+  {%- endcapture %}
+
+        {% capture ALU2_ROWS -%}
+  alu-power-2-flute-45-helix-long-end-mill-e5522~3‖Ø3.0‖Alu-Power 2 Flute | 45° Helix | Long | 3 x 6 x 8 x 57mm  (E5522030)¶
+  alu-power-2-flute-45-helix-long-end-mill-e5522~4‖Ø4.0‖Alu-Power 2 Flute | 45° Helix | Long | 4 x 6 x 11 x 57mm (E5522040)¶
+  alu-power-2-flute-45-helix-long-end-mill-e5522~6‖Ø6.0‖Alu-Power 2 Flute | 45° Helix | Long | 6 x 6 x 13 x 57mm (E5522060)¶
+  alu-power-2-flute-45-helix-long-end-mill-e5522~8‖Ø8.0‖Alu-Power 2 Flute | 45° Helix | Long | 8 x 8 x 19 x 63mm (E5522080)
+  {%- endcapture %}
+
+        {% capture ALU3_ROWS -%}
+  alu-power-3-flute-45-helix-long-end-mill-e5e49~3‖Ø3.0‖Alu-Power 3 Flute | 45° Helix | Long | 3 x 6 x 12 x 57mm (E5E49030)¶
+  alu-power-3-flute-45-helix-long-end-mill-e5e49~4‖Ø4.0‖Alu-Power 3 Flute | 45° Helix | Long | 4 x 6 x 15 x 57mm (E5E49040)¶
+  alu-power-3-flute-45-helix-long-end-mill-e5e49~6‖Ø6.0‖Alu-Power 3 Flute | 45° Helix | Long | 6 x 6 x 20 x 65mm (E5E49060)¶
+  alu-power-3-flute-45-helix-long-end-mill-e5e49~8‖Ø8.0‖Alu-Power 3 Flute | 45° Helix | Long | 8 x 8 x 22 x 65mm (E5E49080)
+  {%- endcapture %}
+
+        {% capture K2_2F_ROWS -%}
+  k-2-carbide-2-flute-30-helix-short-end-mill-g9424~3‖Ø3.0‖K-2 Carbide 2 Flute | 30° Helix | Short | 3 x 3 x 12 x 32mm (G9424030)¶
+  k-2-carbide-2-flute-30-helix-short-end-mill-g9424~4‖Ø4.0‖K-2 Carbide 2 Flute | 30° Helix | Short | 4 x 4 x 12 x 40mm (G9424040)¶
+  k-2-carbide-2-flute-30-helix-short-end-mill-g9424~6‖Ø6.0‖K-2 Carbide 2 Flute | 30° Helix | Short | 6 x 6 x 16 x 50mm (G9424060)¶
+  k-2-carbide-2-flute-30-helix-short-end-mill-g9424~8‖Ø8.0‖K-2 Carbide 2 Flute | 30° Helix | Short | 8 x 8 x 20 x 60mm (G9424080)
+  {%- endcapture %}
+
+        {% capture K2_3F_ROWS -%}
+  k-2-carbide-3-flute-30-helix-short-end-mill-g9425~3‖Ø3.0‖K-2 Carbide 3 Flute | 30° Helix | Short | 3 x 3 x 12 x 32mm (G9425030)¶
+  k-2-carbide-3-flute-30-helix-short-end-mill-g9425~4‖Ø4.0‖K-2 Carbide 3 Flute | 30° Helix | Short | 4 x 4 x 12 x 40mm (G9425040)¶
+  k-2-carbide-3-flute-30-helix-short-end-mill-g9425~6‖Ø6.0‖K-2 Carbide 3 Flute | 30° Helix | Short | 6 x 6 x 16 x 50mm (G9425060)¶
+  k-2-carbide-3-flute-30-helix-short-end-mill-g9425~8‖Ø8.0‖K-2 Carbide 3 Flute | 30° Helix | Short | 8 x 8 x 20 x 60mm (G9425080)
+  {%- endcapture %}
+
+        {% capture K2_4F_ROWS -%}
+  k-2-carbide-4-flute-30-helix-short-end-mill-g9432~3‖Ø3.0‖K-2 Carbide 4 Flute | 30° Helix | Short | 3 x 3 x 12 x 32mm (G9432030)¶
+  k-2-carbide-4-flute-30-helix-short-end-mill-g9432~4‖Ø4.0‖K-2 Carbide 4 Flute | 30° Helix | Short | 4 x 4 x 12 x 40mm (G9432040)¶
+  k-2-carbide-4-flute-30-helix-short-end-mill-g9432~6‖Ø6.0‖K-2 Carbide 4 Flute | 30° Helix | Short | 6 x 6 x 16 x 50mm (G9432060)¶
+  k-2-carbide-4-flute-30-helix-short-end-mill-g9432~8‖Ø8.0‖K-2 Carbide 4 Flute | 30° Helix | Short | 8 x 8 x 20 x 60mm (G9432080)
+  {%- endcapture %}
+
+        {% capture TC804_ROWS -%}
+  din371-din376-combo-spiral-flute-bright-tc804~M4x0.7‖M4 x 0.7‖HSS-E Combo Tap | DIN371 | Spiral Flute | M4 x 0.7 6H 63.0L (TC804246)¶
+  din371-din376-combo-spiral-flute-bright-tc804~M5x0.8‖M5 x 0.8‖HSS-E Combo Tap | DIN371 | Spiral Flute | M5 x 0.8 6H 70.0L (TC804286)¶
+  din371-din376-combo-spiral-flute-bright-tc804~M6x1.0‖M6 x 1.0‖HSS-E Combo Tap | DIN371 | Spiral Flute | M6 x 1.0 6H 80.0L (TC804316)¶
+  din371-din376-combo-spiral-flute-bright-tc804~M8x1.25‖M8 x 1.25‖HSS-E Combo Tap | DIN371 | Spiral Flute | M8 x 1.25 6H 90.0L (TC804366)¶
+  din371-din376-combo-spiral-flute-bright-tc804~M10x1.5‖M10 x 1.5‖HSS-E Combo Tap | DIN371 | Spiral Flute | M10 x 1.5 6H 100.0L (TC804426)
+  {%- endcapture %}
+
+        {% capture TC814_ROWS -%}
+  din371-din376-combo-spiral-point-bright-tc814~M4x0.7‖M4 x 0.7‖HSS-E Combo Tap | DIN371 | Gun Point | M4 x 0.7 6H 63.0L (TC814246)¶
+  din371-din376-combo-spiral-point-bright-tc814~M5x0.8‖M5 x 0.8‖HSS-E Combo Tap | DIN371 | Gun Point | M5 x 0.8 6H 70.0L (TC814286)¶
+  din371-din376-combo-spiral-point-bright-tc814~M6x1.0‖M6 x 1.0‖HSS-E Combo Tap | DIN371 | Gun Point | M6 x 1.0 6H 80.0L (TC814316)¶
+  din371-din376-combo-spiral-point-bright-tc814~M8x1.25‖M8 x 1.25‖HSS-E Combo Tap | DIN371 | Gun Point | M8 x 1.25 6H 90.0L (TC814366)¶
+  din371-din376-combo-spiral-point-bright-tc814~M10x1.5‖M10 x 1.5‖HSS-E Combo Tap | DIN371 | Gun Point | M10 x 1.5 6H 100.0L (TC814426)
+  {%- endcapture %}
+
+        {% capture GOLDP_ROWS -%}
+  gold-p-drills-jobber-din338-dlgp195~3.3‖Ø3.3‖Gold-P Jobber Drill | DIN338/N | 3.3 x 36 x 65mm (DLGP195033)¶
+  gold-p-drills-jobber-din338-dlgp195~4.2‖Ø4.2‖Gold-P Jobber Drill | DIN338/N | 4.2 x 43 x 75mm (DLGP195042)¶
+  gold-p-drills-jobber-din338-dlgp195~5.0‖Ø5.0‖Gold-P Jobber Drill | DIN338/N | 5 x 52 x 86mm (DLGP195050)¶
+  gold-p-drills-jobber-din338-dlgp195~6.8‖Ø6.8‖Gold-P Jobber Drill | DIN338/N | 6.8 x 69 x 109mm (DLGP195068)¶
+  gold-p-drills-jobber-din338-dlgp195~8.5‖Ø8.5‖Gold-P Jobber Drill | DIN338/N | 8.5 x 75 x 117mm (DLGP195085)
+  {%- endcapture %}
+
+        {% capture TNMG_ROWS -%}
+  tnmg-uf-finishing-turning-insert-60-negative~TNMG160404-UF-YG801‖TNMG160404-UF / YG801‖TNMG160404-UF-YG801/TNMG331-UF (22000039)¶
+  tnmg-uf-finishing-turning-insert-60-negative~TNMG160404-UF-YG3030‖TNMG160404-UF / YG3030‖TNMG160404-UF-YG3030/TNMG331-UF (22000272)¶
+  tnmg-uf-finishing-turning-insert-60-negative~TNMG160408-UF-YG3020‖TNMG160408-UF / YG3020‖TNMG160408-UF-YG3020/TNMG332-UF (22000277)¶
+  tnmg-uf-finishing-turning-insert-60-negative~TNMG160408-UF-YG3030‖TNMG160408-UF / YG3030‖TNMG160408-UF-YG3030/TNMG332-UF (22000278)¶
+  tnmg-uf-finishing-turning-insert-60-negative~TNMG160412-UF-YG3020‖TNMG160412-UF / YG3020‖TNMG160412-UF-YG3020/TNMG333-UF (22000588)
+  {%- endcapture %}
+
+        {% capture WNMG_ROWS -%}
+  wnmg-uf-finishing-turning-insert-80-trigonal-negative~WNMG060404-UF-YG801‖WNMG060404-UF / YG801‖WNMG060404-UF-YG801/WNMG331-UF (22000058)¶
+  wnmg-uf-finishing-turning-insert-80-trigonal-negative~WNMG060404-UF-YG3030‖WNMG060404-UF / YG3030‖WNMG060404-UF-YG3030/WNMG331-UF (22000437)¶
+  wnmg-uf-finishing-turning-insert-80-trigonal-negative~WNMG080404-UF-YG801‖WNMG080404-UF / YG801‖WNMG080404-UF-YG801/WNMG431-UF (22000055)¶
+  wnmg-uf-finishing-turning-insert-80-trigonal-negative~WNMG080404-UF-YG3030‖WNMG080404-UF / YG3030‖WNMG080404-UF-YG3030/WNMG431-UF (22000317)¶
+  wnmg-uf-finishing-turning-insert-80-trigonal-negative~WNMG080408-UF-YG3020‖WNMG080408-UF / YG3020‖WNMG080408-UF-YG3020/WNMG432-UF (22000322)¶
+  wnmg-uf-finishing-turning-insert-80-trigonal-negative~WNMG080408-UF-YG3030‖WNMG080408-UF / YG3030‖WNMG080408-UF-YG3030/WNMG432-UF (22000323)
+  {%- endcapture %}
+
+        {% capture CNMG_ROWS -%}
+  cnmg-uf-finishing-turning-insert-80-negative~CNMG120404-UF-YG801‖CNMG120404-UF / YG801‖CNMG120404-UF-YG801/CNMG431-UF (22000003)¶
+  cnmg-uf-finishing-turning-insert-80-negative~CNMG120404-UF-YG3030‖CNMG120404-UF / YG3030‖CNMG120404-UF-YG3030/CNMG431-UF (22000180)¶
+  cnmg-uf-finishing-turning-insert-80-negative~CNMG120408-UF-YG3020‖CNMG120408-UF / YG3020‖CNMG120408-UF-YG3020/CNMG432-UF (22000190)¶
+  cnmg-uf-finishing-turning-insert-80-negative~CNMG120408-UF-YG3030‖CNMG120408-UF / YG3030‖CNMG120408-UF-YG3030/CNMG432-UF (22000191)
+  {%- endcapture %}
+
+        {% capture DNMG_ROWS -%}
+  dnmg-uf-finishing-turning-insert-55-negative~DNMG150404-UF-YG801‖DNMG150404-UF / YG801‖DNMG150404-UF-YG801/DNMG431-UF (22000016)¶
+  dnmg-uf-finishing-turning-insert-55-negative~DNMG150404-UF-YG3030‖DNMG150404-UF / YG3030‖DNMG150404-UF-YG3030/DNMG431-UF (22000365)¶
+  dnmg-uf-finishing-turning-insert-55-negative~DNMG150604-UF-YG801‖DNMG150604-UF / YG801‖DNMG150604-UF-YG801/DNMG441-UF (22000018)¶
+  dnmg-uf-finishing-turning-insert-55-negative~DNMG150604-UF-YG3030‖DNMG150604-UF / YG3030‖DNMG150604-UF-YG3030/DNMG441-UF (22000227)¶
+  dnmg-uf-finishing-turning-insert-55-negative~DNMG150608-UF-YG3020‖DNMG150608-UF / YG3020‖DNMG150608-UF-YG3020/DNMG442-UF (22000232)¶
+  dnmg-uf-finishing-turning-insert-55-negative~DNMG150608-UF-YG3030‖DNMG150608-UF / YG3030‖DNMG150608-UF-YG3030/DNMG442-UF (22000233)
+  {%- endcapture %}
+
+        {%- comment -%} Build unique category list {%- endcomment -%}
+        {% assign cats_raw = '' %}
+        {% for raw in cat_blocks %}
+          {% assign parts = raw | strip | split: '|' %}
+          {% assign k = parts[0] %}
+          {% assign marker = '§' | append: k | append: '§' %}
+          {% unless cats_raw contains marker %}{% assign cats_raw = cats_raw | append: marker %}{% endunless %}
+        {% endfor %}
+        {% assign categories = cats_raw | split: '§' %}
+
+
+        {%- comment -%} Render grouped categories {%- endcomment -%}
+        {% for cat in categories %}
+          {% assign cat_key = cat | strip %}
+          {% if cat_key == '' %}{% continue %}{% endif %}
+
+          {%- comment -%} Find label from first matching block {%- endcomment -%}
+          {% assign cat_label = cat_key %}
+          {% for raw in cat_blocks %}
+            {% assign parts = raw | strip | split: '|' %}
+            {% if parts[0] == cat_key %}
+              {% assign cat_label = parts[1] %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+
+          <div class="sw-category" data-category="{{ cat_key }}" style="margin-bottom:24px">
+            <h2 class="section__title" style="margin:.5rem 0 1rem">{{ cat_label }}</h2>
+
+            <div class="grid-uniform products-collection rlp_regular">
+              {%- comment -%} Loop all products that belong to this category {%- endcomment -%}
+              {% for raw in cat_blocks %}
+                {% assign parts = raw | strip | split: '|' %}
+                {% if parts[0] != cat_key %}{% continue %}{% endif %}
+                {% assign handle = parts[2] %}
+                {% assign rows_var = parts[3] %}
+                {% assign p = all_products[handle] %}
+
+                {% if p %}
+                  <div class="sw-card-wrap" data-product-handle="{{ p.handle }}" style="margin-bottom:12px">
+                    {% render 'product-grid-item-samples', product: p %}
+
+                    <div class="card-variants">
+                      <div class="card-variants-label">Choose option</div>
+                      <div class="card-variants-chips">
+                        {% assign rows_raw = '' %}
+                        {% case rows_var %}
+                          {% when 'ALU1_ROWS' -%}
+                            {%- assign rows_raw = ALU1_ROWS %}
+                          {% when 'ALU2_ROWS' -%}
+                            {%- assign rows_raw = ALU2_ROWS %}
+                          {% when 'ALU3_ROWS' -%}
+                            {%- assign rows_raw = ALU3_ROWS %}
+                          {% when 'K2_2F_ROWS' -%}
+                            {%- assign rows_raw = K2_2F_ROWS %}
+                          {% when 'K2_3F_ROWS' -%}
+                            {%- assign rows_raw = K2_3F_ROWS %}
+                          {% when 'K2_4F_ROWS' -%}
+                            {%- assign rows_raw = K2_4F_ROWS %}
+                          {% when 'TC804_ROWS' -%}
+                            {%- assign rows_raw = TC804_ROWS %}
+                          {% when 'TC814_ROWS' -%}
+                            {%- assign rows_raw = TC814_ROWS %}
+                          {% when 'GOLDP_ROWS' -%}
+                            {%- assign rows_raw = GOLDP_ROWS %}
+                          {% when 'TNMG_ROWS' -%}
+                            {%- assign rows_raw = TNMG_ROWS %}
+                          {% when 'WNMG_ROWS' -%}
+                            {%- assign rows_raw = WNMG_ROWS %}
+                          {% when 'CNMG_ROWS' -%}
+                            {%- assign rows_raw = CNMG_ROWS %}
+                          {% when 'DNMG_ROWS' -%}
+                            {%- assign rows_raw = DNMG_ROWS %}
+                        {% endcase %}
+
+                        {% assign rows = rows_raw | split: '¶' %}
+                        {% for r in rows %}
+                          {% assign cols = r | strip | split: '‖' %}
+                          {% assign vid = cols[0] | strip %}
+                          {% assign lab = cols[1] | strip %}
+                          {% assign hs = cols[2] | strip %}
+                          {% if vid != '' and lab != '' and hs != '' %}
+                            <button
+                              type="button"
+                              class="variant-chip sw-select-variant"
+                              data-hs-prop="{{ cat_key }}"
+                              data-hs-value="{{ hs | escape }}"
+                              data-variant-id="{{ vid | escape }}"
+                            >
+                              {{ lab }}
+                            </button>
+                          {% endif %}
+                        {% endfor %}
+                      </div>
+                    </div>
+
+                    <div class="w-btn-wrapper">
+                      <button class="btn btn-outline sw-select-btn" data-category="{{ cat_key }}">
+                        Confirm selection
+                      </button>
+                    </div>
+                  </div>
+                {% else %}
+                  <div class="card">
+                    Missing product handle: <code>{{ handle }}</code>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+
+        <div class="w-btn-wrapper" style="display:flex;gap:12px;">
+          <button class="btn btn-outline" id="sw-back-2">Back</button>
+          <button class="btn btn-primary" id="sw-next-2">Review</button>
+        </div>
+      </article>
+
+      <!-- Step 3 -->
+      <article class="card" data-panel="3" hidden>
+        <h2 class="section__title">Review</h2>
+        <div id="sw-review"></div>
+        <div class="w-btn-wrapper">
+          <button class="btn btn-outline" id="sw-back-3">Back</button>
+          <button class="btn btn-primary full-width" id="sw-submit">Send me samples</button>
+        </div>
+        <div id="sw-error-3" style="color:#b00020"></div>
+        <div id="sw-success" class="card" style="display:none;padding:20px;justify-content:center;background:#109954;color:white">
+          Thanks, we’ve got it.
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const HUBSPOT = {
+        portalId: '2595431',
+        formGuid: '30c37b27-b6db-444a-9872-19ddb7e78b89',
+        workerEndpoint: 'https://samples-hs-submit.marketingexcision.workers.dev/',
+      };
+
+      const FIELD_MAP = {
+        firstname: 'firstname',
+        lastname: 'lastname',
+        email: 'email',
+        mobilephone: 'mobilephone',
+        address: 'address',
+        company: 'company',
+        machines: 'machines',
+        metals_machining: 'metals_machining',
+        products: {
+          alu_power_endmill: 'alu_power_endmill',
+          k_2_carbide_endmill: 'k_2_carbide_endmill',
+          combo_tap: 'combo_tap',
+          gold_p_jobber_drill: 'gold_p_jobber_drill',
+          iso_inserts: 'iso_inserts',
+        },
+      };
+
+      const state = { step: 1, contact: {}, selections: {} };
+      const $ = (s) => document.querySelector(s);
+      const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
+
+      function setStep(n) {
+        state.step = n;
+        $$('.tabs button').forEach((b, i) => b.setAttribute('aria-selected', String(i + 1 === n)));
+        $$('article.card[data-panel]').forEach((p) => (p.hidden = Number(p.dataset.panel) !== n));
+        if (n === 3) renderReview();
+      }
+
+      $('#sw-next-1').addEventListener('click', () => {
+        const get = (id) => $(id).value.trim();
+        const req = [
+          '#sw-firstname',
+          '#sw-lastname',
+          '#sw-email',
+          '#sw-mobilephone',
+          '#sw-address',
+          '#sw-company',
+          '#sw-machines',
+        ];
+        if (req.some((sel) => !$(sel).value.trim())) {
+          $('#sw-error-1').textContent = 'Fill the required fields first.';
+          return;
+        }
+        $('#sw-error-1').textContent = '';
+        state.contact = {
+          firstname: get('#sw-firstname'),
+          lastname: get('#sw-lastname'),
+          email: get('#sw-email'),
+          mobilephone: get('#sw-mobilephone'),
+          address: get('#sw-address'),
+          company: get('#sw-company'),
+          machines: get('#sw-machines'),
+          metals_machining: get('#sw-metals_machining'),
+        };
+        setStep(2);
+      });
+
+      $('#sw-back-2').addEventListener('click', () => setStep(1));
+      $('#sw-next-2').addEventListener('click', () => setStep(3));
+      $('#sw-back-3').addEventListener('click', () => setStep(2));
+
+      // ONE pick per category. easy switching. pretty outline with offset
+      const catSections = document.querySelectorAll('.sw-category');
+
+      catSections.forEach((section) => {
+        const cat = section.dataset.category;
+
+        // When a chip is clicked in this category
+        section.addEventListener('click', (e) => {
+          const chip = e.target.closest('.sw-select-variant');
+          if (!chip) return;
+
+          // Which card was clicked
+          const wrap = chip.closest('.sw-card-wrap');
+
+          // 1) Clear "pending" from every card in this category
+          section.querySelectorAll('.sw-card-wrap').forEach((w) => {
+            delete w.dataset.pendingVariantId;
+            delete w.dataset.pendingSku;
+            delete w.dataset.pendingHsValue;
+            // also clear any active chip styling inside each card
+            w.querySelectorAll('.sw-select-variant').forEach((c) => c.classList.remove('is-active'));
+          });
+
+          // 2) Mark this chip active within its card
+          chip.classList.add('is-active');
+
+          // 3) Stash pending pick on THIS card only
+          wrap.dataset.pendingVariantId = chip.dataset.variantId;
+          wrap.dataset.pendingSku = chip.dataset.variantSku || '';
+          wrap.dataset.pendingHsValue = chip.dataset.hsValue;
+        });
+
+        // Confirm selection for the CATEGORY (overwrites previous)
+        section.addEventListener('click', (e) => {
+          const btn = e.target.closest('.sw-select-btn');
+          if (!btn) return;
+
+          // The only card that currently has a pending selection
+          const candidate = Array.from(section.querySelectorAll('.sw-card-wrap')).find(
+            (w) => w.dataset.pendingVariantId && w.dataset.pendingHsValue
+          );
+
+          if (!candidate) {
+            alert('Pick an option first.');
+            return;
+          }
+
+          const vid = candidate.dataset.pendingVariantId;
+          const hsValue = candidate.dataset.pendingHsValue;
+
+          // Persist the category selection
+          state.selections[cat] = {
+            variantId: vid,
+            sku: candidate.dataset.pendingSku || '',
+            value: hsValue,
+          };
+
+          // Visuals: mark selected card with class. clear on others
+          section.querySelectorAll('.sw-card-wrap').forEach((w) => w.classList.remove('is-selected'));
+          candidate.classList.add('is-selected');
+
+          // Important: clear ALL pending markers so a new click starts fresh
+          section.querySelectorAll('.sw-card-wrap').forEach((w) => {
+            delete w.dataset.pendingVariantId;
+            delete w.dataset.pendingSku;
+            delete w.dataset.pendingHsValue;
+          });
+        });
+      });
+
+      function renderReview() {
+        const c = state.contact,
+          s = state.selections;
+        $('#sw-review').innerHTML = `
+        <div><strong>Contact</strong><br>
+        ${c.firstname || ''} ${c.lastname || ''} · ${c.email || ''}<br>
+        ${c.mobilephone || ''} · ${c.address || ''}<br>
+        ${c.company || ''} · Machines: ${c.machines || ''}<br>
+        Materials: ${c.metals_machining || ''}</div>
+        <hr style="margin:12px 0">
+        <div><strong>Samples</strong><ul style="margin:.5rem 0">
+          ${Object.entries(FIELD_MAP.products)
+            .map(([k, _]) => {
+              const v = s[k]?.value || '—';
+              const label = k.replaceAll('_', ' ').replace('k 2', 'K-2');
+              return `<li>${label}: ${v}</li>`;
+            })
+            .join('')}
+        </ul></div>`;
+      }
+
+      function buildPayload() {
+        const fields = [];
+        const c = state.contact;
+        Object.keys(FIELD_MAP).forEach((k) => {
+          if (k === 'products') return;
+          fields.push({ name: FIELD_MAP[k], value: String(c[k] || '') });
+        });
+        Object.entries(FIELD_MAP.products).forEach(([cat, prop]) => {
+          const val = state.selections[cat]?.value || '';
+          fields.push({ name: prop, value: val });
+        });
+        const hutk = document.cookie
+          .split('; ')
+          .find((c) => c.startsWith('hubspotutk='))
+          ?.split('=')[1];
+        return {
+          portalId: HUBSPOT.portalId,
+          formGuid: HUBSPOT.formGuid,
+          fields,
+          context: { hutk, pageUri: location.href, pageName: document.title },
+        };
+      }
+
+      $('#sw-submit').addEventListener('click', async () => {
+        try {
+          $('#sw-error-3').textContent = '';
+          const res = await fetch(HUBSPOT.workerEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(buildPayload()),
+          });
+          if (!res.ok) throw new Error(await res.text());
+          $('#sw-success').style.display = 'flex';
+          if (HUBSPOT.redirectUrl) setTimeout(() => (location.href = HUBSPOT.redirectUrl), 900);
+        } catch (err) {
+          $('#sw-error-3').textContent = 'Submission failed: ' + (err.message || err);
+        }
+      });
+
+      setStep(1);
+    })();
+  </script>
+</section>
+
+<style>
+  /* selected chip state . you already had this */
+  button.variant-chip.sw-select-variant.is-active {
+    border: 2px solid var(--color-secondary-steel);
+  }
+
+  /* selected CARD outline with offset */
+  .sw-card-wrap.is-selected {
+    outline: 2px solid var(--color-secondary-steel);
+    outline-offset: 10px; /* this is the offset you wanted */
+    border-radius: 15px;  /* matches your card radius so it looks clean */
+  }
+
+  /* optional . makes the offset look nicer on light bg */
+  .product-grid-image--centered {
+    background: #f1f1f1;
+    border-radius: 15px;
+  }
+
+  /* keep your existing layout tweaks */
+  .grid-item.large--one-quarter.medium-down--one-half { width: 100%; }
+  .sw-card-wrap { display:flex; flex-direction:column; max-width:330px; border-radius:15px; }
+  button.variant-chip.sw-select-variant { background:none; }
+
+  button.btn.btn-outline.sw-select-btn {
+      width: 100%;
+      font-size: 17px;
+      border: 2px solid #e0592a;
+  }
+
+  .sw-card-wrap.is-selected .btn.btn-outline.sw-select-btn {
+  background: #e0592a;
+  color: white;
+  }
+  
+  div#sw-app {
+    padding: 40px;
+    border: 2px solid #e8e8e8;
+    border-radius: 15px;
+    background: white;
+}
+
+section#samples-wizard {
+    background: #0069a7;
+    margin-top: 0px !IMPORTANT;
+    padding-top: 30px;
+    padding-bottom: var(--space-7);
+}
+
+button {
+    font-size: 18px !important;
+}
+
+.tabs {
+    margin-bottom: var(--space-6);
+}
+
+/* 2-column tidy grid */
+.sw-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* make textarea span the full width */
+.sw-field--full {
+  grid-column: 1 / -1;
+}
+
+/* mobile: stack to one column */
+@media (max-width: 749px) {
+  .sw-grid { grid-template-columns: 1fr; }
+}
+
+/* hide labels but keep them for screen readers */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+}
+
+/* optional polish. keeps inputs consistent height */
+.form-input {
+  height: 44px;
+  padding: 10px 0px;
+  line-height: 1.2;
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid #e8e8e8;
+  margin-bottom: 0px !important;
+}
+textarea.form-input { height: auto; }
+
+</style>
+
+{% schema %}
+{
+  "name": "Samples Wizard",
+  "settings": [
+    { "type": "collection", "id": "alu_power_endmill", "label": "Alu-Power Endmill collection" },
+    { "type": "collection", "id": "k_2_carbide_endmill", "label": "K-2 Carbide Endmill collection" },
+    { "type": "collection", "id": "combo_tap", "label": "Combo Tap collection" },
+    { "type": "collection", "id": "gold_p_jobber_drill", "label": "Gold-P Jobber Drill collection" },
+    { "type": "collection", "id": "iso_inserts", "label": "ISO Inserts collection" }
+  ],
+  "presets": [{ "name": "Samples Wizard" }]
+}
+{% endschema %}

@@ -1,0 +1,327 @@
+{%- comment -%} Clean login page (no breadcrumbs) {%- endcomment -%}
+
+<style>
+    /* Layout: stack card + extra box */
+  .account-auth { flex-direction: column; gap: 20px; }
+
+  /* Distributor callout */
+  .auth-extra {
+    width: 100%;
+    max-width: 440px;
+    background: #fff;
+    border-radius: 15px;
+    padding: 28px;
+  }
+  .auth-extra__body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .auth-extra__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: #0069a7;              /* PRIMARY: Cobalt Blue */
+    color: #fff;
+    text-decoration: none;
+    line-height: 1;
+  }
+  .auth-extra__cta:hover { opacity: .9; }
+
+  /* Helper for small hint text under the ABN input */
+  .field-help {
+    display: block;
+    margin-top: -8px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: #666666;                   /* Iron Grey */
+  }
+
+    .form-success{
+      /* tweakables */
+      --radius: 7px;
+      --stripe: 7px;                  /* bar width */
+      --stripe-color: #109954;         /* bar colour */
+      --card-bg:rgba(241, 241, 241, 0.5);              /* card background */
+      border-radius: var(--radius);
+      padding: 20px 20px 15px calc(20px + var(--stripe));
+      background:
+        /* left bar */
+        linear-gradient(var(--stripe-color), var(--stripe-color)) left/var(--stripe) 100% no-repeat,
+        /* card background */
+        var(--card-bg);
+      font-size: 16px;
+      min-height: 82px;
+      color: black !important;
+      border: 0;
+    }
+    .account-auth {
+      background: #0069a7; /* Excision blue */
+      min-height: 85vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+    .auth-card {
+      background: #fff;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 15px;
+      padding: 28px;
+    }
+    .auth-card h1 { margin: 0 0 12px; font-size: 28px; line-height: 1.2; }
+    .auth-card p.subtle { margin: 0 0 24px; color: #555; }
+
+    .auth-card label.hidden-label { position: absolute; left: -9999px; }
+    .auth-card input[type="text"],
+    .auth-card input[type="email"],
+    .auth-card input[type="password"]{
+      width: 100%;
+      height: 40px;
+      margin: 8px 0 16px;
+      padding-left: 0px;
+    }
+    .auth-card .btn, .auth-extra__cta{
+      width: 100%;
+      min-height: 40px;
+      border-radius: 999px;
+      font-weight: 400;
+      font-family: 'Humanist777Bt-Bold';
+      font-size: 17px;
+      line-height: 1;
+      justify-content: center;
+      color: white;
+    }
+    .auth-extra__cta:hover {
+    color: white;
+  }
+    .auth-card .links {
+      margin-top: 14px;
+      display: grid;
+      gap: 8px;
+      text-align: center;
+      font-size: 16px;
+    }
+    .auth-card .links a { text-decoration: underline; }
+    .auth-card hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+
+    /* Toggle panels */
+    #recover_password,
+    #register_account { display: none; }
+</style>
+
+<div class="account-auth">
+  <div class="auth-card">
+    <div class="note form-success" id="resetSuccess" style="display:none;">
+      {{ 'customer.recover_password.success' | t | default: 'We’ve emailed you a link to reset your password.' }}
+    </div>
+
+    {%- comment -%} LOGIN {%- endcomment -%}
+    <div id="customer_login">
+      <h1>{{ 'customer.login.title' | t }}</h1>
+      <p class="subtle">Sign in to your account</p>
+      {% form 'customer_login' %}
+        {% include 'form-errors-custom' %}
+
+        <label for="customer_email" class="hidden-label">{{ 'customer.login.email' | t }}</label>
+        <input
+          type="email"
+          name="customer[email]"
+          id="customer_email"
+          placeholder="{{ 'customer.login.email' | t }}"
+          autocorrect="off"
+          autocapitalize="off"
+          autofocus
+        >
+
+        {% if form.password_needed %}
+          <label for="customer_password" class="hidden-label">{{ 'customer.login.password' | t }}</label>
+          <input
+            type="password"
+            name="customer[password]"
+            id="customer_password"
+            placeholder="{{ 'customer.login.password' | t }}"
+          >
+          <div class="links" style="text-align:right">
+            <a href="#" onclick="showRecoverPasswordForm();return false;" style="margin-bottom: 20px;">
+              {{- 'customer.login.forgot_password' | t -}}
+            </a>
+          </div>
+        {% endif %}
+
+        <p><input type="submit" class="btn" value="{{ 'customer.login.sign_in' | t }}"></p>
+      {% endform %}
+
+      <div class="links">
+        <a href="#" onclick="showRegisterForm();return false;">
+          {{- 'customer.register.title' | t | default: 'Create an account' -}}
+        </a>
+        <a href="{{ shop.url }}">{{ 'customer.login.cancel' | t }}</a>
+      </div>
+
+      {% if shop.checkout.guest_login %}
+        <hr>
+        <h3 style="margin:0 0 8px">{{ 'customer.login.guest_title' | t }}</h3>
+        {% form 'guest_login' %}
+          <input type="submit" class="btn" value="{{ 'customer.login.guest_continue' | t }}">
+        {% endform %}
+      {% endif %}
+    </div>
+
+    {%- comment -%} RECOVER PASSWORD {%- endcomment -%}
+    <div id="recover_password" aria-hidden="true">
+      <h2>{{ 'customer.recover_password.title' | t }}</h2>
+      <p>{{ 'customer.recover_password.subtext' | t }}</p>
+      {% form 'recover_customer_password' %}
+        {% include 'form-errors-custom' %}
+        {% if form.posted_successfully? %}{% assign reset_success = true %}{% endif %}
+        <label for="recover-email" class="hidden-label">{{ 'customer.recover_password.email' | t }}</label>
+        <input
+          type="email"
+          name="email"
+          id="recover-email"
+          placeholder="{{ 'customer.recover_password.email' | t }}"
+          autocorrect="off"
+          autocapitalize="off"
+        >
+        <p><input type="submit" class="btn" value="{{ 'customer.recover_password.submit' | t }}"></p>
+        <div class="links">
+          <a href="#" onclick="hideRecoverPasswordForm();return false;">{{ 'customer.recover_password.cancel' | t }}</a>
+        </div>
+      {% endform %}
+    </div>
+
+    {%- comment -%} CREATE ACCOUNT (folded in) {%- endcomment -%}
+    <div id="register_account" aria-hidden="true">
+      <h2>{{ 'customer.register.title' | t }}</h2>
+      <p class="subtle">{{ 'customer.register.subtitle' | t | default: 'Create your Excision account' }}</p>
+
+      {% form 'create_customer' %}
+        {% include 'form-errors-custom' %}
+
+        <label for="first_name" class="hidden-label">{{ 'customer.register.first_name' | t }}</label>
+        <input
+          type="text"
+          name="customer[first_name]"
+          id="first_name"
+          placeholder="{{ 'customer.register.first_name' | t }}"
+          {% if form.errors contains 'first_name' %}
+            class="error"
+          {% endif %}
+        >
+
+        <label for="last_name" class="hidden-label">{{ 'customer.register.last_name' | t }}</label>
+        <input
+          type="text"
+          name="customer[last_name]"
+          id="last_name"
+          placeholder="{{ 'customer.register.last_name' | t }}"
+          {% if form.errors contains 'last_name' %}
+            class="error"
+          {% endif %}
+        >
+
+        <label for="email" class="hidden-label">{{ 'customer.register.email' | t }}</label>
+        <input
+          type="email"
+          name="customer[email]"
+          id="email"
+          placeholder="{{ 'customer.register.email' | t }}"
+          {% if form.errors contains 'email' %}
+            class="error"
+          {% endif %}
+          autocorrect="off"
+          autocapitalize="off"
+        >
+
+        <label for="company" class="hidden-label">Company name</label>
+        <input
+          type="text"
+          id="company"
+          placeholder="Company name"
+          autocomplete="organization"
+          aria-describedby="companyHelp"
+        >
+
+        <label for="abn" class="hidden-label">ABN</label>
+        <input
+          type="text"
+          id="abn"
+          name="customer[note]"
+          placeholder="ABN"
+          inputmode="numeric"
+          pattern="[0-9 ]{11,}"
+          aria-describedby="abnHelp"
+        >
+        <small id="abnHelp" class="field-help">Australian Business Number (11 digits).</small>
+
+        <label for="create_password" class="hidden-label">{{ 'customer.register.password' | t }}</label>
+        <input
+          type="password"
+          name="customer[password]"
+          id="create_password"
+          placeholder="{{ 'customer.register.password' | t }}"
+          {% if form.errors contains 'password' %}
+            class="error"
+          {% endif %}
+        >
+
+        <p><input type="submit" value="{{ 'customer.register.submit' | t }}" class="btn"></p>
+
+        <div class="links">
+          <a href="#" onclick="hideRegisterForm();return false;">
+            {{- 'customer.register.cancel' | t | default: 'Back to sign in' -}}
+          </a>
+        </div>
+      {% endform %}
+    </div>
+  </div>
+  <div class="auth-extra" role="complementary" aria-label="Distributor login">
+    <div class="auth-extra__body">
+      <div>
+        <strong>Are you a distributor?</strong><br>
+        <span> Login to MyExcision.</span>
+      </div>
+      <a class="auth-extra__cta" href="https://www.myexcision.com.au/login" target="_blank" rel="noopener"> Login </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* Toggle helpers (match reset pattern) */
+  function showRecoverPasswordForm(){
+    document.getElementById('recover_password').style.display='block';
+    document.getElementById('customer_login').style.display='none';
+    document.getElementById('register_account').style.display='none';
+    location.hash = '#recover';
+  }
+  function hideRecoverPasswordForm(){
+    document.getElementById('recover_password').style.display='none';
+    document.getElementById('customer_login').style.display='block';
+    document.getElementById('register_account').style.display='none';
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+
+  function showRegisterForm(){
+    document.getElementById('register_account').style.display='block';
+    document.getElementById('customer_login').style.display='none';
+    document.getElementById('recover_password').style.display='none';
+    location.hash = '#register';
+  }
+  function hideRegisterForm(){
+    document.getElementById('register_account').style.display='none';
+    document.getElementById('customer_login').style.display='block';
+    document.getElementById('recover_password').style.display='none';
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+
+  /* Deep-links + success state */
+  if (window.location.hash === '#recover') { showRecoverPasswordForm(); }
+  if (window.location.hash === '#register') { showRegisterForm(); }
+  {% if reset_success %}document.getElementById('resetSuccess').style.display='block';{% endif %}
+</script>

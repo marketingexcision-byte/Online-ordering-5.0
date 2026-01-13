@@ -1,0 +1,31 @@
+{% if section.settings.related_products_enable %}
+   {% assign grid_item_width = 'large--one-third medium--one-third small--one-whole' %}
+   <div class="related-products__outer-wrapper">      
+     {% include 'related-products' %}
+   </div>
+{% endif %}
+
+   
+{% schema %}
+{
+  "name": "Related Products",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Related products"
+    },
+    {
+      "type": "checkbox",
+      "id": "related_products_enable",
+      "label": "Show related products"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Related Products"
+    }
+  ]
+}
+{% endschema %}

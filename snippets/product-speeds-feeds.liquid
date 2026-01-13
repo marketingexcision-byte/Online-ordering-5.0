@@ -1,0 +1,217 @@
+{% if product.metafields.custom.speeds_feeds
+  or product.metafields.custom.speeds_feeds_slotting
+  or product.metafields.custom.speeds_feeds_side_cutting
+  or product.metafields.custom.speeds_feeds_heavy_side_cutting
+  or product.metafields.custom.speeds_feeds_side_cutting_slotting
+  or product.metafields.custom.speeds_feeds_chamfering
+  or product.metafields.custom.speeds_feeds_chamfering_side_cutting
+  or product.metafields.custom.speeds_feeds_v_grooving
+  or product.metafields.custom.speeds_feeds_side_cutting_HSM_light != blank
+%}
+  <div id="speeds-feeds-section" class="product-additional container dt-prl-30 lazyload-element">
+    <section class="work-material-section">
+      <div style="margin-bottom: 10px;" class="table-header">
+        <h2>Speeds & Feeds</h2>
+      </div>
+
+      {% if product.metafields.custom.speeds_feeds != blank %}
+        <div class="speeds-feeds-hidden">
+          {{ product.metafields.custom.speeds_feeds.value }}
+        </div>
+
+        <div id="feeds-calculator" style="display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start;">
+          <!-- Input section -->
+          <div style="flex: 1; min-width: 250px;">
+            <label id="operation-label" style="display: none;"><strong>Operation:</strong></label>
+            <select id="operation-select" style="min-width: 150px; display: none; margin-bottom: 10px;"></select>
+
+            <label><strong>Material:</strong></label>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+              <select id="material-select" style="min-width: 150px;"></select>
+              <span id="material-icon" class="material" style="display: none;"></span>
+            </div>
+
+            <label><strong>Diameter (mm):</strong></label>
+            <select id="diameter-select" style="min-width: 100px;"></select>
+          </div>
+
+          <!-- Output section -->
+          <div style="flex: 1; min-width: 250px;">
+            <table style="border-collapse: collapse; width: 100%;">
+              <tbody>
+                <tr>
+                  <td><strong>RPM:</strong></td>
+                  <td id="rpm">–</td>
+                  <td style="text-align: end;">rev/min</td>
+                </tr>
+                <tr>
+                  <td><strong>FEED:</strong></td>
+                  <td id="feed">–</td>
+                  <td style="text-align: end;">mm/min</td>
+                </tr>
+                <tr>
+                  <td><strong>Vc:</strong></td>
+                  <td id="vc">–</td>
+                  <td style="text-align: end;">m/min</td>
+                </tr>
+                <tr>
+                  <td><strong>Fz:</strong></td>
+                  <td id="fz">–</td>
+                  <td style="text-align: end;">mm/tooth</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <p id="operation-line" style="margin-top:10px; display: none;">
+              <strong>Cutting Conditions:</strong> <span id="operation"></span>
+            </p>
+          </div>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+{% endif %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", initFeedsCalculator);
+    document.addEventListener("shopify:section:load", initFeedsCalculator);
+
+    function initFeedsCalculator() {
+      const tables = document.querySelectorAll(".speeds-feeds");
+      if (!tables.length || document.getElementById("feeds-calculator-initialised")) return;
+
+      const wrapper = document.getElementById("feeds-calculator");
+      if (!wrapper) return;
+      wrapper.id = "feeds-calculator-initialised";
+
+      const opLabel = document.getElementById("operation-label");
+      const opSelect = document.getElementById("operation-select");
+      const matSelect = document.getElementById("material-select");
+      const diaSelect = document.getElementById("diameter-select");
+      const rpmEl = document.getElementById("rpm");
+      const feedEl = document.getElementById("feed");
+      const vcEl = document.getElementById("vc");
+      const fzEl = document.getElementById("fz");
+      const operationText = document.getElementById("operation");
+      const operationLine = document.getElementById("operation-line");
+      const materialIcon = document.getElementById("material-icon");
+
+      const rawData = [];
+      const operationsSet = new Set();
+
+      tables.forEach(table => {
+        const material = table.dataset.material;
+        const code = table.dataset.code || "";
+        const ae = table.dataset.ae || "";
+        const ap = table.dataset.ap || "";
+        const operation = table.dataset.operation || "";
+        operationsSet.add(operation);
+
+        const entries = [];
+        table.querySelectorAll("tbody tr").forEach(row => {
+          const cells = row.querySelectorAll("td");
+          if (cells.length >= 5) {
+            entries.push({
+              diameter: cells[0].textContent.trim(),
+              vc: cells[1].textContent.trim(),
+              fz: cells[2].textContent.trim(),
+              rpm: cells[3].textContent.trim(),
+              feed: cells[4].textContent.trim()
+            });
+          }
+        });
+
+        rawData.push({ material, code, ae, ap, operation, entries });
+      });
+
+      const grouped = {};
+      rawData.forEach(d => {
+        if (!grouped[d.operation]) grouped[d.operation] = [];
+        grouped[d.operation].push(d);
+      });
+
+      if (operationsSet.size > 1) {
+        opLabel.style.display = "block";
+        opSelect.style.display = "inline-block";
+
+        Array.from(operationsSet).forEach(op => {
+          const opt = document.createElement("option");
+          opt.value = op;
+          opt.textContent = op;
+          opSelect.appendChild(opt);
+        });
+      }
+
+      function updateMaterials() {
+        const selectedOp = opSelect.value || [...operationsSet][0];
+        const materials = grouped[selectedOp] || [];
+
+        matSelect.innerHTML = "";
+        materials.forEach(data => {
+          const opt = document.createElement("option");
+          opt.value = data.material;
+          opt.textContent = data.material;
+          matSelect.appendChild(opt);
+        });
+
+        updateDiameters();
+      }
+
+      function updateDiameters() {
+        const selectedOp = opSelect.value || [...operationsSet][0];
+        const selectedMat = matSelect.value;
+        const match = (grouped[selectedOp] || []).find(d => d.material === selectedMat);
+        if (!match) return;
+
+        diaSelect.innerHTML = "";
+        match.entries.forEach(e => {
+          const opt = document.createElement("option");
+          opt.value = e.diameter;
+          opt.textContent = e.diameter;
+          diaSelect.appendChild(opt);
+        });
+
+        materialIcon.textContent = match.code || "";
+        materialIcon.className = `material material-${match.code}`;
+        materialIcon.style.display = match.code ? "inline-flex" : "none";
+
+        if (match.ae || match.ap) {
+          operationText.textContent = `Ae = ${match.ae}, Ap = ${match.ap}`;
+          operationLine.style.display = "block";
+        } else {
+          operationText.textContent = "";
+          operationLine.style.display = "none";
+        }
+
+        updateOutput();
+      }
+
+      function updateOutput() {
+        const selectedOp = opSelect.value || [...operationsSet][0];
+        const selectedMat = matSelect.value;
+        const dia = diaSelect.value;
+        const match = (grouped[selectedOp] || []).find(d => d.material === selectedMat);
+        const entry = match?.entries.find(e => e.diameter === dia);
+
+        rpmEl.textContent = entry?.rpm || "–";
+        feedEl.textContent = entry?.feed || "–";
+        vcEl.textContent = entry?.vc || "–";
+        fzEl.textContent = entry?.fz || "–";
+      }
+
+      opSelect.addEventListener("change", () => {
+        updateMaterials();
+      });
+
+      matSelect.addEventListener("change", updateDiameters);
+      diaSelect.addEventListener("change", updateOutput);
+
+      // init
+      if (opSelect.options.length) {
+        opSelect.selectedIndex = 0;
+        updateMaterials();
+      } else {
+        updateMaterials();
+      }
+    }
+  </script>

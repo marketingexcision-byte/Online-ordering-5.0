@@ -1,0 +1,835 @@
+{%- comment -%}
+Define all possible variant metafield columns as:
+  "<namespace>|<key>:<Header label>,"
+Only columns with at least one non-blank value across variants will render.
+{%- endcomment -%}
+{%- assign fields = "
+filter|thread_length_mm:Thread length (mm),
+filter|overall_length_mm:Overall length (mm),
+filter|neck_length_mm:Neck length (mm),
+filter|shank_diameter_mm:Shank dia. (mm),
+filter|square_size_mm:Square size (mm),
+filter|square_length_mm:Square length (mm),
+filter|flutes:Flutes,
+filter|inner_circle_mm:Inner Circle (mm),
+custom|mill_diameter_mm:Mill dia. (mm),
+custom|length_of_cut_mm:Length of cut (mm),
+custom|mill_dia_tolerance_mm:Mill dia. tol (mm),
+custom|shank_dia_tolerance:Shank dia. tol,
+custom|ball_nose_radius_mm:Ball nose radius (mm),
+custom|corner_radius_mm:Corner radius (mm),
+custom|length_below_shank_mm:Length below shank (mm),
+custom|neck_diameter_mm:Neck dia. (mm),
+custom|thickness_mm:Thickness (mm),
+custom|tapping_drill_diameter_mm:Tapping drill dia. (mm),
+custom|thread_direction:Thread direction,
+custom|tolerance:Tolerance,
+custom|bolt_diameter_mm:Bolt dia. (mm),
+custom|overall_diameter_mm:Overall dia. (mm),
+custom|overall_diameter_inch:Overall dia. (inch),
+custom|spanner_width:Spanner Width,
+custom|thickness:Thickness,
+" | split: "," -%}
+
+{%- assign option_count = product.options | size -%}
+
+{%- comment -%} PASS 1: Decide which metafield columns to include {%- endcomment -%}
+{%- assign include_blob = '' -%}
+{%- for f in fields -%}
+  {%- assign f_trim = f | strip -%}
+  {%- if f_trim == blank -%}{% continue %}{%- endif -%}
+  {%- assign p = f_trim | split: ":" -%}
+  {%- if p.size < 2 -%}{% continue %}{%- endif -%}
+
+  {%- assign left  = p[0] | strip -%}
+  {%- assign parts = left | split: "|" -%}
+  {%- assign ns    = parts[0] | strip -%}
+  {%- assign key   = parts[1] | strip -%}
+
+  {%- assign found = false -%}
+  {%- for v in product.variants -%}
+    {%- assign mf = v.metafields[ns][key] -%}
+    {%- if mf != blank -%}
+      {%- assign found = true -%}{%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- if found -%}
+    {%- assign include_blob = include_blob | append: f_trim | append: '||' -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- assign included_fields = include_blob | split: '||' -%}
+{%- assign has_any_meta_col = false -%}
+{%- if include_blob != '' -%}{%- assign has_any_meta_col = true -%}{%- endif -%}
+
+{%- if has_any_meta_col -%}
+<div class="vmx">
+  <table class="vmx__table">
+    <thead>
+      <tr class="vmx__tr vmx__head">
+        <th class="vmx__th">SKU</th>
+
+        {%- for i in (1..option_count) -%}
+          <th class="vmx__th">{{ product.options[forloop.index0] }}</th>
+        {%- endfor -%}
+
+        {%- for f in included_fields -%}
+          {%- assign f_trim = f | strip -%}
+          {%- if f_trim == blank -%}{% continue %}{%- endif -%}
+          {%- assign p = f_trim | split: ":" -%}
+          {%- if p.size < 2 -%}{% continue %}{%- endif -%}
+          <th class="vmx__th">{{ p[1] | strip }}</th>
+        {%- endfor -%}
+
+        <th class="vmx__th vmx__sticky-r rr4">Stock</th>
+        <th class="vmx__th vmx__sticky-r rr3">Price</th>
+        <th class="vmx__th vmx__sticky-r rr2">Qty</th>
+        <th class="vmx__th vmx__sticky-r rr1">Add</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {%- for v in product.variants -%}
+        <tr class="vmx__tr" data-variant-id="{{ v.id }}">
+          <td class="vmx__td">{{ v.sku }}</td>
+
+          {%- for i in (1..option_count) -%}
+            {%- capture oi -%}option{{ i }}{%- endcapture -%}
+            <td class="vmx__td">{{ v[oi] }}</td>
+          {%- endfor -%}
+
+          {%- for f in included_fields -%}
+            {%- assign f_trim = f | strip -%}
+            {%- if f_trim == blank -%}{% continue %}{%- endif -%}
+            {%- assign p     = f_trim | split: ":" -%}
+            {%- if p.size < 2 -%}{% continue %}{%- endif -%}
+            {%- assign left  = p[0]   | strip -%}
+            {%- assign parts = left   | split: "|" -%}
+            {%- assign ns    = parts[0] | strip -%}
+            {%- assign key   = parts[1] | strip -%}
+            {%- assign mf    = v.metafields[ns][key] -%}
+            <td class="vmx__td">{% if mf != blank %}{{ mf.value }}{% else %}-{% endif %}</td>
+          {%- endfor -%}
+
+{%- comment -%} Stock/status logic {%- endcomment -%}
+{%- assign low_threshold = 3 -%}
+{%- assign managed = v.inventory_management -%}
+{%- assign qty = v.inventory_quantity | default: 0 | plus: 0 -%}
+
+{%- assign has_incoming = false -%}
+{%- if v.incoming and v.next_incoming_date -%}
+  {%- assign has_incoming = true -%}
+{%- endif -%}
+
+{%- assign continue_selling = false -%}
+{%- if v.inventory_policy == 'continue' -%}
+  {%- assign continue_selling = true -%}
+{%- endif -%}
+
+{%- assign is_yg1 = false -%}
+{%- if product and product.tags and product.tags contains 'YG-1' -%}
+  {%- assign is_yg1 = true -%}
+{%- endif -%}
+
+
+{%- assign status = 'grey' -%}
+{%- capture status_text -%}Quantity unavailable{%- endcapture -%}
+
+{%- if managed -%}
+  {%- if qty > low_threshold -%}
+    {%- assign status = 'green' -%}
+    {%- capture status_text -%}In stock{%- endcapture -%}
+  {%- elsif qty > 0 -%}
+    {%- assign status = 'orange' -%}
+    {%- capture status_text -%}Low stock{%- endcapture -%}
+  {%- else -%}
+    {%- if has_incoming -%}
+      {%- assign status = 'blue' -%}
+      {%- capture status_text -%}Restocking · Due {{ v.next_incoming_date | date: "%-d %b %Y" }}{%- endcapture -%}
+    {%- elsif continue_selling -%}
+      {%- if is_yg1 -%}
+        {%- assign status = 'yellow' -%}
+        {%- capture status_text -%}5 days{%- endcapture -%}
+      {%- else -%}
+        {%- assign status = 'red' -%}
+        {%- capture status_text -%}Order in{%- endcapture -%}
+      {%- endif -%}
+    {%- else -%}
+      {%- assign status = 'red' -%}
+      {%- capture status_text -%}No stock{%- endcapture -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endif -%}
+
+
+          <td class="vmx__td vmx__sticky-r rr4">
+            <span class="ex-card-badge" data-status="{{ status | strip }}" title="Qty: {{ qty }}">
+              {{ status_text | strip }}
+            </span>
+          </td>
+
+          {%- comment -%} Price + Qty + Add/Quote {%- endcomment -%}
+          {%- assign is_zero_price = false -%}
+          {%- if v.price == 0 -%}{%- assign is_zero_price = true -%}{%- endif -%}
+
+          <td class="vmx__td vmx__sticky-r rr3">
+            {%- if is_zero_price -%}-{% else %}{{ v.price | money }}{%- endif -%}
+          </td>
+
+          {%- comment -%} Per-variant MOQ / Pack from metaobject {%- endcomment -%}
+{%- assign oq_ref = v.metafields.custom.order_quantity -%}
+{%- if oq_ref == blank -%}
+  {%- assign oq_ref = product.metafields.custom.order_quantity -%}
+{%- endif -%}
+
+{%- assign _min  = 0 -%}
+{%- assign _pack = 0 -%}
+{%- if oq_ref and oq_ref.value -%}
+  {%- assign _min  = oq_ref.value.min_order_qty | default: 0 | plus: 0 -%}  
+  {%- assign _pack = oq_ref.value.pack_qty      | default: 0 | plus: 0 -%}  
+{%- endif -%}
+
+{%- assign moq = 1 -%}
+{%- assign step = 1 -%}
+{%- if _pack > 0 and _min > 0 -%}
+  {%- assign moq = _min -%}{%- assign step = _pack -%}
+{%- elsif _pack > 0 -%}
+  {%- assign moq = _pack -%}{%- assign step = _pack -%}
+{%- elsif _min > 0 -%}
+  {%- assign moq = _min -%}{%- assign step = 1 -%}
+{%- endif -%}
+
+{%- assign rendered_qty = 1 | at_least: moq -%}
+
+<td class="vmx__td vmx__sticky-r rr2">
+  <input
+    type="number"
+    value="{{ rendered_qty }}"
+    min="{{ moq }}"
+    step="{{ step }}"
+    class="vmx__qty"
+    data-variant-id="{{ v.id }}"
+    inputmode="numeric"
+    pattern="[0-9]*"
+  >
+</td>
+
+
+          {%- comment -%} Build a clean variant options string (skips blank / “Default Title”) {%- endcomment -%}
+          {%- assign opts_buf = '' -%}
+          {%- for i in (1..option_count) -%}
+            {%- capture oi -%}option{{ i }}{%- endcapture -%}
+            {%- assign opt_val = v[oi] | default: '' -%}
+            {%- assign opt_lc  = opt_val | downcase -%}
+
+            {%- assign skip = false -%}
+            {%- if opt_val == blank -%}
+              {%- assign skip = true -%}
+            {%- elsif opt_lc == 'default title' -%}
+              {%- assign skip = true -%}
+            {%- endif -%}
+
+            {%- unless skip -%}
+              {%- if opts_buf != '' -%}
+                {%- assign opts_buf = opts_buf | append: ' / ' -%}
+              {%- endif -%}
+              {%- assign opts_buf = opts_buf | append: opt_val -%}
+            {%- endunless -%}
+          {%- endfor -%}
+          {%- assign v_options = opts_buf -%}
+
+          <td class="vmx__td vmx__sticky-r rr1">
+            {%- if is_zero_price -%}
+              <button
+                type="button"
+                class="quote-btn"
+                data-variant-id="{{ v.id }}"
+                data-sku="{{ v.sku | escape }}"
+                data-title="{{ product.title | escape }}"
+                data-options="{{ v_options | escape }}"
+              >Quote</button>
+            {%- else -%}
+              <button type="button" class="add-to-cart-btn" data-variant-id="{{ v.id }}">Add</button>
+            {%- endif -%}
+          </td>
+
+        </tr>
+      {%- endfor -%}
+    </tbody>
+  </table>
+</div>
+
+<style>
+.vmx {
+  --w-add:   100px;  /* right rail widths */
+  --w-qty:    80px;
+  --w-price: 90px;
+  --w-stock: 140px;
+}
+.vmx__table{ border-collapse:separate; border-spacing:0; width:100%; display:block; overflow:auto; }
+.vmx__th,.vmx__td{ padding:.65rem .9rem; white-space:nowrap; background:#fff; }
+.vmx__qty{ width:64px; }
+
+/* sticky header row */
+.vmx__head .vmx__th{ position:sticky; top:0; z-index:4; font-family:'Humanist777BT-Bold';
+  border-bottom:2px solid #e8e8e8 !important; background:#0069a7; color:#fff; }
+
+/* zebra rows */
+.vmx__table tbody .vmx__tr:nth-of-type(odd){  --rowbg:#fff; }
+.vmx__table tbody .vmx__tr:nth-of-type(even){ --rowbg:#fff; }
+.vmx__table tbody .vmx__td{ background:var(--rowbg,#fff); }
+.vmx__table tbody .vmx__td.vmx__sticky-r{ background:var(--rowbg,#fff); }
+
+/* right-sticky rail */
+.vmx__sticky-r{ position:sticky; right:0; z-index:3; }
+.rr1{ right:0; min-width:var(--w-add); text-align:left; }                  /* Add/Quote */
+.rr2{ right:calc(var(--w-add)); min-width:var(--w-qty); }                 /* Qty */
+.rr3{ right:calc(var(--w-add) + var(--w-qty)); min-width:var(--w-price);} /* Price */
+.rr4{ right:calc(var(--w-add) + var(--w-qty) + var(--w-price));
+     min-width:var(--w-stock); border-left:1px solid #eee; box-shadow: 0px 0px 70px 0px white;  }              /* Stock */
+
+/* match header offsets exactly */
+thead .rr1{ right:0; }
+thead .rr2{ right:calc(var(--w-add)); }
+thead .rr3{ right:calc(var(--w-add) + var(--w-qty)); }
+thead .rr4{ right:calc(var(--w-add) + var(--w-qty) + var(--w-price));
+  border-left:1px solid rgba(0,0,0,.08); }
+
+
+button.add-to-cart-btn {
+    padding: 10px 15px;
+    border-radius: 25px;
+    border: none;
+    background: #e0592a;
+    color: white;
+}
+
+button.quote-btn{
+    padding: 10px 15px;
+    border-radius: 25px;
+    border: none;
+    background: #f88d2b;
+    color: white;
+}
+</style>
+
+<style>
+/* ---- Column Filters UI (range slider + white icon) ---- */
+.vmx__th { position: relative; padding-right: 40px !important; }  /* room for the icon */
+.vmx__filter-btn {
+  appearance: none; border: 0; background: transparent; cursor: pointer;
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 6px;
+  margin-left: 10px; /* requested */
+}
+.vmx__filter-btn:hover { background: rgba(255,255,255,.16); }
+/* default: white icon */
+.vmx__filter-btn { color:#fff; }
+.vmx__filter-btn svg { width:18px; height:18px; fill: currentColor; opacity:1; }
+
+/* per-column active state (from TH class) */
+.vmx__th.is-filtered .vmx__filter-btn { color:#f88d2b; }
+
+/* extra insurance: if the SVG doesn't inherit color, force it */
+.vmx__th.is-filtered .vmx__filter-btn svg,
+.vmx__th.is-filtered .vmx__filter-btn svg path { fill:#f88d2b !important; }
+
+/* optional: also react to a data flag on the button itself */
+.vmx__filter-btn[data-filtered="1"] svg,
+.vmx__filter-btn[data-filtered="1"] svg path { fill:#f88d2b !important; }
+
+
+/* Floating menu */
+.vmx__filter-menu {
+  position: fixed; z-index: 9999; width: 330px; max-height: 60vh; overflow: auto;
+  background: #fff; border-radius: 15px; box-shadow: 0 12px 30px rgba(0,0,0,.18);
+}
+.vmx__fm-head { padding: 15px 15px 5px; display: flex; gap: 8px; }
+.vmx__fm-head input[type="search"]{ flex:1; margin-bottom: 0; }
+.vmx__fm-body { padding: 15px; max-height: 46vh; overflow: auto; }
+.vmx__fm-footer { padding: 5px 15px 20px; display:flex; gap:8px; justify-content: space-between; }
+.vmx__chip { font-size: 12px; padding: 4px 8px; border-radius: 999px; border: none; background: #f1f1f1; cursor:pointer; }
+.vmx__chip:hover { opacity: 85%; }
+.vmx__fm-list { display: grid; gap: 6px; }
+.vmx__fm-list label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.vmx__fm-row { display:flex; gap:8px; align-items:center; }
+.vmx__fm-row input[type="number"]{ width: 100%; margin-bottom: 0; }
+.vmx__btn { line-height: 1; padding:10px 15px; border-radius:25px; border:2px solid #e8e8e8; background:#fff; cursor:pointer; }
+.vmx__btn.primary { border-color:#0069a7; background:#0069a7; color:#fff; }
+.vmx__btn:hover { opacity: 85%; }
+
+/* Little caret */
+.vmx__filter-menu::before{
+  content:""; position: fixed; width: 10px; height: 10px; transform: rotate(45deg);
+  background: #fff; z-index: -1;
+}
+
+/* Dual-handle range slider */
+.vmx__range{ padding: 6px 2px 10px; }
+.vmx__range .track{ position:relative; height:4px; background:#e5e7eb; border-radius:999px; }
+.vmx__range .fill{ position:absolute; height:100%; background:#0069a7; border-radius:999px; }
+.vmx__range input[type=range]{
+  -webkit-appearance:none; appearance:none; position:absolute; left:0; top:62px;
+  width:100%; background:transparent; pointer-events:none; height:16px;
+}
+.vmx__range input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none; width:16px; height:16px; border-radius:50%;
+  background:#0069a7; border:2px solid #fff; box-shadow:0 1px 2px rgba(0,0,0,.25);
+  pointer-events:auto; cursor:pointer;
+}
+.vmx__range input[type=range]::-moz-range-thumb{
+  width:16px; height:16px; border-radius:50%; background:#0069a7; border:2px solid #fff;
+  pointer-events:auto; cursor:pointer;
+}
+
+/* $ prefix for price min/max inputs */
+.vmx__money{ position:relative; flex:1; }
+.vmx__money input{ width:100%; padding-left:18px; }
+.vmx__money::before{
+  content:'$';
+  position:absolute; left:8px; top:33%; transform:translateY(-50%);
+  color:#6b7280; font-size:12px;
+}
+
+
+</style>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  (function(){
+    const ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v2H3V5zm4 6h10v2H7v-2zm3 6h4v2h-4v-2z"/></svg>';
+    const TYPE_TEXT = 'text', TYPE_PRICE = 'price', TYPE_STOCK = 'stock';
+    const SKIP_COL_CLASSES = new Set(['rr2','rr1']); // skip Qty + Add/Quote
+
+    function moneyToNumber(txt){
+      if (!txt || txt.trim() === '-' ) return 0;
+      const n = parseFloat(String(txt).replace(/[^0-9.\-]/g,'')); return isNaN(n) ? NaN : n;
+    }
+    function isInStockFromStatus(s){ return s === 'green' || s === 'orange'; }
+    function detectType(th){ if (th.classList.contains('rr3')) return TYPE_PRICE; if (th.classList.contains('rr4')) return TYPE_STOCK; return TYPE_TEXT; }
+    function uniqueValuesForText(cells){
+      const set = new Set(); for (const td of cells) set.add((td.textContent || '').trim() || '—');
+      return Array.from(set).sort((a,b)=> String(a).localeCompare(String(b), undefined, {numeric:true, sensitivity:'base'}));
+    }
+
+    function attachGlobalGuards(ctx, menu, btn, caret){
+      // Install after the opening click finishes so it doesn't close immediately
+      const onDoc = (e) => { if (!menu.contains(e.target) && !btn.contains(e.target)) closeMenu(); };
+      const onKey = (e) => { if (e.key === 'Escape') closeMenu(); };
+      const onReflow = () => {
+        if (!ctx.openMenu) return;
+        const r = btn.getBoundingClientRect();
+        menu.style.left = Math.max(8, r.right - 330) + 'px';
+        menu.style.top  = (r.bottom + 8) + 'px';
+        if (caret) caret.textContent = '.vmx__filter-menu::before{left:'+(r.right-15)+'px; top:'+(r.bottom-3)+'px;}';
+      };
+      setTimeout(() => {
+        document.addEventListener('mousedown', onDoc, true);
+        document.addEventListener('keydown', onKey, true);
+        window.addEventListener('resize', onReflow, {passive:true});
+        window.addEventListener('scroll', onReflow, {passive:true});
+      }, 0);
+
+      function closeMenu(){
+        document.removeEventListener('mousedown', onDoc, true);
+        document.removeEventListener('keydown', onKey, true);
+        window.removeEventListener('resize', onReflow, true);
+        window.removeEventListener('scroll', onReflow, true);
+        menu.remove();
+        ctx.openMenu = null;
+      }
+      return closeMenu;
+    }
+
+    // Build PRICE menu with dual range slider + min/max boxes
+    function buildPriceMenu(col, menu){
+      const chips = document.createElement('div'); chips.className='vmx__fm-head';
+      const zeroChip = document.createElement('button'); zeroChip.className='vmx__chip'; zeroChip.textContent='Zero only';
+      zeroChip.addEventListener('click', ()=>{ col.active = {type:'range', min:0, max:0}; applyFilters(col.ctx); setFilteredState(col); close(); });
+      const clearChip = document.createElement('button'); clearChip.className='vmx__chip'; clearChip.textContent='Clear';
+      clearChip.addEventListener('click', ()=>{ col.active = null; applyFilters(col.ctx); setFilteredState(col); close(); });
+      chips.appendChild(zeroChip); chips.appendChild(clearChip);
+      menu.appendChild(chips);
+
+      const nums = col.cells.map(td => moneyToNumber(td.textContent)).filter(n => !isNaN(n));
+      const hardMin = nums.length ? Math.min.apply(null, nums) : 0;
+      const hardMax = nums.length ? Math.max.apply(null, nums) : 0;
+
+      const body = document.createElement('div'); body.className='vmx__fm-body';
+      const rangeWrap = document.createElement('div'); rangeWrap.className='vmx__range';
+      const track = document.createElement('div'); track.className='track';
+      const fill = document.createElement('div'); fill.className='fill';
+      track.appendChild(fill); rangeWrap.appendChild(track);
+
+      const r1 = document.createElement('input'); r1.type='range';
+      const r2 = document.createElement('input'); r2.type='range';
+      [r1,r2].forEach(r => { r.min = hardMin; r.max = hardMax; r.step = 0.01; });
+      r1.value = col.active?.type==='range' && col.active.min!=null ? col.active.min : hardMin;
+      r2.value = col.active?.type==='range' && col.active.max!=null ? col.active.max : hardMax;
+      rangeWrap.appendChild(r1); rangeWrap.appendChild(r2);
+
+      const row = document.createElement('div'); row.className='vmx__fm-row';
+      const minI = document.createElement('input'); minI.type='number'; minI.placeholder='Min'; minI.step='0.01';
+      const maxI = document.createElement('input'); maxI.type='number'; maxI.placeholder='Max'; maxI.step='0.01';
+      minI.value = r1.value; maxI.value = r2.value;
+      const minWrap = document.createElement('label'); minWrap.className = 'vmx__money';
+      const maxWrap = document.createElement('label'); maxWrap.className = 'vmx__money';
+      minWrap.appendChild(minI); maxWrap.appendChild(maxI);
+      row.appendChild(minWrap); row.appendChild(maxWrap);
+
+
+      body.appendChild(rangeWrap); body.appendChild(row);
+      menu.appendChild(body);
+
+      const footer = document.createElement('div'); footer.className='vmx__fm-footer';
+      const clearB = document.createElement('button'); clearB.className='vmx__btn'; clearB.textContent='Clear';
+      clearB.addEventListener('click', ()=>{ col.active=null; applyFilters(col.ctx); setFilteredState(col); close(); });
+      const applyB = document.createElement('button'); applyB.className='vmx__btn primary'; applyB.textContent='Apply';
+      applyB.addEventListener('click', ()=> {
+        const min = minI.value === '' ? null : Number(minI.value);
+        const max = maxI.value === '' ? null : Number(maxI.value);
+        col.active = (min===null && max===null) ? null : {type:'range', min, max};
+        applyFilters(col.ctx); setFilteredState(col); close();
+      });
+      footer.appendChild(clearB); footer.appendChild(applyB);
+      menu.appendChild(footer);
+
+      function clamp(v, lo, hi){ return Math.min(Math.max(v, lo), hi); }
+      function syncFromRanges(){
+        let a = Number(r1.value), b = Number(r2.value);
+        if (a > b){ const t=a; a=b; b=t; }
+        minI.value = a; maxI.value = b; positionFill(a,b);
+      }
+      function syncFromInputs(){
+        let a = minI.value === '' ? hardMin : Number(minI.value);
+        let b = maxI.value === '' ? hardMax : Number(maxI.value);
+        a = clamp(a, hardMin, hardMax); b = clamp(b, hardMin, hardMax);
+        if (a > b){ const t=a; a=b; b=t; }
+        r1.value = a; r2.value = b; positionFill(a,b);
+      }
+      function positionFill(a,b){
+        const span = hardMax - hardMin || 1;
+        const left = ((a - hardMin) / span) * 100;
+        const right = ((b - hardMin) / span) * 100;
+        fill.style.left = left + '%';
+        fill.style.width = (right - left) + '%';
+      }
+      [r1,r2].forEach(r => r.addEventListener('input', syncFromRanges));
+      [minI,maxI].forEach(i => i.addEventListener('input', syncFromInputs));
+      positionFill(Number(r1.value), Number(r2.value));
+
+      // caret + global guards
+      const caret = document.createElement('style');
+      caret.textContent = '.vmx__filter-menu::before{left:'+(col.btn.getBoundingClientRect().right-15)+'px; top:'+(col.btn.getBoundingClientRect().bottom-3)+'px;}';
+      menu.appendChild(caret);
+      const close = attachGlobalGuards(col.ctx, menu, col.btn, caret);
+    }
+
+    function buildTextMenu(col, menu){
+      const head = document.createElement('div'); head.className='vmx__fm-head';
+      const body = document.createElement('div'); body.className='vmx__fm-body';
+      const footer = document.createElement('div'); footer.className='vmx__fm-footer';
+
+      const search = document.createElement('input'); search.type = 'search'; search.placeholder = 'Search values';
+      head.appendChild(search);
+
+      const allValues = uniqueValuesForText(col.cells);
+      const list = document.createElement('div'); list.className = 'vmx__fm-list';
+      function renderList(q=''){
+        list.innerHTML = '';
+        const needle = (q || '').toLowerCase().trim();
+        const selected = new Set(col.active?.values || []);
+        for (const val of allValues) {
+          const label = String(val);
+          if (needle && !label.toLowerCase().includes(needle)) continue;
+          const row = document.createElement('label');
+          const cb = document.createElement('input'); cb.type='checkbox'; cb.value = label;
+          cb.checked = selected.size ? selected.has(label) : false;
+          cb.addEventListener('change', () => {
+            const set = new Set(col.active?.values || []);
+            if (cb.checked) set.add(label); else set.delete(label);
+            col.active = {type:'set', values: Array.from(set)};
+            applyFilters(col.ctx); setFilteredState(col);
+          });
+          const span = document.createElement('span'); span.textContent = label;
+          row.appendChild(cb); row.appendChild(span); list.appendChild(row);
+        }
+      }
+      renderList();
+      search.addEventListener('input', e => renderList(e.target.value));
+
+      const left = document.createElement('div'); left.style.display='flex'; left.style.gap='8px';
+      const allBtn = document.createElement('button'); allBtn.className='vmx__btn'; allBtn.textContent='Select all';
+      allBtn.addEventListener('click', ()=>{ col.active = {type:'set', values: allValues.map(String)}; applyFilters(col.ctx); setFilteredState(col); renderList(search.value); });
+      const clrBtn = document.createElement('button'); clrBtn.className='vmx__btn'; clrBtn.textContent='Clear all';
+      clrBtn.addEventListener('click', ()=>{ col.active = null; applyFilters(col.ctx); setFilteredState(col); renderList(search.value); });
+      left.appendChild(allBtn); left.appendChild(clrBtn);
+
+      const done = document.createElement('button'); done.className='vmx__btn primary'; done.textContent='Done';
+      done.addEventListener('click', ()=> close());
+
+      menu.appendChild(head); menu.appendChild(body); menu.appendChild(footer);
+      body.appendChild(list); footer.appendChild(left); footer.appendChild(done);
+
+      const caret = document.createElement('style');
+      caret.textContent = '.vmx__filter-menu::before{left:'+(col.btn.getBoundingClientRect().right-15)+'px; top:'+(col.btn.getBoundingClientRect().bottom-3)+'px;}';
+      menu.appendChild(caret);
+      const close = attachGlobalGuards(col.ctx, menu, col.btn, caret);
+    }
+
+    function buildStockMenu(col, menu){
+      const body = document.createElement('div'); body.className='vmx__fm-body';
+      const footer = document.createElement('div'); footer.className='vmx__fm-footer';
+
+      const list = document.createElement('div'); list.className='vmx__fm-list';
+      const opts = [{v:'in',label:'In stock'}, {v:'no',label:'No stock'}];
+      const activeSet = new Set(col.active?.values || []);
+      for (const o of opts){
+        const row = document.createElement('label');
+        const cb = document.createElement('input'); cb.type='checkbox'; cb.value = o.v; cb.checked = activeSet.has(o.v);
+        cb.addEventListener('change', ()=>{
+          const set = new Set(col.active?.values || []);
+          if (cb.checked) set.add(o.v); else set.delete(o.v);
+          col.active = {type:'set', values: Array.from(set)};
+          applyFilters(col.ctx); setFilteredState(col);
+        });
+        const span = document.createElement('span'); span.textContent = o.label;
+        row.appendChild(cb); row.appendChild(span); list.appendChild(row);
+      }
+      body.appendChild(list);
+
+      const clr = document.createElement('button'); clr.className='vmx__btn'; clr.textContent='Clear';
+      clr.addEventListener('click', ()=>{ col.active=null; applyFilters(col.ctx); setFilteredState(col); });
+      const done = document.createElement('button'); done.className='vmx__btn primary'; done.textContent='Done';
+      done.addEventListener('click', ()=> close());
+      footer.appendChild(clr); footer.appendChild(done);
+
+      menu.appendChild(body); menu.appendChild(footer);
+
+      const caret = document.createElement('style');
+      caret.textContent = '.vmx__filter-menu::before{left:'+(col.btn.getBoundingClientRect().right-15)+'px; top:'+(col.btn.getBoundingClientRect().bottom-3)+'px;}';
+      menu.appendChild(caret);
+      const close = attachGlobalGuards(col.ctx, menu, col.btn, caret);
+    }
+
+    // put this ABOVE rowPasses() and applyFilters()
+function setFilteredState(col){
+  const on = !!(col.active && (col.active.type === 'set'
+              ? (col.active.values || []).length
+              : true));
+  col.th.classList.toggle('is-filtered', on);
+  // also mark the button so CSS can target it directly
+  col.btn.dataset.filtered = on ? '1' : '0';
+}
+
+
+    function rowPasses(row, columns){
+      for (const col of columns){
+        if (!col.active) continue;
+        const td = row.children[col.index]; if (!td) continue;
+
+        if (col.type === TYPE_STOCK){
+          const status = (td.querySelector('.ex-card-badge')?.dataset.status || '').trim();
+          const inStock = isInStockFromStatus(status);
+          const want = new Set(col.active.values || []);
+          if (want.size && !want.has(inStock ? 'in' : 'no')) return false;
+
+        } else if (col.type === TYPE_PRICE){
+          const n = moneyToNumber(td.textContent);
+          const {min, max} = col.active;
+          if (min !== null && !(n >= min)) return false;
+          if (max !== null && !(n <= max)) return false;
+
+        } else { // TEXT
+          const val = (td.textContent || '').trim() || '—';
+          const set = new Set(col.active.values || []);
+          if (set.size && !set.has(val)) return false;
+        }
+      }
+      return true;
+    }
+
+    function applyFilters(ctx){
+      for (const row of ctx.rows) row.style.display = rowPasses(row, ctx.columns) ? '' : 'none';
+    }
+
+    // Init
+    document.querySelectorAll('.vmx__table').forEach(table => {
+      const header = table.querySelector('thead tr'); if (!header) return;
+      const ths = Array.from(header.children);
+      const rows = Array.from(table.querySelectorAll('tbody tr'));
+      const ctx = {rows, columns: [], openMenu: null};
+
+      ths.forEach((th, index) => {
+        if ([...th.classList].some(c => SKIP_COL_CLASSES.has(c))) return;
+        const type = detectType(th);
+        const cells = rows.map(r => r.children[index]).filter(Boolean);
+
+        const btn = document.createElement('button');
+        btn.className = 'vmx__filter-btn';
+        btn.type = 'button';
+        btn.style.pointerEvents = 'auto'; // ensure clickable even in sticky headers
+        btn.setAttribute('aria-label', 'Filter column');
+        btn.innerHTML = ICON;
+        th.appendChild(btn);
+
+        const col = {ctx, th, btn, index, type, active: null, cells, key: 'col'+index};
+        ctx.columns.push(col);
+
+        setFilteredState(col); // initialize icon color state
+
+
+        btn.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation(); // don’t let global handlers see the opener click
+          if (ctx.openMenu) { ctx.openMenu.remove(); ctx.openMenu = null; }
+
+          const menu = document.createElement('div');
+          menu.className = 'vmx__filter-menu';
+          menu.style.zIndex = '2147483647'; // above everything
+          const r = btn.getBoundingClientRect();
+          menu.style.left = Math.max(8, r.right - 310) + 'px';
+          menu.style.top  = (r.bottom + 2) + 'px';
+
+          // Build by type
+          if (type === TYPE_PRICE)      buildPriceMenu(col, menu);
+          else if (type === TYPE_STOCK) buildStockMenu(col, menu);
+          else                          buildTextMenu(col, menu);
+
+          document.body.appendChild(menu);
+          ctx.openMenu = menu;
+
+          // focus something helpful
+          requestAnimationFrame(()=>{
+            const el = menu.querySelector('input,button'); if (el) el.focus();
+          });
+        });
+      });
+
+      table.__vmxFilterCtx = ctx; // debugging hook
+    });
+  })();
+});
+</script>
+
+
+
+
+{%- comment -%}
+Glue: when a "Quote" button is clicked, open your HubSpot modal (from your provided script)
+and prefill the quote_product field with this row’s info.
+{%- endcomment -%}
+<script>
+(function () {
+  function formatQuoteProduct(btn){
+    var title = btn.dataset.title || '';
+    var opts  = (btn.dataset.options || '').trim();
+    var sku   = btn.dataset.sku || '';
+    var s = title;
+    if (opts && opts.toLowerCase() !== 'default title') s += ' — ' + opts;
+    if (sku) s += ' (SKU ' + sku + ')';
+    s += ' — ' + window.location.href;
+    return s;
+  }
+
+  function fillQuoteField(value){
+    var tries = 0;
+    (function tryFill(){
+      var f  = document.querySelector('#hs-quote-form form');
+      var qp = f && f.querySelector('[name="quote_product"]');
+      if (qp) {
+        qp.value = value;
+        qp.dispatchEvent(new Event('input',  { bubbles:true }));
+        qp.dispatchEvent(new Event('change', { bubbles:true }));
+      } else if (tries++ < 40) {
+        setTimeout(tryFill, 100); // wait up to ~4s for HS form to mount
+      }
+    })();
+  }
+
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('.quote-btn');
+    if (!btn) return;
+    e.preventDefault();
+
+    if (window.__openQuotePopup) window.__openQuotePopup(); // provided by your HubSpot modal script
+    fillQuoteField(formatQuoteProduct(btn));
+  }, false);
+})();
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  (function () {
+    // Map of "Text" => array of material codes to show (e.g., "P05", "K10")
+    const WM_MAP = {
+      "YG1001": ["P05","K10"],
+      "YG3010": ["P10","K20"],
+      "YG3020": ["P20"],
+      "YG3030": ["P30","M20"],
+      "YG801":  ["P20"],
+      "YG100":  ["N20"],
+      "YG10":   ["N20"],
+      "YG211":  ["M15","S10"],
+      "YG213":  ["M30","S20"],
+      "YG214":  ["M40","S30"]
+    };
+
+    // Enhance any body cell whose text matches a key above
+    document.querySelectorAll('.vmx__table tbody td:not(.vmx__sticky-r)').forEach(td => {
+      const raw = (td.textContent || '').trim();
+      if (!WM_MAP.hasOwnProperty(raw)) return;
+
+      const group = document.createElement('span');
+      group.className = 'wm-chip-group';
+
+      // Build chips. We reuse your color rules via the first letter in data-m (P/M/K/N/S)
+      for (const code of WM_MAP[raw]) {
+        const chip = document.createElement('span');
+        chip.className = 'work-mat__chip wm-chip';
+        chip.dataset.m = code.charAt(0).toUpperCase(); // gives P/M/K/N/S -> your CSS sets the color
+        chip.textContent = code;                        // shows e.g. "P05"
+        group.appendChild(chip);
+      }
+
+      const label = document.createElement('span');
+      label.className = 'wm-chip-text';
+      label.textContent = ' ' + raw;
+
+      td.textContent = '';
+      td.appendChild(group);
+      td.appendChild(label);
+      td.classList.add('has-wm-chips');
+    });
+  })();
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  function i(v,d){ v=parseInt(v,10); return isNaN(v)?d:v; }
+  function snap(val, min, step){
+    val = Math.max(i(val, min), min);
+    step = Math.max(i(step, 1), 1);
+    if (step === 1) return val;
+    const k = Math.ceil((val - min) / step);
+    return min + k * step;
+  }
+  document.querySelectorAll('.vmx__qty').forEach(function(input){
+    const fix = () => {
+      const min  = i(input.min || '1', 1);
+      const step = i(input.step || '1', 1);
+      input.value = snap(input.value, min, step);
+    };
+    input.addEventListener('change', fix);
+    input.addEventListener('blur', fix);
+    // init pass
+    fix();
+  });
+});
+</script>
+
+
+{%- endif -%}

@@ -1,0 +1,108 @@
+<div class="contact_us_outer_wrapper simple-lazyload">
+  <div class="container dt-prl-30 content">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="row contact-details">
+          <div class="col-12 col-sm-6 left-main-div">
+            <section class="inner-wrapper lazyload-element">
+             <div class="w-btn-wrapper" style="padding-bottom: 30px;">
+               <a class="w-btn icon_atleft" href="https://excision.com.au/pages/material-handling-page"><span class="w-btn-label font-bold"><em>←</em> Back to Material Handling</span></a>
+             </div> 
+              <h1 style="color: #fff;">{{ page.title }}</h1>
+              <div class="rte" style="color: #fff;">{{ page.content }}</div>
+            </section>
+          </div>
+          <div class="col-12 col-sm-6 lazyload-element">
+          <div class="globo-formbuilder" data-id="{{ page.metafields.custom.power_form_id }}"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{ page.metafields.custom.extra_code | raw }}
+</div>
+
+<style>
+main.wrapper.main-content {
+    max-width: 100%;
+    padding: 0;
+}
+.inner-wrapper h1{
+    margin-bottom: 20px;
+}
+
+.gfb__template__wizard1 {
+  background: white;
+   box-shadow: none;
+  border-radius: 15px;
+}
+  .gfb-style-line .gfb__footer button[type=button] {
+    border-radius: 30px;
+    box-shadow: none;
+    border: 2px solid #e0592a;
+    background: white;
+    color: black;
+    font-family: 'Humanist777BT-Bold';
+  }
+ .gfb__template__wizard1 .gfb__sticky-navigation-previous, .gfb__template__wizard1 .gfb__sticky-navigation-next {
+   background: #0069a7;
+ }
+  .gfb__template__wizard1 .gfb__indicator--line .gfb__indicator--progress {
+    background: #e0592a;
+  }
+  .gfb-style-line .globo-form-control .globo-form-input .globo-list-control .radio-wrapper {
+    border-radius: 30px;
+    background: #e8e8e8;
+    box-shadow: none;
+  }
+  .globo-form-control .radio-wrapper .radio-input~.radio-label:before, .globo-form-control .radio-wrapper .radio-input~.radio-label:after {
+    border: none;
+    box-shadow: none;
+  }
+  .globo-form-control .radio-wrapper .radio-input:checked~.radio-label:after {
+    background: #0a4875;
+  }
+  .gfb-style-line .gfb__footer button[type=submit] {
+    border-radius: 30px;
+    box-shadow: none;
+    background: #e0592a;
+    font-family: 'Humanist777BT-Bold';
+    transition: 0.3s ease-in-out;
+  }
+  .gfb__template__wizard1 .gfb__sticky-navigation-previous:hover, .gfb__template__wizard1 .gfb__sticky-navigation-next:hover, .gfb__template__wizard1 .gfb__sticky-copyright:hover, .gfb-style-line .gfb__footer button[type=button]:hover, .gfb-style-line .gfb__footer button[type=submit]:hover, .gfb-style-line .gfb__sticky-footer button[type=button]:hover, .gfb-style-line .gfb__sticky-footer button[type=submit]:hover, .gfb-style-line_rounded .gfb__footer button[type=button]:hover, .gfb-style-line_rounded .gfb__footer button[type=submit]:hover, .gfb-style-line_rounded .gfb__sticky-footer button[type=button]:hover, .gfb-style-line_rounded .gfb__sticky-footer button[type=submit]:hover {
+    filter: brightness(100%);
+    opacity: 85%;
+  }
+  .gfb__template__wizard1 .gfb__sticky-navigation-previous, .gfb__template__wizard1 .gfb__sticky-navigation-next {
+    box-shadow: none;
+  }
+  .gfb-style-line .globo-form-control .globo-form-input .globo-list-control .checkbox-wrapper {
+    border-radius: 30px;
+    background: #e8e8e8;
+    box-shadow: none;
+  }
+  .globo-form-control .checkbox-wrapper .checkbox-input~.checkbox-label:before {
+    border: none;
+    box-shadow: none;
+    border-radius: 50%;
+  }
+  .gfb-style-line .globo-form-control .checkbox-wrapper .checkbox-input~.checkbox-label:after {
+    
+  }
+  .globo-form-control .checkbox-wrapper .checkbox-input:checked~.checkbox-label:before {
+    background: #0a4875;
+  }
+  .gfb-style-line .globo-form-control .globo-description, .gfb-style-line_rounded .globo-form-control .globo-description {
+    font-size: 16px;
+    color: black;
+  }
+  .gfb__template__wizard1 .globo-form-app {
+        margin: 36px 0;
+  }
+  .gfb__template__wizard1 .globo-form-app h3 {
+    color: #e0592a;
+  }
+    .gfb__template__wizard1 .globo-form-app h2 {
+    margin-bottom: 0px;
+  }
+</style>

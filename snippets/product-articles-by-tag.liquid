@@ -1,0 +1,78 @@
+        <div class="grid-item medium--one-half large--one-third sp-blog-items">
+           <div class="rte blog-content-wrapper">
+              {% if article.image %}
+              {% assign image_alt = article.title | escape %}
+              {%- assign image = article.image -%}
+              {% comment %}{{ article | img_url: '1024x1024' | img_tag: image_alt, 'article__image' | link_to: article.url }}{% endcomment %}
+              <a href="{{ article.url }}" alt="{{ image_alt }}">
+                 {%- assign width = 350 -%} 
+                 {%- assign height = 600 -%}
+                 {%- include 'image-logic' with width: width, height: height -%}
+                 {%- assign img_url = article.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+                 <div class="lazyload__image-wrapper" data-image-id="{{ image.id }}" style="max-width: {{ max_width }}px">
+                    <div class="lazyload__image-wrapper no-js" style="padding-top:{{ 1 | divided_by: article.image.aspect_ratio | times: 100}}%;">
+                       <img class="lazyload js article__image"
+                          src="{{ article.image | img_url: '300x' }}"
+                          data-src="{{ img_url }}"
+                          data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                          data-aspectratio="{{ article.image.aspect_ratio }}"
+                          data-sizes="auto"
+                          alt="{{ image_alt }}"> 
+                    </div>
+                 </div>
+                 <noscript>
+                    <img src="{{ image | img_url: '580x' }}"
+                       srcset="{{ image | img_url: '580x' }} 1x, {{ image | img_url: '580x', scale: 2 }} 2x"
+                       alt="{{ image.alt }}" style="opacity:1;">
+                 </noscript>
+              </a>
+              {% endif %}
+              <div class="article-info">
+               {% comment %}
+                <p class="text-dark article-meta">                    
+                    {% capture author %}<span class="article_author">{{ article.author }}</span>{% endcapture %}
+                    {% capture date %}<span class="article_date"><time pubdate datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}">{{ article.published_at | date: format: 'date' }}</time></span>{% endcapture %}
+                    {{ 'blogs.article.author_on_date_html' | t: author: author, date: date }}                     
+                    {% if article.metafields.global.author %} 
+                    <span class="article_author">By {{ article.metafields.global.author }} </span>
+                    {% else %}
+                    <span class="article_author">By {{ article.author }} </span>
+                    {% endif %}                   
+                    <span class="article_date font-bold"><time pubdate datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}">{{ article.published_at | date: format: 'date' }}</time></span>
+                </p> 
+                {% endcomment %} 
+                 <a href="{{ article.url }}">
+                   <h3>{{ article.title }}</h3>
+                   <p class="article-excerpt">{{ article.excerpt_or_content | strip_html | truncatewords: 22 }}</p>
+                 </a>
+                 {% comment %}
+                 {% if article.excerpt.size > 0 %}
+                 <p class="article-excerpt">{{ article.excerpt }}</p>
+                 {% else %}
+                 <p class="article-excerpt">{{ article.content | strip_html | truncatewords: 22 }}</p>
+                 {% endif %}
+                 {% endcomment %}                 
+                 <div class="article_divider"></div>
+                 <span class="article_date"><a href="{{ article.url }}"><time pubdate datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}">{{ article.published_at | date: format: 'date' }}</time></a></span>
+                 <div class="article_author_meta">                   
+                   {%- if article.metafields.global.author.value != blank -%}
+                   <a href="/pages/{{ article.metafields.global.author | handle }}">
+                     <img class="article_img" src="{{ article.metafields.global.author | handle | file_url | split: "?" | first }}.jpg" alt="{{ article.metafields.global.author }}">
+                   </a>                   
+                   <a href="/pages/{{ article.metafields.global.author | handle }}">
+                     <span class="article_author font-bold">{{ article.metafields.global.author }} </span>
+                   </a>
+                   {%- endif -%}
+                 </div>
+                 {%- if article.metafields.custom.type.value != blank -%}
+                    <p class="article_type_items">                  
+                      {% assign article_type = article.metafields.custom.type.value %}
+                      {%- for a_type in article_type -%}                    
+                          <span class="article_type at_{{ a_type | handle }}">{{ a_type }}</span>
+                      {%- endfor -%}                  
+                    </p>
+                 {%- endif -%}
+                 {% comment %}<div class="read__more-btn-wrapper"><a class="read__more" href="{{ article.url }}">{{ 'blogs.article.read_more' | t }} <span style="font-family: monospace;">→</span></a></div>{% endcomment %}                             
+               </div>
+           </div>
+        </div>

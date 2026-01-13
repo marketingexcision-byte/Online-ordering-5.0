@@ -1,0 +1,820 @@
+<!doctype html>
+<html class="no-touch no-js" lang="en" dir="ltr">
+  <head>
+ {%- render 'ecom_header' -%}
+{% liquid
+  assign request_path  = request.path        | default: '' | downcase
+  assign request_query = request.query_string| default: '' | downcase
+
+  # Defaults
+  assign robots_directive = 'index,follow'
+  assign canonical_href   = canonical_url
+
+  # Detect filtered collections (ONLY evaluate on collection pages)
+  assign has_collection_filters = false
+  if request.page_type == 'collection'
+    if current_tags and current_tags.size > 0
+      assign has_collection_filters = true
+    elsif request_query contains 'filter.' or request_query contains 'filter%5b' or request_query contains 'pf_' or request_query contains 'constraint=' or request_query contains 'options%5b'
+      assign has_collection_filters = true
+    else
+      # legacy tag-in-path like /collections/handle/tag1+tag2
+      assign after_collections = request_path | split: '/collections/' | last
+      assign segments = after_collections | split: '/'
+      if segments.size > 1 and segments[1] contains '+'
+        assign has_collection_filters = true
+      endif
+    endif
+  endif
+
+  # Per-page-type rules
+  case request.page_type
+    when 'product'
+      # Products: ALWAYS index & self-canonical
+      assign canonical_href   = shop.url | append: product.url
+      assign robots_directive = 'index,follow'
+
+      # Optional: allow explicit opt-out for true service SKUs only
+      # (remove these 3 lines if you never want any product noindexed)
+      if product.tags contains 'svc-noindex'
+        assign robots_directive = 'noindex,follow'
+      endif
+
+    when 'collection'
+      assign canonical_href = shop.url | append: collection.url
+
+      # Only filtered or paginated collection variants are noindex
+      if has_collection_filters or (paginate and paginate.current_page > 1)
+        assign robots_directive = 'noindex,follow'
+      endif
+
+    when 'search'
+      assign robots_directive = 'noindex,follow'
+  endcase
+
+  # Fence off app/search/compare paths (but NEVER override product setting)
+  if request.page_type != 'product' and (request_path contains '/a/search' or request_path contains '/search' or request_path contains '/compare')
+    assign robots_directive = 'noindex,follow'
+  endif
+%}
+
+<meta name="robots" content="{{ robots_directive }}">
+<link rel="canonical" href="{{ canonical_href }}">
+
+
+
+    <script>
+      (function (H) {
+        H.className = H.className.replace(/\bno-js\b/, 'js');
+      })(document.documentElement);
+    </script>
+    <!-- Basic page needs ================================================== -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    {%- if settings.favicon -%}
+      <link rel="shortcut icon" href="{{ settings.favicon | img_url: '32x32' }}" type="image/png" defer="defer">
+    {%- endif -%}
+    <!-- Title and description ================================================== -->
+    <title>
+      {{ page_title }}
+      {%- if current_tags -%}
+        {%- assign current_tags_joined = current_tags | join: ', ' -%}
+        &ndash; {{ 'general.meta.tags' | t: tags: current_tags_joined }}
+      {%- endif -%}
+      {%- if current_page != 1 -%}&ndash; {{ 'general.meta.page' | t: page: current_page }}{%- endif -%}
+      {%- unless page_title contains shop.name -%}&ndash; {{ shop.name }}{%- endunless -%}
+    </title>
+  
+    <!-- Product meta ================================================== -->
+    {%- include 'social-meta-tags' -%}
+    <!-- Helpers ================================================== -->
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <!-- CSS ================================================== -->
+    {%- comment -%} New CSS layers {%- endcomment -%}
+    {{ 'tokens.css' | asset_url | stylesheet_tag }}
+    {{ 'typography.css' | asset_url | stylesheet_tag }}
+    {{ 'components.css' | asset_url | stylesheet_tag }}
+    {{ 'custom.css' | asset_url | stylesheet_tag }}
+    {% comment %} {{ 'theme.scss.css' | asset_url | stylesheet_tag }}  {% endcomment %}
+    <link rel="stylesheet" href="{{ 'theme.scss.css' | asset_url }}" media="print" as="style" onload="this.media='all'">
+    {%- if template contains 'product' -%}
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.5.9/slick.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.5.9/slick-theme.min.css">
+    {%- endif -%}
+    {{ 'plyr.css' | asset_url | stylesheet_tag }}
+    <!-- Header hook for plugins ================================================== -->
+    {{ content_for_header }}
+    {%- if request.page_type contains 'customers/' -%}
+      {{ 'shopify_common.js' | shopify_asset_url | script_tag }}
+      {{ 'customer_area.js' | shopify_asset_url | script_tag }}
+      {{ 'account.css' | asset_url | stylesheet_tag }}
+      <script src="{{ 'account.js' | asset_url }}" defer></script>
+    {%- endif -%}
+    <script src="{{ 'jquery-2.2.3.min.js' | asset_url }}"></script>
+    <script src="{{ 'lazysizes.min.js' | asset_url }}" async="async"></script>
+    <script src="{{ 'vendor.js' | asset_url }}" defer></script>
+    <script src="{{ 'theme.js' | asset_url }}" defer></script>
+    <!-- Excision: Minimum Order logic -->
+    <script src="{{ 'ex-min-order.js' | asset_url }}" defer></script>
+    {% comment %}<link rel="stylesheet" href="{{ 'bootstrap.min.css' | asset_url }}" media="print" as="style" onload="this.media='all'"> {% endcomment %}
+    <link
+      rel="stylesheet"
+      href="{{ 'bootstrap.min.css' | asset_url }}"
+      media="print"
+      as="style"
+      onload="this.media='all'"
+      async="async"
+    >
+    {% comment %}<link rel="stylesheet" defer="defer" type="text/css" href="" media="all" /> {% endcomment %}
+    <link
+      rel="preload"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css?display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    >
+
+    <script type="text/javascript">
+      jQuery(document).ready(function () {
+        $('.advanced-filter[data-group=Price]').closest('.grid-item').hide();
+      });
+    </script>
+    <!-- Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', 'GTM-PR6WTQFC');
+    </script>
+    <!-- End Google Tag Manager -->
+
+    {% unless request.page_type == 'index' or request.page_type == 'cart' %}
+      <!-- Breadcrumb -->
+      <script type="application/ld+json">
+        {
+          "@context": "http://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "item": {
+                "@id": "{{ routes.root_url }}",
+                "name": "{{ 'general.breadcrumbs.home' | t }}"
+              }
+            },
+            {% assign breadcrumb_position = 2 %}
+            {% if request.page_type == 'product' %}
+              {% if collection %}
+                {
+                  "@type": "ListItem",
+                  "position": {{ breadcrumb_position }},
+                  "item": {
+                    "@id": "{{ collection.url }}",
+                    "name": "{{ collection.title }}"
+                  }
+                },
+                {% assign breadcrumb_position = breadcrumb_position | plus: 1 %}
+              {% endif %}
+              {
+                "@type": "ListItem",
+                "position": {{ breadcrumb_position }},
+                "item": {
+                  "@id": "{{ product.url }}",
+                  "name": "{{ product.title }}"
+                }
+              }
+            {% elsif request.page_type == 'collection' and collection.handle %}
+              {
+                "@type": "ListItem",
+                "position": {{ breadcrumb_position }},
+                "item": {
+                  "@id": "{{ collection.url }}",
+                  "name": "{{ collection.title }}"
+                }
+              },
+              {% assign breadcrumb_position = breadcrumb_position | plus: 1 %}
+              {% if current_tags %}
+                {% for tag in current_tags %}
+                  {
+                    "@type": "ListItem",
+                    "position": {{ breadcrumb_position }},
+                    "item": {
+                      "@id": "{{ collection.url }}/{{ tag }}",
+                      "name": "{{ tag | replace: "_", " " | capitalize }}"
+                    }
+                  },
+                  {% assign breadcrumb_position = breadcrumb_position | plus: 1 %}
+                {% endfor %}
+              {% endif %}
+            {% elsif request.page_type == 'blog' %}
+              {
+                "@type": "ListItem",
+                "position": {{ breadcrumb_position }},
+                "item": {
+                  "@id": "{{ blog.url }}",
+                  "name": "{{ blog.title }}"
+                }
+              },
+              {% assign breadcrumb_position = breadcrumb_position | plus: 1 %}
+              {% if current_tags %}
+                {% for tag in current_tags %}
+                  {
+                    "@type": "ListItem",
+                    "position": {{ breadcrumb_position }},
+                    "item": {
+                      "@id": "{{ blog.url }}/{{ tag }}",
+                      "name": "{{ tag | replace: "_", " " | capitalize }}"
+                    }
+                  },
+                  {% assign breadcrumb_position = breadcrumb_position | plus: 1 %}
+                {% endfor %}
+              {% endif %}
+            {% elsif request.page_type == 'article' %}
+              {
+                "@type": "ListItem",
+                "position": {{ breadcrumb_position }},
+                "item": {
+                  "@id": "{{ blog.url }}",
+                  "name": "{{ blog.title }}"
+                }
+              },
+              {% assign breadcrumb_position = breadcrumb_position | plus: 1 %}
+              {
+                "@type": "ListItem",
+                "position": {{ breadcrumb_position }},
+                "item": {
+                  "@id": "{{ article.url }}",
+                  "name": "{{ article.title }}"
+                }
+              }
+            {% elsif request.page_type == 'page' %}
+              {
+                "@type": "ListItem",
+                "position": {{ breadcrumb_position }},
+                "item": {
+                  "@id": "{{ page.url }}",
+                  "name": "{{ page.title }}"
+                }
+              }
+            {% else %}
+              {
+                "@type": "ListItem",
+                "position": {{ breadcrumb_position }},
+                "item": {
+                  "@id": "{{ canonical_url }}",
+                  "name": "{{ page_title }}"
+                }
+              }
+            {% endif %}
+          ]
+        }
+      </script>
+      <!-- End of Breadcrumb schema -->
+    {% endunless %}
+
+    {% if request.page_type == 'search' %}
+      <!-- Start of Sitelinks search box schema -->
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "url": "{{ shop.url }}",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "{{ shop.url }}/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      </script>
+    {% endif %}
+
+    {% if article.updated_at != article.published_at %}
+      <meta http-equiv="last-modified" content="{{ article.updated_at | date: '%a, %d %b %Y %T GMT' }}">
+    {% endif %}
+
+    {% if template contains 'index' %}
+
+      <!-- Manufacturer Schema -->
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"Organization",
+  "name":"Excision Pty Ltd",
+  "url":"https://excision.com.au/",
+  "logo":"https://excision.com.au/cdn/shop/files/Registered_LR_360x.png?v=1691147873",
+  "description":"A seasoned manufacturer and importer of high-quality industrial cutting solutions in Australia, boasting over 30 years of expertise.",
+  "contactPoint":{"@type":"ContactPoint","telephone":"+61 035 551 4555","contactType":"customer service","areaServed":["AU"]},
+  "address":{"@type":"PostalAddress","streetAddress":"35 Peck Street","addressLocality":"Hamilton","addressRegion":"VIC","postalCode":"3300","addressCountry":"AU"},
+  "sameAs":[
+    "https://www.facebook.com/people/Excision-Pty-Ltd/100090557419325",
+    "https://www.linkedin.com/company/4987236/"
+  ],
+  "additionalType":"http://schema.org/Manufacturer"
+}
+</script>
+
+
+      <!-- WebPage Schema for Homepage -->
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Excision Pty Ltd Homepage",
+          "url": "https://excision.com.au/",
+          "description": "Welcome to Excision Pty Ltd, your trusted source for industrial cutting solutions and more.",
+          "publisher": {
+            "@type": "Organization",
+            "name": "Excision Pty Ltd",
+            "url": "https://excision.com.au/"
+          },
+          "mainEntity": {
+            "@type": "Organization",
+            "name": "Excision Pty Ltd",
+            "description": "A seasoned manufacturer and importer of high-quality industrial cutting solutions in Australia, boasting over 30 years of expertise.",
+            "url": "https://excision.com.au/",
+            "telephone": "+61 035 551 4555",
+            "openingHours": "Mo-Fr 08:00-17:00",
+            "image": "https://excision.com.au/cdn/shop/files/Registered_LR_360x.png?v=1691147873",
+            "sameAs": [
+              "https://www.facebook.com/people/Excision-Pty-Ltd/100090557419325",
+              "https://www.linkedin.com/company/4987236/"
+            ],
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "35 Peck Street",
+              "addressLocality": "Hamilton",
+              "addressRegion": "VIC",
+              "postalCode": "3300",
+              "addressCountry": {
+                "@type": "Country",
+                "name": "Australia"
+              }
+            }
+          }
+        }
+      </script>
+    {% endif %}
+    {% render 'rapid-search-settings' %}
+    {% render 'lazyloadElements' %}
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css">
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>
+
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+<link rel="preconnect" href="https://js.hs-scripts.com" crossorigin>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-946467806">
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-946467806');
+</script>
+
+
+  </head>
+  <body
+    id="{{ page_title | handle }}"
+    class="{% if customer %}customer-logged-in {% endif %} template-{{ request.page_type | handle }} {% if product.tags contains 'Ecom_Ebox_Product_Section' %}collection-Ebox{% endif %}"
+    onload="checkCookie()"
+  >
+    <div id="preloader">
+      <div class="loader-bar-wrapper">
+        <div class="loader-bar">
+          <div class="loader-loaded"></div>
+          <div class="loader-unloaded"></div>
+        </div>
+      </div>
+    </div>
+    {%- section 'header' -%}
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-PR6WTQFC"
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"
+      ></iframe
+    ></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <main
+      class="wrapper main-content{%- if request.page_type == blank -%} main-content--no-template{%- endif -%} {% if product.tags contains 'Ecom BSBL Promo Section' %} show-ecom-bsbl-promo-section{% endif %}"
+      role="main"
+    >
+      {{ content_for_layout }}
+    </main>
+    {%- section 'footer' -%}
+    <script>
+      var moneyFormat = '{{ shop.money_format }}';
+      var theme = {
+        strings:{
+          product:{
+            unavailable: {{ 'products.product.unavailable' | t | json }},
+            will_be_in_stock_after:{{ 'products.product.will_be_in_stock_after' | t: date: '[date]' | json }},
+            only_left:{{ 'products.product.only_left' | t: count: '1' | json }},
+            unitPrice: {{ 'products.product.unit_price_label' | t | json }},
+            unitPriceSeparator: {{ 'general.accessibility.unit_price_separator' | t | json }}
+          },
+          navigation:{
+            more_link: {{ 'layout.navigation.more' | t | json }}
+          },
+          map:{
+            addressError: {{ 'map.errors.address_error' | t | json }},
+            addressNoResults: {{ 'map.errors.address_no_results' | t | json }},
+            addressQueryLimit: {{ 'map.errors.address_query_limit_html' | t | json }},
+            authError: {{ 'map.errors.auth_error_html' | t | json }}
+          }
+        },
+        settings:{
+          cartType: {{ settings.ajax_cart_method | json }}
+        }
+      }
+    </script>
+    {%- if settings.ajax_cart_method != 'page' -%}
+      {%- include 'ajax-cart-template' -%}
+    {%- endif -%}
+    <ul hidden>
+      <li id="a11y-refresh-page-message">{{ 'general.accessibility.refresh_page' | t }}</li>
+    </ul>
+    {{ 'bootstrap.min.js' | asset_url | script_tag }}
+    <script
+      src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/plyr.js"
+      crossorigin="anonymous"
+      type="text/javascript"
+    ></script>
+
+    {%- comment -%}
+      <!-- WPD Start -->
+      {%- if customer.tags.size > 0 and template != 'cart' -%}
+      <script>
+         document.addEventListener('DOMContentLoaded', function() {
+           let checkoutbtninterval = setInterval(function(){
+             var x=document.querySelectorAll("input[name='checkout'], button[name='checkout'], input[name='goto_pp'], button[name='goto_pp'], input[name='goto_gc'], button[name='goto_gc'], [href$='checkout']");
+             var WPD_RedirectToCart = function(e) {
+               	e.stopPropagation();
+                 e.preventDefault();
+                 window.location = '/cart';
+                 };
+                 for (var i = 0; i < x.length; i++) {
+                     x[i].addEventListener('click', WPD_RedirectToCart, false);
+                 }
+         },500)
+         });
+      </script>
+      {%- endif -%}
+      {%- if customer.tags.size > 0 and template == 'cart' -%}
+      {%- include 'wcp_cart' -%}
+      {%- endif -%}
+      <!-- WPD End -->
+    {%- endcomment -%}
+    <script>
+      $(document).ready(function () {
+        $('a.dust-and-fume-control__nav-link').attr('target', '_blank');
+        //Product page specifications tab
+        var $firstTable = $('.pdp .variant-matrix .description table').first();
+        if ($firstTable.length) $('<h5>Specifications</h5>').insertBefore($firstTable);
+      });
+
+      $(window).scroll(function () {
+        if ($(this).scrollTop() > 50) {
+          $('#mobileNavBar').addClass('NavBarsticky');
+        } else {
+          $('#mobileNavBar').removeClass('NavBarsticky');
+        }
+      });
+    </script>
+    {%- render 'ecom_footer' -%}
+
+    {{ 'variant-matrix.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'variant-matrix.js' | asset_url }}" defer></script>
+
+    <script>
+      const loadedEl = document.querySelector('.loader-loaded');
+      const unloadedEl = document.querySelector('.loader-unloaded');
+      const preloader = document.getElementById('preloader');
+
+      let progress = 0;
+      let animationFrame;
+
+      function updateBar(value) {
+        const clamped = Math.min(value, 100);
+        loadedEl.style.width = `${clamped}%`;
+        unloadedEl.style.width = `${100 - clamped}%`;
+      }
+
+      function animateProgress() {
+        if (progress < 90) {
+          progress += Math.random() * 1.5; // simulate progressive load
+          updateBar(progress);
+          animationFrame = requestAnimationFrame(animateProgress);
+        }
+      }
+
+      // Start simulating progress
+      requestAnimationFrame(animateProgress);
+
+      // Use PerformanceObserver to detect First Contentful Paint
+      const po = new PerformanceObserver((entryList, observer) => {
+        for (const entry of entryList.getEntries()) {
+          if (entry.name === 'first-contentful-paint') {
+            // Finish progress bar
+            cancelAnimationFrame(animationFrame);
+            updateBar(100);
+            setTimeout(() => {
+              preloader.style.opacity = '0';
+              setTimeout(() => (preloader.style.display = 'none'), 300);
+            }, 200); // small delay to show 100%
+            observer.disconnect();
+          }
+        }
+      });
+
+      try {
+        po.observe({ type: 'paint', buffered: true });
+      } catch (e) {
+        // Fallback if unsupported
+        window.addEventListener('DOMContentLoaded', () => {
+          updateBar(100);
+          setTimeout(() => {
+            preloader.style.opacity = '0';
+            setTimeout(() => (preloader.style.display = 'none'), 300);
+          }, 200);
+        });
+      }
+    </script>
+
+    <!-- HubSpot Embed Code -->
+    <script id="hs-script-loader" async defer src="//js.hs-scripts.com/2595431.js"></script>
+
+    <!-- Quote Modal -->
+    <div id="ex-quote-modal" class="ex-modal" hidden aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="ex-modal__backdrop" data-ex-quote-close></div>
+      <div class="ex-modal__dialog" role="document">
+        <button class="ex-modal__close" type="button" data-ex-quote-close aria-label="Close">×</button>
+        <div id="ex-quote-form"></div>
+      </div>
+    </div>
+
+    <style>
+      .ex-modal[hidden]{display:none}
+      .ex-modal{position:fixed;inset:0;z-index:9999}
+      .ex-modal__backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+      .ex-modal__dialog{position:relative;margin:6vh auto;max-width:720px;background:#fff;border-radius:12px;padding:24px}
+      .ex-modal__close{position:absolute;top:8px;right:8px;background:none;border:0;font-size:24px;line-height:1;cursor:pointer}
+    </style>
+
+    <script>
+      // Lightweight global to open the HS form modal and inject product context
+      window.exQuote = (function () {
+        var hsLoaded = false;
+        function loadHS(cb) {
+          if (hsLoaded) return cb();
+          var s = document.createElement('script');
+          s.src = '//js-ap1.hsforms.net/forms/embed/v2.js';
+          s.async = true;
+          s.onload = function () {
+            hsLoaded = true;
+            cb();
+          };
+          document.head.appendChild(s);
+        }
+        function fillHiddenFields(formEl, ctx) {
+          if (!formEl) return;
+          function setHidden(name, val) {
+            var input = formEl.querySelector('input[name="' + name + '"]');
+            if (!input) {
+              input = document.createElement('input');
+              input.type = 'hidden';
+              input.name = name;
+              formEl.appendChild(input);
+            }
+            input.value = val || '';
+          }
+          setHidden('product_name', ctx.name);
+          setHidden('product_url', ctx.url);
+          setHidden('variant_title', ctx.variantTitle || '');
+          setHidden('variant_sku', ctx.variantSku || '');
+        }
+        function open(ctx) {
+          var m = document.getElementById('ex-quote-modal');
+          if (!m) return;
+          m.hidden = false;
+          m.setAttribute('aria-hidden', 'false');
+
+          // (Re)render the form fresh each time so we can set hidden fields
+          var tgt = document.getElementById('ex-quote-form');
+          tgt.innerHTML = '';
+
+          loadHS(function () {
+            if (!window.hbspt || !hbspt.forms || !hbspt.forms.create) return;
+            hbspt.forms.create({
+              portalId: '2595431',
+              formId: '40149631-403b-45b0-897c-3c1d08fa1a32',
+              region: 'ap1',
+              target: '#ex-quote-form',
+              onFormReady: function ($form) {
+                var formEl = document.querySelector('#ex-quote-form form');
+                fillHiddenFields(formEl, ctx || {});
+              },
+            });
+          });
+        }
+        function close() {
+          var m = document.getElementById('ex-quote-modal');
+          if (!m) return;
+          m.hidden = true;
+          m.setAttribute('aria-hidden', 'true');
+        }
+        document.addEventListener('click', function (e) {
+          if (e.target.closest('[data-ex-quote-close]')) close();
+        });
+        return { open: open, close: close };
+      })();
+    </script>
+
+    <script>
+  document.addEventListener('click', function (event) {
+    // Look for a click on or inside the Judge.me preview widget
+    const widget = event.target.closest('.jdgm-widget.jdgm-preview-badge');
+    if (!widget) return;
+
+    // Find the reviews tab and its content
+    const reviewsTab = document.querySelector('.tab[data-tab="reviews"]');
+    const reviewsContent = document.querySelector('.tab-content[data-tab="reviews"]');
+
+    if (!reviewsTab) {
+      console.error('Reviews tab not found: .tab[data-tab="reviews"]');
+      return;
+    }
+
+    // 1) Trigger the theme’s own tab logic
+    reviewsTab.click();
+
+    // 2) If the theme uses "active" classes, enforce them as a fallback
+    if (reviewsTab.classList) {
+      const allTabs = document.querySelectorAll('.tab');
+      allTabs.forEach(tab => tab.classList.remove('active'));
+      reviewsTab.classList.add('active');
+    }
+
+    if (reviewsContent) {
+      const allContents = document.querySelectorAll('.tab-content');
+      allContents.forEach(c => c.classList.remove('active'));
+      reviewsContent.classList.add('active');
+
+      // 3) Scroll to the reviews content (more reliable than the <li>)
+      reviewsContent.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    } else {
+      // If no content element found, scroll to the tab at least
+      reviewsTab.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  });
+</script>
+
+{% comment %}
+
+<!-- Black Friday Popup -->
+<div id="bf-popup" class="bf-popup">
+  <div class="bf-popup__card">
+    <button class="bf-popup__close" onclick="closeBFPopup()">×</button>
+
+    <div class="bf-popup__bigtext">20% OFF</div>
+    <p class="bf-popup__subtitle">All Consumables<br>
+      <span class="bf-timer-label">Online only</span>
+    </p>
+    
+
+
+
+    <div class="bf-popup__timer">
+      <div id="bf-countdown">00:00:00</div>
+      <span class="bf-timer-label">Sale ends Friday</span>
+    </div>
+
+    <a href="/pages/black-friday-sale" class="btn btn--accent full-width sale">Shop Now</a>
+
+  </div>
+</div>
+
+
+<script>
+  const POPUP_KEY = "bfPopupViews";
+  const POPUP_LIMIT = 2; // show only twice
+
+  function closeBFPopup() {
+    document.getElementById('bf-popup').classList.remove('active');
+  }
+
+  function startCountdown() {
+    const saleEnd = new Date(2025, 10, 28, 23, 59, 0);
+    const display = document.getElementById('bf-countdown');
+
+    function update() {
+      const now = new Date();
+      const diff = saleEnd - now;
+
+      if (diff <= 0) {
+        display.textContent = "0d 0h 0m 0s";
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const mins = Math.floor((diff / (1000 * 60)) % 60);
+      const secs = Math.floor((diff / 1000) % 60);
+
+      display.textContent = `${days}d ${hours}h ${mins}m ${secs}s`;
+    }
+
+    update();
+    setInterval(update, 1000);
+  }
+
+  function shouldShowPopup() {
+    // 1. NEVER show on homepage
+    const path = window.location.pathname;
+    if (path === "/" || path === "/index.html") {
+      return false;
+    }
+
+    // 2. View limit logic
+    let views = localStorage.getItem(POPUP_KEY);
+    if (!views) {
+      return true;
+    }
+    views = parseInt(views, 10);
+    return views < POPUP_LIMIT;
+  }
+
+  function incrementViews() {
+    let views = localStorage.getItem(POPUP_KEY);
+    if (!views) {
+      localStorage.setItem(POPUP_KEY, "1");
+      return;
+    }
+    views = parseInt(views, 10) + 1;
+    localStorage.setItem(POPUP_KEY, String(views));
+  }
+
+  window.addEventListener('load', () => {
+    if (!shouldShowPopup()) {
+      return;
+    }
+
+    setTimeout(() => {
+      incrementViews();
+      document.getElementById('bf-popup').classList.add('active');
+      startCountdown();
+    }, 1200);
+  });
+</script>
+
+{% endcomment %}
+
+{% if template == 'page.saved-lists' %}
+<script>
+  console.log("=== Saved Lists template loaded (from layout) ===");
+
+  window.SavedLists = window.SavedLists || {};
+
+  document.addEventListener("DOMContentLoaded", function() {
+    console.log("=== Saved Lists DOMContentLoaded ===");
+
+    var el = document.getElementById('saved-lists-data');
+    if (!el) {
+      console.error('NO saved-lists-data element found');
+      window.SavedLists.data = { version: 1, lists: [] };
+      return;
+    }
+
+    try {
+      window.SavedLists.data = JSON.parse(el.textContent);
+      console.log("Parsed metafield:", window.SavedLists.data);
+    } catch (e) {
+      console.error("Parse error:", e);
+      window.SavedLists.data = { version: 1, lists: [] };
+    }
+  });
+</script>
+{% endif %}
+
+
+
+  </body>
+</html>

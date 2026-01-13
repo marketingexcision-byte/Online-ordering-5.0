@@ -1,0 +1,107 @@
+<div class="container dt-prl-30">
+      <div class="row">
+         <div class="col-12 s12 {{ section.settings.align_text }} mt2 mb2 lazyload-element">
+            <h2>{{ section.settings.title }}</h2> 
+         </div>
+      </div>    
+     {% if section.blocks.size > 0 %}      
+      {% assign defaultSize = 3 %} 
+      {% assign counter = 1 %}
+      {% assign count = 1 %}
+      {% for block in section.blocks %}
+          {% assign nextItem = count | minus:1 %}
+          {% assign nextItem = defaultSize | times:nextItem %}
+          {% assign nextItem = nextItem | plus:1 %}
+          {% if counter == 1 or counter == nextItem %}    
+          <div class="staff-wrapper lazyload-element">{% endif %}
+              <div class="staff-block"> 
+                <div class="staff-img-box">
+                  <img src="{{ block.settings.image | img_url: 'grande'}}" alt="{{ block.settings.team_name }}" />
+                  {% if block.settings.team_bio_url != blank %}
+                  <div class="hover-view-btn">
+                    <a href="{{ block.settings.team_bio_url }}" class="prd-view-btn waves-effect waves-light z-depth-3 font-bold"><em>View {{ block.settings.team_name }}'s Bio</em> <span style="font-family: monospace;"> →</span></a>
+                  </div>
+                  {% endif %} 
+                  </div>
+                <p class="staff_meta"><strong class="font-bold">{{ block.settings.team_name }}</strong><br>{{ block.settings.team_designation }}</p>
+                {% if block.settings.team_info !=blank %}
+                  <p>{{ block.settings.team_info }}</p> 
+                {% endif %} 
+
+                
+              </div>
+          {% assign lastItem = defaultSize | times:count %}
+          {% if counter == lastItem or forloop.last == true %}
+          </div>
+          {% assign count = count | plus: 1 %}
+          {% endif %}
+          {% assign counter = counter | plus: 1 %}
+      {% endfor %}
+     {% endif %}    
+  </div>
+ 
+{% schema %}
+  {
+    "name": "Our Teams",
+    "max_blocks": 25,
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Name"
+      },
+      {
+        "type": "select",
+        "id": "align_text",
+        "label": "Text alignment",
+        "default": "center",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Centered"
+          }
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "type": "team",
+        "name": "Team",
+        "settings": [          
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "type": "text",
+            "id": "team_name",
+            "label": "Name",
+            "default": "name"
+          },
+          {
+            "type": "text",
+            "id": "team_designation",
+            "label": "Designation",
+            "default": "designation"
+          },
+          {
+            "type": "richtext",
+            "id": "team_info",
+            "label": "Text"
+          },
+          {
+            "type": "url",
+            "id": "team_bio_url",
+            "label": "Bio page url"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %} 

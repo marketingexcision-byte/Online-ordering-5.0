@@ -1,0 +1,48 @@
+<div class="container small simple-lazyload">
+   <div class="product-grid row">
+      {% for block in section.blocks limit: section.blocks.size %}
+      <div class="col-sm-3 lazyload-element">
+         {%- assign collection = collections[block.settings.collection] -%}
+         <a class="product-card card hoverable" href="{% if block.settings.url != blank %} {{ block.settings.url }} {% else %} {{ collection.url }} {% endif %}" title="View {{ collection.title }}">
+            {% if collection.image %}
+            	<img class="product-image" src="{{ collection.image.src | img_url: 'medium' }}"  alt="{{ collection.title }}" height="88">
+            {% else %}
+            	<img class="product-image" src="{{ collection.products.first.featured_image | img_url: 'medium' }}"  alt="{{ collection.title }}" height="88">
+            {% endif %}
+            <div class="product-detail" style="height: 22px;">
+               <h2 class="product-name">{{ collection.title }}</h2>
+            </div>
+            <button class="btn view-all waves-effect waves-light z-depth-3">View All</button>
+         </a>
+      </div>
+      {% endfor %}          
+   </div>
+</div>
+ 
+{% schema %}
+{
+  "name": "Collection list",
+  "class": "index-section",
+  "max_blocks": 12,
+  "settings": [    
+  ],
+  "blocks": [
+    {
+      "type": "featured_collection",
+      "name": "Collection",
+      "settings": [ 
+        {
+          "label": "Collection",
+          "id": "collection",
+          "type": "collection"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Custom url"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

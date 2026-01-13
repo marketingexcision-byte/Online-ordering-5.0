@@ -1,0 +1,26 @@
+<form action="{{ routes.search_url }}" method="get" class="search-bar font-bold" role="search">
+  <div style="display: flex; align-items: center; background: #f1f1f1; border-radius: 26px;">
+
+    <input type="search" name="q" value="{{ search.terms | escape }}" class="font-bold" placeholder="{{ 'layout.search_bar.placeholder' | t }}" aria-label="{{ 'layout.search_bar.placeholder' | t }}" style="flex-grow: 1;">
+
+    <button type="submit" aria-label="Search" class="search-bar--submit icon-fallback-text search-button-hover" style="margin-left: 5px;">
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Search_White_Alt_Bold.svg?v=1759450598"
+           style="max-height: 24px; width: 24px;"
+           class="hover-img-search">
+      <span class="fallback-text">{% comment %}{{ 'layout.search_bar.submit' | t }}{% endcomment %}</span>
+    </button>
+  </div>
+</form>
+
+<style>
+  .search-button-hover:hover .hover-img-search {
+    content: url("https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Search_White_Bold.svg?v=1759450598");
+  }
+  button.search-bar--submit.icon-fallback-text.search-button-hover {
+    display: flex;
+    align-items: center;
+}
+button.search-bar--submit.icon-fallback-text.search-button-hover:focus {
+    outline: none;
+}
+</style>

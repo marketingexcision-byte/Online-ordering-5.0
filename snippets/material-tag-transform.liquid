@@ -1,0 +1,21 @@
+{% assign tag_parts = tag | split: '_' %}
+{% assign tag_prefix = tag_parts[0] | strip %}
+{% assign tag_value = tag_parts[1] | strip %}
+
+{% assign code = '' %}
+{% case tag_prefix %}
+  {% when 'Carbon Steels' %}
+    {% assign code = 'P' %}
+  {% when 'Alloy Steels' %}
+    {% assign code = 'M' %}
+  {% when 'High Alloy Steels' %}
+    {% assign code = 'K' %}
+  {% when 'Stainless Steels' %}
+    {% assign code = 'N' %}
+  {% when 'Cast Iron' %}
+    {% assign code = 'S' %}
+  {% when 'Non-Ferrous' %}
+    {% assign code = 'H' %}
+{% endcase %}
+
+{{ code }}::{{ tag_prefix }}::{{ tag_value }}

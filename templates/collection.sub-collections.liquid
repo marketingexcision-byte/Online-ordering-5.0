@@ -1,0 +1,20 @@
+<div class="canvas">
+{% assign collection_handle = "collection-" | append: collection.handle %}
+<ul class="gallery">
+{% for link in linklists[collection_handle].links %}
+{% assign coll = link.object %}
+<a href="{{ coll.url }}">
+<li>
+{% if coll.image %}
+<img src="{{ coll | img_url: '600x600' }}" alt="{{ link.title | escape }}"/>
+{% else %}
+{% assign prod = coll.products.first %}
+<img src="{{ prod | img_url: '600x600' }}" alt="{{ link.title | escape }}"/>
+{% endif %}
+<br/><br/>
+<h4 class="title">{{ coll.title }}</h4>
+</li>
+</a>
+{% endfor %}
+</ul>
+</div> 

@@ -1,0 +1,56 @@
+{%- comment -%}
+This file outputs robots.txt for Shopify.
+
+Strategy:
+1) Print Shopify's default groups (keeps their best-practice rules & sitemaps).
+2) Append custom rules to reduce crawl of low-value duplicates:
+   - Block filtered collection URLs with tag-combos (`+`) and OS 2.0 query filters (`?filter.`).
+   - Keep search/cart/checkout out of crawl.
+NOTE: Robots.txt cannot remove already indexed URLs; the meta robots in theme.liquid does that.
+{%- endcomment -%}
+
+{%- for group in robots.default_groups -%}
+{{- group.user_agent -}}
+
+{%- for rule in group.rules -%}
+{{- rule -}}
+{%- endfor -%}
+
+{%- if group.sitemap != blank -%}
+Sitemap: {{ group.sitemap }}
+{%- endif -%}
+
+{%- endfor -%}
+
+User-agent: *
+
+# Block legacy tag-in-path URLs and collection feeds
+User-agent: *
+Disallow: /*.atom$                 
+Disallow: /collections/*/*+*       
+Disallow: /collections/*/*_*      
+
+# Do NOT block modern query-parameter filters
+Allow: /collections/*?filter.*
+
+
+# Keep internal search results out of crawl
+Disallow: /search
+Disallow: /search*
+
+# Prevent crawl of cart/checkout surfaces
+Disallow: /cart
+Disallow: /cart*
+Disallow: /checkout
+Disallow: /checkout*
+
+# Reduce crawl of tracking-param duplicates
+Disallow: /*?*utm_
+Disallow: /*?*gclid=
+Disallow: /*?*fbclid=
+
+# (Optional) If your theme uses alternate "view=" templates, uncomment:
+# Disallow: /*?*view=
+
+# Always allow the sitemap (Shopify defaults already print this; kept for clarity)
+Allow: /sitemap.xml

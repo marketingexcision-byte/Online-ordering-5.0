@@ -1,0 +1,148 @@
+/* assets/account.css */
+/* Excision Accounts UI -------------------------------------------------------
+   tokens • base • components • utilities
+   Brand: #0069a7 (primary), #e0592a (accent), #3995e6 (steel), #666, #e1e1e1, #f1f1f1
+---------------------------------------------------------------------------- */
+
+@layer tokens {
+  :root {
+    /* Color */
+    --ex-blue: #0069a7;
+    --ex-accent: #e0592a;
+    --ex-steel: #3995e6;
+    --ex-iron: #666666;
+    --ex-grey: #e1e1e1;
+    --ex-light: #f1f1f1;
+    --ex-card: #ffffff;
+
+    /* Type (Humanist 777 family from brand guide) */
+    --ex-font-h: 'Humanist 777BT-Bold', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --ex-font-b: 'Humanist 777BT', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
+    --ex-size-h1: 28px;
+    --ex-size-h2: 24px;
+    --ex-size-h3: 18px;
+    --ex-size-p: 16px;
+
+    /* Spacing */
+    --s-1: .25rem; --s-2: .5rem; --s-3: .75rem; --s-4: 1rem;
+    --s-5: 1.5rem; --s-6: 2rem; --s-7: 3rem;
+
+    /* Shape / effects */
+    --rad-1: 7px; --rad-2: 12px; --rad-pill: 999px;
+    --shadow-1: 0 10px 30px rgba(0,0,0,.08);
+    --easing: cubic-bezier(.2,.7,.2,1);
+  }
+}
+
+@layer base {
+  .account-shell {
+    background: var(--ex-blue);
+    min-height: 85vh;
+    display: flex; justify-content: center;
+    padding: clamp(20px, 3vw, 40px) clamp(16px, 4vw, 60px);
+  }
+  .account-card {
+    background: var(--ex-card);
+    width: 100%; max-width: 1320px;
+    border-radius: 16px; padding: clamp(20px, 3vw, 40px);
+    box-shadow: var(--shadow-1);
+  }
+  .account-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .account-head h1 { margin: 0; font: 700 var(--ex-size-h1)/1.2 var(--ex-font-h); }
+  .account-logout a { font-weight: 600; text-decoration: underline; }
+
+  /* Tabs */
+  .tab-nav { display:flex; flex-wrap:nowrap; gap:12px 16px; margin: 6px 0 16px;overflow: scroll; }
+  .tab-nav .tab {
+    display:inline-block; cursor:pointer; padding:8px 14px;
+    border:1px solid var(--ex-grey); border-radius: var(--rad-pill);
+    color:#111; text-decoration:none; transition: all .2s var(--easing);
+  }
+  .tab-nav .tab:hover { opacity:.9; }
+  .tab-nav .tab.active { border-color: var(--ex-accent); }
+
+  /* Panels */
+  .panel { display:none; padding: 0; }
+  .panel.active { display:block; }
+
+  /* Generic “striped card” */
+  .ex-card {
+    --stripe: 7px;
+    --stripe-color: var(--ex-steel);
+    background:
+      linear-gradient(var(--stripe-color), var(--stripe-color)) left/var(--stripe) 100% no-repeat,
+      color-mix(in srgb, var(--ex-light) 60%, white);
+    border-radius: var(--rad-1);
+    padding: 18px 18px 18px calc(18px + var(--stripe));
+    font: 400 var(--ex-size-p)/1.5 var(--ex-font-b);
+  }
+  .orders-empty { --stripe-color: #f88d2b; }
+
+  /* Orders table (list view) */
+  .orders-table { width:100%; border-collapse: collapse; }
+  .orders-table th, .orders-table td { padding: 10px; border-bottom: 1px solid #eee; text-align:left; }
+  .orders-table a.js-order-link { text-decoration: none; color: var(--ex-blue); font-weight: 600; }
+  .chip {
+    display:inline-flex; align-items:center; gap:6px;
+    padding: 4px 10px; border-radius: var(--rad-pill);
+    font: 600 13px/1 var(--ex-font-b); background: var(--ex-light); color:#111; border:1px solid var(--ex-grey);
+  }
+  .chip--paid, .chip--authorized, .chip--successful { background: #E9F7EF; color:#0a7a3d; border-color:#bfe8cf; }
+  .chip--refunded, .chip--voided { background: #FFF2F0; color:#a63a21; border-color:#ffdbd4; }
+  .chip--fulfilled, .chip--partial { background: #EAF3FE; color:#124a8a; border-color:#cfe3fd; }
+  .chip--unfulfilled { background: #FFF8E6; color:#8a5a12; border-color:#ffeab3; }
+
+  /* Drawer */
+  .order-drawer {
+    position: fixed; inset: 0; display:none; z-index: 9999;
+    background: color-mix(in srgb, black 30%, transparent);
+  }
+  .order-drawer.is-open { display:block; }
+  .order-drawer__panel {
+    position: absolute; inset: 0 0 0 auto; width: min(940px, 100%);
+    background: #fff; transform: translateX(100%); transition: transform .35s var(--easing);
+    box-shadow: -20px 0 60px rgba(0,0,0,.15); overflow:auto;
+  }
+  .order-drawer.is-open .order-drawer__panel { transform: translateX(0); }
+  .order-drawer__head {
+    position: sticky; top:0; z-index:2; background:#fff; border-bottom:1px solid #eee; padding: 16px 20px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .order-drawer__close { appearance:none; border:0; background:transparent; font-size: 22px; line-height:1; padding:8px; cursor:pointer; }
+
+  /* Order details card layout */
+  .ex-order { padding: 20px; }
+  .ex-order__meta { margin: 0 0 12px; color: var(--ex-iron); font-size: 14px; }
+  .ex-order__grid { display:grid; grid-template-columns: 1fr 320px; gap: 20px; }
+  .order-lines { width:100%; border-collapse: collapse; }
+  .order-lines th, .order-lines td { padding: 10px; border-bottom:1px solid #eee; text-align:left; vertical-align: top; }
+  .order-aside h4 { margin: 0 0 6px; font: 700 var(--ex-size-h3)/1.2 var(--ex-font-h); }
+  .order-aside address { font-style: normal; color: #333; }
+
+  /* Buttons */
+  .btn, .btn--pill, .btn.btn--pill {
+    display:inline-grid; place-items:center; min-height:40px; padding: 6px 16px;
+    border-radius: var(--rad-pill); border: 2px solid #e8e8e8; font: 400 17px/1 var(--ex-font-b);
+    background:#fff; color:#111; text-decoration:none;
+  }
+  .btn--primary { background: var(--ex-accent); color:#fff; border-color: var(--ex-accent); }
+
+  /* Focus */
+  :where(a, button, [href], input, select, textarea):focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--ex-accent) 60%, white);
+    outline-offset: 2px; border-radius: 6px;
+  }
+
+  @media (max-width: 980px) {
+    .ex-order__grid { grid-template-columns: 1fr; }
+    .order-drawer__panel { width: 100%; }
+  }
+}
+
+@layer utilities {
+  .mt-1{margin-top:var(--s-1)} .mt-2{margin-top:var(--s-2)} .mt-3{margin-top:var(--s-3)}
+  .mb-0{margin-bottom:0} .mb-2{margin-bottom:var(--s-2)} .mb-3{margin-bottom:var(--s-3)}
+  .text-right{text-align:right}
+  .hide{display:none!important}
+}

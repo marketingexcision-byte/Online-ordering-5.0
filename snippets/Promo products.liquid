@@ -1,0 +1,66 @@
+{% assign number_of_products = 5 %}
+{% assign number_of_products_to_fetch = number_of_products | plus: 1 %}
+{%- assign width = '195' -%}
+{%- assign height = '125' -%}
+{% if collection == null or collection.handle == 'frontpage' or collection.handle == 'all' %}
+  {% assign found_a_collection = false %}
+  {% for c in product.collections %}
+    {% if found_a_collection == false and c.handle != 'frontpage' and c.handle != 'all' and c.all_products_count > 1 %}
+      {% assign found_a_collection = true %}
+      {% assign collection = c %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+<style>
+  @media only screen and (max-width: 932px){
+  .small--one-half {min-width: 50%;}
+  table {
+    max-width: fit-content;
+  }
+  }
+  @media only screen and (min-width 768px) {
+    .container {
+    max-width: 900px !important;
+    }
+  }
+  .grid-uniform.products-collection {margin: 10px 0px !important;
+                                    overscroll-behavior: auto;
+                                    padding: 0px 0px 10px 0px;
+                                    margin-right: 20px;
+                                    scroll-snap-type: x mandatory;
+                                    margin-left: 10px !important;
+                                    }
+  .grid-uniform.products-collection {margin: 0px;
+                                  display: flex;
+                                  flex-wrap: nowrap;
+                                  overflow-x: auto;
+                                  white-space: nowrap;
+                                  scroll-behaviour: smooth;
+                          }
+.scroll-container {
+  position: relative; /* Ensure scrollbar and content are positioned relative to this container */
+}
+  
+</style>
+
+{% if collection and collection.products_count > 1 %}
+<div class="related_product_section container">
+  <h2 class="h4">You Might Also Like</h2>
+  <div class="grid-uniform products-collection">
+    {% assign current_product = product %} 
+    {% assign current_product_found = false %}
+    {% for product in collection.products limit: number_of_products_to_fetch %}
+      {%- if product.metafields.custom.promotion == true -%}
+        {% if product.handle == current_product.handle %}
+          {% assign current_product_found = true %}
+        {% else %}
+          {% unless current_product_found == false and forloop.last %}
+            {% include 'product-grid-item' %}
+          {% endunless %}
+        {% endif %}
+      {%- endif -%}
+    {% endfor %}
+  </div>
+ </div>
+{% endif %}

@@ -1,0 +1,110 @@
+{% schema %}
+  {
+    "name": "Coolant Calculator",
+    "settings": []
+  }
+{% endschema %}
+
+<div id="coolant-calculator-section" class="col-12 col-sm-6">
+  <div class="rte">
+    {% comment %}{{ page.content }}{% endcomment %}
+    <div class="coolant_concentration_calculator">
+      <div class="row">
+        <div class="col-6 col-sm-8">
+          <p>Type of Coolant</p>
+        </div>
+        <div class="col-6 col-sm-4">
+          <label>
+            <select name="typeOfCoolant" id="typeOfCoolant">
+              <option value="1">XDP 1000</option>
+              <option value="0.99">XDP 1400</option>
+              <option value="1.78">XDP 2000</option>
+              <option value="1.81">XDP 2100</option>
+              <option value="1.25">XDP 2400</option>
+              <option value="3">XDP 3000</option>
+              <option value="1.78">XDP 3200</option>
+              <option value="3">XDP 3400</option>
+              <option value="1.7">XDP 3500</option>
+              <option value="1.72">XDP 3800</option>
+            </select>
+          </label>
+        </div>
+        <div class="col-6 col-sm-8">
+          <p>Capacity of tank</p>
+        </div>
+        <div class="col-6 col-sm-4">
+          <label><input type="text" id="capacityOfTank" required> <span>L</span></label>
+        </div>
+        <div class="col-6 col-sm-8">
+          <p>Current volume in tank</p>
+        </div>
+        <div class="col-6 col-sm-4">
+          <label><input type="text" id="volumeOfTank" required> <span>L</span></label>
+        </div>
+        <div class="col-6 col-sm-8">
+          <p>Refractometer Reading</p>
+        </div>
+        <div class="col-6 col-sm-4">
+          <label><input type="text" id="refractometerReading" required> <span>%</span></label>
+        </div>
+        <div class="col-6 col-sm-8">
+          <p>Actual concentration</p>
+        </div>
+        <div class="col-6 col-sm-4">
+          <label><div id="actualConcentration"></div><span>%</span></label>
+        </div>
+        <div class="col-6 col-sm-8">
+          <p>Desired concentration</p>
+        </div>
+        <div class="col-6 col-sm-4">
+          <label><input type="text" id="desiredConcentration" required> <span>%</span></label>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-6 col-sm-8">
+          <p>Top up amount</p>
+        </div>
+        <div class="col-6 col-sm-4">
+          <label><div id="topUpAmount"></div><span>L</span></label>
+        </div>
+        <div class="col-6 col-sm-8">
+          <p>Top up ratio</p> 
+        </div>
+        <div class="col-6 col-sm-4">
+          <label><div id="topUpRatio"></div><span>%</span></label>
+        </div>
+        <div class="col-6 col-sm-8">
+          <p><b class="font-bold">Concentrate Amount</b></p>
+        </div>
+        <div class="col-6 col-sm-4">
+          <label><div id="concentrateAmount"></div><span><b class="font-bold">L</b></span></label>
+        </div>
+        <div class="col-6 col-sm-8">
+          <p><b class="font-bold">Water Amount</b></p>
+        </div>
+        <div class="col-6 col-sm-4">
+          <label><div id="waterAmount"></div><span><b class="font-bold">L</b></span></label>
+        </div>
+
+        <div class="col-sm-12">
+          <div id="error_msg" style="display:none;"><p>It is not possible to adjust to your desired concentration in one top-up. The minimum top-up ratio is 0.5%</p></div>
+        </div> 
+      </div>
+      
+      <div class="row hidden_val">
+        <div id="B21"></div>
+        <div id="B22"></div>
+        <div id="C21"></div>
+        <div id="C22"></div>
+      </div>
+      
+      <div class="btn-wrapper">
+        <button id="btn" class="btn" onclick="calculateBMI()">Calculate</button>
+        <button id="clearBtn" class="btn" onclick="ClearFields()">Clear</button>
+      </div>
+      
+      <div class="contact_us_call font-bold"> <i class="fa fa-phone" aria-hidden="true"></i> Having trouble? Call us on <a href="tel:+61355514555">+61 (03) 5551 4555</a></div>
+    </div>
+  </div> 
+</div>

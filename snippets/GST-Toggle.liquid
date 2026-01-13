@@ -1,0 +1,15 @@
+{%- comment -%}
+Floating GST toggle (bottom-left). Works with gst-toggle.js.
+Hides on gift-card & password templates.
+{%- endcomment -%}
+
+{% unless template == 'gift_card' or template == 'password' %}
+  <div class="gst-fab gst-fab--toggle" role="group" aria-label="Price display mode">
+    <span class="gst-fab__label">EX GST</span>
+    <label class="toggle" for="gstToggleSwitch">
+      <input type="checkbox" id="gstToggleSwitch" aria-label="Include GST">
+      <span class="gst slider" aria-hidden="true"></span>
+    </label>
+    <span class="gst-fab__label">INC GST</span>
+  </div>
+{% endunless %}

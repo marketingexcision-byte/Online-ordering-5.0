@@ -1,0 +1,20 @@
+<div class="contact_us_outer_wrapper simple-lazyload">
+  <div class="container dt-prl-30 content">
+     <section class="inner-wrapper lazyload-element">
+        <h1 style="color: #fff;">{{ page.title }}</h1>
+        <div class="rte" style="color: #fff;">{{ page.content }}</div>
+     </section>
+  </div>
+    {{ page.metafields.custom.extra_code | raw }}
+</div>
+
+<style>
+main.wrapper.main-content {
+    max-width: 100%;
+    padding: 0;
+}
+.inner-wrapper h1{
+    margin-bottom: 20px;
+    text-align: center;
+} 
+</style>

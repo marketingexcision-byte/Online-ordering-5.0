@@ -1,0 +1,1345 @@
+  {% if product.tags contains 'Custom Length' %}
+    <script>
+    function exInit() {
+      // --------- ELEMENTS ----------
+      const variantSelect = document.getElementById('productSelect-{{ section.id }}'); // Shopify's variant <select> (may be hidden)
+      const lengthInput = document.getElementById('customLength') || document.getElementById('length');
+      const hiddenPrice = document.getElementById('ex-computed-price');
+      const skuEl = document.querySelector('[data-variant-sku]') || document.querySelector('.variant-sku');
+      const atcBtn = document.getElementById('addToCartButton');
+      const USE_7_DIGIT_PREFIX = {% if product.tags contains '7 Digit Prefix [Price Matrix Logic]' %}true{% else %}false{% endif %};
+
+
+  function formatMoney(cents){
+    try {
+      if (Shopify && Shopify.formatMoney) {
+        return Shopify.formatMoney(cents, "{{ shop.money_format | escape }}");
+      }
+    } catch(e){}
+    return new Intl.NumberFormat('en-AU', { style:'currency', currency:'AUD' })
+            .format((cents||0)/100);
+  }
+
+  function resolveTaxable() {
+    const vid = variantSelect?.value;
+    const v = productData?.variants?.find(x => String(x.id) === String(vid));
+    if (typeof v?.taxable === 'boolean') return v.taxable;
+    return true; // safe fallback
+  }
+
+  function renderPriceBoth(node, cents, taxable) {
+    const taxesIncluded = {{ shop.taxes_included | json }};
+    const raw = (cents|0);
+
+    let ex = raw, inc = raw;
+    if (taxable) {
+      if (taxesIncluded) { inc = raw; ex = Math.round(raw / 1.10); }
+      else               { ex = raw; inc = Math.round(raw * 1.10); }
+    }
+
+    node.innerHTML =
+      `<span class="ex-price ex-price--stack">
+        <strong class="ex-price__inc">
+          ${formatMoney(inc)}<span class="inc-price__label">INC GST</span>
+        </strong>
+        ${ taxable ? `<small class="ex-price__ex">
+          ${formatMoney(ex)} <span class="ex-price__label">EX GST</span>
+        </small>` : `` }
+      </span>`;
+  }
+
+
+      function syncATCDisabled() {
+    const unknown = !hiddenPrice || !hiddenPrice.value;
+    if (atcBtn) atcBtn.toggleAttribute('disabled', unknown);
+  }
+
+      console.log('[exInit] script loaded ✅');
+
+  window.__exLastCents = null;
+  window.__exTaxable   = undefined;
+
+      // Simple busy-state helper for buttons
+  function setBusy(btn, busy, labelWhenBusy='Adding to cart…', labelWhenReady='Add to Cart') {
+    if (!btn) return;
+    if (busy) {
+      btn.dataset.exBusy = '1';
+      btn.setAttribute('disabled', 'disabled');
+      // preserve original label once
+      if (!btn.dataset.exLabel) btn.dataset.exLabel = btn.textContent.trim();
+      btn.textContent = labelWhenBusy;
+      btn.classList.add('ex-btn-busy');
+      // add spinner
+      const sp = document.createElement('span');
+      sp.className = 'ex-spinner';
+      btn.appendChild(sp);
+      btn.setAttribute('aria-busy', 'true');
+    } else {
+      btn.dataset.exBusy = '0';
+      btn.removeAttribute('disabled');
+      // restore original label if we saved it
+      const original = btn.dataset.exLabel || labelWhenReady;
+      btn.textContent = original;
+      btn.classList.remove('ex-btn-busy');
+      btn.removeAttribute('aria-busy');
+    }
+  }
+
+
+  // Invisible marker (must match Worker)
+  const SVC = ' · svc';
+
+  // Stricter svc detection + robust stripping (handles "· svc", "- svc", plain "svc")
+  const SVC_RX_ANY = /\bsvc\b/i;
+  const SVC_RX_SUFFIX = /\s*[·\-]?\s*svc\s*$/i;
+  const stripSvc = (s) => String(s || '').replace(SVC_RX_SUFFIX, '').trim();
+  const hasSvc   = (s) => SVC_RX_ANY.test(String(s || ''));
+
+
+  // Remove any SVC-labelled choices from native selects & custom pill UIs
+  function purgeSvcOptionsInUI(root = document) {
+    // Native <select> options
+    root.querySelectorAll('select').forEach(sel => {
+      for (let i = sel.options.length - 1; i >= 0; i--) {
+        const o = sel.options[i];
+        if (hasSvc(o.value) || hasSvc(o.text)) sel.remove(i);
+      }
+    });
+
+    // Common custom UIs (labels/pills/radios). Remove the *wrapper* if possible.
+    const candidateNodes = root.querySelectorAll(
+      [
+        '[data-value]',
+        '[data-option-value]',
+        '.swatch-element',
+        'label',
+        'button',
+        'li',
+        'input[type="radio"]',
+        'input[type="button"]'
+      ].join(',')
+    );
+
+    candidateNodes.forEach(el => {
+      const val =
+        el.getAttribute?.('data-value') ||
+        el.getAttribute?.('data-option-value') ||
+        ('value' in el ? el.value : '') ||
+        el.textContent;
+
+      if (hasSvc(val)) {
+        const wrap = el.closest('.swatch-element, .single-option-selector__item, li, label') || el;
+        wrap.remove();
+      }
+    });
+  }
+
+  // Remove svc variants from the native <select name="id"> / Shopify variant select
+  function sanitizeNativeVariantSelect(productData) {
+    if (!productData || !variantSelect) return;
+    const svcIds = new Set(
+      (productData.variants || []).filter(isInvisible).map(v => String(v.id))
+    );
+    for (let i = variantSelect.options.length - 1; i >= 0; i--) {
+      const opt = variantSelect.options[i];
+      if (svcIds.has(String(opt.value))) variantSelect.remove(i);
+    }
+  }
+
+  // If the theme currently points at an svc/blank-SKU variant, jump to a good one
+  function ensureNonSvcSelected(productData) {
+    if (!productData || !variantSelect) return;
+    const all = productData.variants || [];
+    const isSvcVar = (v) => isInvisible(v) || !v?.sku;
+
+    const selected = all.find(v => String(v.id) === String(variantSelect.value));
+    const replacement =
+      (!selected || isSvcVar(selected))
+        ? (all.find(v => !isSvcVar(v) && v.available) || all.find(v => !isSvcVar(v)) || all[0])
+        : selected;
+
+    if (replacement) {
+      if (String(variantSelect.value) !== String(replacement.id)) {
+        variantSelect.value = String(replacement.id);
+        // keep the form’s hidden [name="id"] in sync too
+        const idField = document.querySelector('form[action="/cart/add"] [name="id"]');
+        if (idField) idField.value = String(replacement.id);
+      }
+      if (skuEl) {
+        skuEl.setAttribute('data-base-sku', replacement.sku || '');
+        skuEl.textContent = replacement.sku || '';
+      }
+    }
+  }
+
+
+  // Re-purge any late-inserted SVC UI from theme hydration
+  function startSvcWatcher(root) {
+    if (!root) root = document;
+    let t;
+    const run = () => {
+      clearTimeout(t);
+      t = setTimeout(() => purgeSvcOptionsInUI(root), 30);
+    };
+    const mo = new MutationObserver(run);
+    mo.observe(root, { childList: true, subtree: true });
+    // extra sweeps for slow hydrations/back-forward cache
+    setTimeout(() => purgeSvcOptionsInUI(root), 200);
+    setTimeout(() => purgeSvcOptionsInUI(root), 800);
+  }
+
+
+  // Helper: is this our service variant?
+  const isInvisible = (v) => [v.option1, v.option2, v.option3]
+    .some(o => String(o ?? '').endsWith(SVC));
+
+  // If selection points at an SVC variant, jump to a visible/priced one
+  function coerceVisibleVariant() {
+    if (!productData) return;
+
+    // Make sure native select has no svc options and the selection is safe
+    sanitizeNativeVariantSelect(productData);
+    ensureNonSvcSelected(productData);
+
+    // 1) If current id is SVC, pick a non-SVC best match
+    const selId = String(variantSelect.value || '');
+    const current = productData.variants.find(v => String(v.id) === selId);
+    if (current && isInvisible(current)) {
+      const v =
+        findVariantByOptions(currentOptions()) ||
+        productData.variants.find(v => v.available && !isInvisible(v)) ||
+        productData.variants.find(v => !isInvisible(v));
+      if (v) {
+        variantSelect.value = String(v.id);
+        if (skuEl) {
+          skuEl.setAttribute('data-base-sku', v.sku || '');
+          skuEl.textContent = v.sku || '';
+        }
+      }
+    }
+
+    // 2) If a custom UI has a "· svc" choice visually selected, nudge its group
+    //    back to the same value without the suffix.
+    document.querySelectorAll('[data-value], [data-option-value], label, button').forEach(el => {
+      const val = (el.getAttribute?.('data-value') ||
+                  el.getAttribute?.('data-option-value') ||
+                  el.textContent || '').trim();
+      if (/\s*·\s*svc\s*$/i.test(val)) {
+        // If the element is "active/selected", click the non-svc twin if present.
+        if (el.classList?.contains('is-selected') || el.ariaPressed === 'true') {
+          const plain = val.replace(/\s*·\s*svc\s*$/i, '').trim();
+          const twin = Array.from(el.parentElement?.querySelectorAll('[data-value], [data-option-value], label, button') || [])
+            .find(n => (n.getAttribute?.('data-value') || n.getAttribute?.('data-option-value') || n.textContent || '').trim() === plain);
+          if (twin) twin.click();
+        }
+      }
+    });
+  }
+
+
+
+
+  let qtyInput =
+    document.getElementById('quantity') ||
+    document.querySelector('input[name="quantity"]') ||
+    document.querySelector('[id^="Quantity-"]');
+
+  // replace your current priceSpans line with:
+  let priceSpans = document.querySelectorAll('#productPrice-{{ section.id }}');
+  if (!priceSpans.length) {
+    priceSpans = document.querySelectorAll([
+      '[data-product-price]',
+      '.product__price .price-item--regular',
+      '.price__regular .price-item--regular',
+      '.price .price__current .money',
+      '.price__container .money'
+    ].join(','));
+  }
+
+
+
+      const originalPriceHTML = Array.from(priceSpans).map((el) => el.innerHTML);
+
+      // ----- Price placeholder / skeleton wiring -----
+
+  // Static placeholder state
+  const priceWrap = document.getElementById('ex-price-wrap-{{ section.id }}');
+  if (priceWrap && !priceWrap.hasAttribute('data-price')) priceWrap.setAttribute('data-price','');
+
+  function showPriceSkeleton() {
+    if (priceWrap) priceWrap.setAttribute('data-price-state', 'unknown');
+  }
+  function showPriceUI() {
+    if (priceWrap) priceWrap.setAttribute('data-price-state', 'ready');
+  }
+
+
+  // start unknown
+  showPriceSkeleton();
+  syncATCDisabled();   // disable ATC until we have a price
+
+
+
+      // --------- BASE SKU HELPERS ----------
+      const initialSku = {{ product.selected_or_first_available_variant.sku | json }};
+
+  // ALWAYS return the base SKU for pricing (never the selected SVC one)
+  function baseSKU() {
+    // 0) Prefer the base we control (seeded from a NON-SVC variant)
+    if (skuEl) {
+      const b = skuEl.getAttribute('data-base-sku');
+      if (b) return b;
+    }
+
+    // 1) Try to map current options → a NON-SVC variant
+    if (productData) {
+      const v = findVariantByOptions(currentOptions());
+      if (v && v.sku) return v.sku;
+    }
+
+    // 2) Avoid trusting the theme's selected option if it might be SVC
+    if (productData && variantSelect && variantSelect.value) {
+      const vById = productData.variants.find(v => String(v.id) === String(variantSelect.value));
+      if (vById && !isInvisible(vById) && vById.sku) return vById.sku;
+    }
+
+    // 3) Last resort: the server-rendered sku
+  const vis = VISIBLE_VARIANTS.find(v => v.sku)?.sku;
+  return vis || initialSku || ''
+  }
+
+
+      // write the visible code (base SKU or base-length)
+      function updateDisplayedCode() {
+        if (!skuEl) return;
+        const base = baseSKU();
+        const len = lengthInput && String(lengthInput.value || '').trim();
+        skuEl.textContent = len && len.length ? `${base}-${len}` : base;
+        // keep the attribute in sync so we never read the "-length" back
+        skuEl.setAttribute('data-base-sku', base);
+      }
+
+      // --------- PRODUCT JSON + VARIANT SYNC ----------
+  const productJsonEl = document.getElementById('ProductJson-{{ section.id }}');
+  const productData = productJsonEl ? JSON.parse(productJsonEl.textContent) : null;
+
+  // Build "visible" views of the variants once (non-svc)
+  const ALL_VARIANTS = productData?.variants || [];
+  const VISIBLE_VARIANTS = ALL_VARIANTS.filter(v => !isInvisible(v));
+
+  // Hard-remove svc options from the native select and force a safe selection
+  sanitizeNativeVariantSelect(productData);
+  ensureNonSvcSelected(productData);
+
+  // Seed base SKU from a safe (non-svc) variant
+  if (productData) {
+    const preferred =
+      VISIBLE_VARIANTS.find(v => v.available && v.sku) ||
+      VISIBLE_VARIANTS.find(v => v.sku) ||
+      VISIBLE_VARIANTS[0] ||
+      ALL_VARIANTS[0];
+
+    if (preferred && skuEl) {
+      skuEl.setAttribute('data-base-sku', preferred.sku || '');
+      skuEl.textContent = preferred.sku || '';
+    }
+  }
+
+  coerceVisibleVariant();
+
+
+
+      // Grab all theme option controls (selects/radios)
+      const optionSelects = Array.from(
+        document.querySelectorAll(
+          'select[name^="options"], .single-option-selector, .single-option-select, input[name^="options["]'
+        )
+      );
+
+      // ===== REBUILD OPTION LISTS BY CONTENT (Width → Thickness → TPI) =====
+      if (productData && Array.isArray(productData.variants) && productData.variants.length) {
+        // 1) Figure out which option index is Width / Thickness / TPI by name (fallback to 0/1/2)
+        const names = productData.options || [];
+        const idxOr = (rx, fb) => {
+          const i = names.findIndex((n) => rx.test(String(n || '')));
+          return i === -1 ? fb : i;
+        };
+        const iWidth = idxOr(/width/i, 0);
+        const iThickness = idxOr(/thick/i, 1);
+        const iTPI = idxOr(/tpi|teeth/i, 2);
+
+        // 2) Build the canonical value sets for each option position from AVAILABLE variants
+  // must match the Worker
+
+  // Available variants, excluding the invisible custom-priced one
+  const av = VISIBLE_VARIANTS.filter(v => v.available);
+
+
+  const setFrom = (i) => new Set(av.map((v) => String(v.options[i])));
+  const widthSet = setFrom(iWidth);
+  const thicknessSet = setFrom(iThickness);
+  const tpiSet = setFrom(iTPI);
+
+
+        // Width->Thickness->TPI availability maps
+        const mapWidthToThickness = {}; // { width -> Set(thickness) }
+        const mapWidthThickToTPI = {}; // { width -> { thickness -> Set(tpi) } }
+
+        av.forEach((v) => {
+          const w = String(v.options[iWidth]);
+          const th = String(v.options[iThickness]);
+          const tp = String(v.options[iTPI]);
+          (mapWidthToThickness[w] ||= new Set()).add(th);
+          ((mapWidthThickToTPI[w] ||= {})[th] ||= new Set()).add(tp);
+        });
+
+        // 3) Find the select elements by CONTENT similarity (most overlapping values wins)
+        function findProductFormRoot() {
+          return (
+            document.getElementById('addToCartForm-{{ section.id }}') ||
+            document.querySelector('form[data-product-form]') ||
+            document
+          );
+        }
+        const root = findProductFormRoot();
+        purgeSvcOptionsInUI(root);
+        startSvcWatcher(root);
+        coerceVisibleVariant();
+
+
+
+        function scoreSelectAgainstSet(select, set) {
+          const opts = Array.from(select.options)
+            .map((o) => String(o.value || '').trim())
+            .filter(Boolean);
+          if (!opts.length) return 0;
+          let hit = 0;
+          for (const v of opts) if (set.has(v)) hit++;
+          return hit / opts.length;
+        }
+
+        function classifySelects() {
+          const allSelects = Array.from(root.querySelectorAll('select'));
+          const widthSel = [];
+          const thickSel = [];
+          const tpiSel = [];
+          allSelects.forEach((sel) => {
+            const sW = scoreSelectAgainstSet(sel, widthSet);
+            const sTh = scoreSelectAgainstSet(sel, thicknessSet);
+            const sT = scoreSelectAgainstSet(sel, tpiSet);
+            const max = Math.max(sW, sTh, sT);
+            if (max === 0) return;
+            if (max === sW) widthSel.push(sel);
+            else if (max === sTh) thickSel.push(sel);
+            else tpiSel.push(sel);
+          });
+          return { widthSel, thickSel, tpiSel };
+        }
+
+        const groups = classifySelects();
+
+        // If we couldn't classify at least one of each, bail gracefully
+        if (groups.widthSel.length && groups.thickSel.length && groups.tpiSel.length) {
+          // 4) Snapshot original texts to preserve wording/order when we rebuild
+          const originalOptions = new Map();
+          function snapshot(select) {
+            originalOptions.set(
+              select,
+              Array.from(select.options).map((o) => ({ value: String(o.value || ''), text: o.text }))
+            );
+          }
+          groups.widthSel.forEach(snapshot);
+  groups.thickSel.forEach(snapshot);
+  groups.tpiSel.forEach(snapshot);
+
+          function rebuild(select, allowedSet) {
+            const orig = originalOptions.get(select) || [];
+            const current = String(select.value || '');
+
+            // wipe
+            while (select.options.length) select.remove(0);
+
+            // keep placeholder (empty) if present
+            const ph = orig.find((o) => o.value === '');
+            if (ph) select.add(new Option(ph.text, ''));
+
+            // add allowed in original order
+            let first = '';
+            for (const o of orig) {
+              const v = o.value.trim();
+              if (!v) continue;
+              if (!allowedSet.has(v)) continue;
+  const label = o.text
+    .replace(/\s*\(Custom\)\s*/gi, '')
+    .replace(/\s*·\s*svc\s*$/i, ''); // hide service suffix in UI
+  select.add(new Option(label, v));
+              if (!first) first = v;
+            }
+
+            // restore or set first
+            select.value = allowedSet.has(current) ? current : first;
+
+            // bubble change for custom UIs
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+
+          // One-off: rebuild Width to drop any " · svc" options from the UI
+  groups.widthSel.forEach((sel) => rebuild(sel, widthSet));
+
+          function currentWidthValue() {
+            // Prefer the first width select’s value
+            const sel = groups.widthSel[0];
+            return String((sel && sel.value) || '');
+          }
+
+          function currentThicknessValue() {
+            const sel = groups.thickSel[0];
+            return String((sel && sel.value) || '');
+          }
+
+          function refreshForWidth() {
+            const w = currentWidthValue();
+            if (!w || !mapWidthToThickness[w]) return;
+
+            // Rebuild ALL thickness selects
+            groups.thickSel.forEach((sel) => rebuild(sel, mapWidthToThickness[w]));
+
+            // Now rebuild ALL TPI selects based on (width + selected thickness in each thickSel[0])
+            const th = currentThicknessValue();
+            const tpiAllowed =
+              mapWidthThickToTPI[w] && mapWidthThickToTPI[w][th]
+                ? mapWidthThickToTPI[w][th]
+                : tpiSet;
+            groups.tpiSel.forEach((sel) => rebuild(sel, tpiAllowed));
+
+            // Snap to exact variant + recompute your price/SKU
+            const v = findVariantByOptions(currentOptions());
+            applyVariant(v);
+          }
+          
+
+          function refreshTPI() {
+            const w = currentWidthValue();
+            const th = currentThicknessValue();
+            if (!w) return;
+            const allowed =
+              mapWidthThickToTPI[w] && mapWidthThickToTPI[w][th]
+                ? mapWidthThickToTPI[w][th]
+                : tpiSet;
+            groups.tpiSel.forEach((sel) => rebuild(sel, allowed));
+            const v = findVariantByOptions(currentOptions());
+            applyVariant(v);
+          }
+
+          // Wire changes (all duplicates)
+          groups.widthSel.forEach((sel) => sel.addEventListener('change', refreshForWidth));
+          groups.thickSel.forEach((sel) => sel.addEventListener('change', refreshTPI));
+          groups.tpiSel.forEach((sel) =>
+            sel.addEventListener('change', () => {
+              const v = findVariantByOptions(currentOptions());
+              applyVariant(v);
+            })
+          );
+
+          // Initial pass (run twice to catch late hydration)
+          refreshForWidth();
+          setTimeout(refreshForWidth, 60);
+        }
+      }
+      // ===== END REBUILD OPTION LISTS =====
+
+      // Detect which option index is Width / Thickness / TPI
+      const optNames = (productData && productData.options) || [];
+      const findIdx = (regexes, fallback) => {
+        const idx = optNames.findIndex((n) => regexes.some((rx) => rx.test(String(n))));
+        return idx === -1 ? fallback : idx;
+      };
+      const iWidth = findIdx([/width/i], 0);
+      const iThickness = findIdx([/thick/i], 1);
+      const iTPI = findIdx([/tpi|teeth/i], 2);
+
+      function currentOptions() {
+    const opts = [null, null, null];
+    optionSelects.forEach((sel) => {
+      const pos =
+        Number(
+          sel.getAttribute('data-option-position') ||
+          sel.dataset.index ||
+          sel.dataset.position ||
+          (sel.name && sel.name.replace(/\D/g, '')) ||
+          1
+        ) || 1;
+
+      const raw =
+        sel.tagName === 'INPUT'
+          ? (document.querySelector(`input[name="${sel.name}"]:checked`)?.value || '')
+          : sel.value;
+
+      opts[pos - 1] = stripSvc(raw);
+    });
+
+    // Fallback from variantSelect text if needed
+    if (!opts[0] && variantSelect) {
+      const t = variantSelect.options[variantSelect.selectedIndex]?.text || '';
+      t.split(' / ').forEach((v, i) => (opts[i] = opts[i] || stripSvc(v)));
+    }
+    return opts;
+  }
+
+
+  function findVariantByOptions(opts) {
+    // Search only within non-svc variants
+    return (
+      VISIBLE_VARIANTS.find(v =>
+        v.available && v.options.every((val, i) => !opts[i] || val === opts[i])
+      ) ||
+      VISIBLE_VARIANTS.find(v =>
+        v.options.every((val, i) => !opts[i] || val === opts[i])
+      )
+    );
+  }
+
+
+  function applyVariant(v) {
+    if (!v) return;
+    if (variantSelect) variantSelect.value = String(v.id); // do NOT dispatch a change
+    if (skuEl) {
+      skuEl.setAttribute('data-base-sku', v.sku || '');
+      skuEl.textContent = v.sku || '';
+    }
+    computeAndRender(true);
+  }
+
+
+      // Keep syncing variant if any other option changes
+      optionSelects.forEach((sel) => {
+        sel.addEventListener('change', () => {
+          const v = findVariantByOptions(currentOptions());
+          applyVariant(v);
+        });
+      });
+
+    // --------- PRICE MATRIX (robust + smoothing) ----------
+  const rawEl = document.getElementById('ex-price-matrix-raw');
+
+  // Default: remove last 3 digits; special tag: remove last 2
+  function prefixFromSku(sku) {
+    const digits = String(sku || '').replace(/\D/g, '');
+    const cut = USE_7_DIGIT_PREFIX ? 2 : 3;
+    return digits.length > cut ? digits.slice(0, -cut) : null;
+  }
+
+  // Parse CSV/TSV with multiple prefixes; backfill missing 5+/10+ prices
+  function parseTable(text) {
+    const lines = (text || '').trim().split(/\r?\n/).filter(Boolean);
+    if (lines.length < 2) return [];
+
+    const rawHeader = lines[0].replace(/^\uFEFF/, ''); // strip BOM if present
+  const d = rawHeader.includes('\t') ? '\t' : ',';
+  const norm = (s) => String(s).replace(/\s+/g, ' ').trim().toLowerCase();
+  const cols = rawHeader.split(d).map(norm);
+
+  // Accept "Price" or "Web Price"
+  const RX_P1  = /^(?:web\s+)?price(?:\s*1\+)?$/i;
+  const RX_P5  = /^(?:web\s+)?price\s*5\+$/i;
+  const RX_P10 = /^(?:web\s+)?price\s*10\+$/i;
+
+  const idx = {
+    prefix: cols.findIndex(c => /^prefix$/i.test(c)),
+    length: cols.findIndex(c => /^length(?:\s*\(mm\))?$/i.test(c)),
+    p1:     cols.findIndex(c => RX_P1.test(c)),
+    p5:     cols.findIndex(c => RX_P5.test(c)),
+    p10:    cols.findIndex(c => RX_P10.test(c)),
+  };
+  if ([idx.prefix, idx.length, idx.p1].some(i => i < 0)) return [];
+
+
+    const out = [];
+    for (let i = 1; i < lines.length; i++) {
+      const parts = lines[i].split(d).map(s => s.trim());
+      if (!parts.length) continue;
+
+      // support comma- or semicolon-separated prefixes with spaces
+      const prefixes = String(parts[idx.prefix] || '')
+        .split(/[,;]+/)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      const L  = Number(parts[idx.length]);
+      let p1   = Number(parts[idx.p1]);
+      let p5   = idx.p5 >= 0 ? Number(parts[idx.p5])  : NaN;
+      let p10  = idx.p10>= 0 ? Number(parts[idx.p10]) : NaN;
+
+      if (!Number.isFinite(L) || !Number.isFinite(p1)) continue;
+      if (!Number.isFinite(p5))  p5  = p1;       // backfill 5+
+      if (!Number.isFinite(p10)) p10 = p5 || p1; // backfill 10+
+
+      prefixes.forEach(px => out.push({ prefix: px, length: L, price: p1, price5: p5, price10: p10 }));
+    }
+    return out;
+  }
+
+  const rows = rawEl ? parseTable(rawEl.textContent) : [];
+
+  // Build map { prefix -> sorted unique lengths }
+  const byPrefix = {};
+  const rangeMap = {}; // { prefix -> {min,max} }
+  if (rows.length) {
+    const temp = {};
+    rows.forEach(r => {
+      (temp[r.prefix] ||= {})[r.length] = r; // latest row wins
+    });
+
+    Object.entries(temp).forEach(([px, obj]) => {
+      const arr = Object.values(obj).sort((a,b) => a.length - b.length);
+      byPrefix[px] = arr;
+      rangeMap[px] = { min: arr[0].length, max: arr[arr.length-1].length };
+    });
+  }
+
+  // Price formatting
+  const fmt = (n) => new Intl.NumberFormat('en-AU', {
+    minimumFractionDigits: 2, maximumFractionDigits: 2
+  }).format(n);
+
+  // ceil to the next defined length ≥ L
+  function pickTier(tiers, L) {
+    if (!tiers || !tiers.length || !Number.isFinite(L)) return null;
+    for (const t of tiers) {
+      if (L <= t.length) return t;              // first length ≥ L
+    }
+    return tiers[tiers.length - 1];             // if above highest, use last
+  }
+
+  // Pick the quantity price (backfilled already)
+  function priceForQty(row, q) {
+    const n = Number(q) || 1;
+    if (n >= 10) return row.price10;
+    if (n >= 5)  return row.price5;
+    return row.price;
+  }
+
+  // Range helpers (use precomputed ranges)
+  function getMinMaxForPrefix(prefix) { return rangeMap[prefix] || null; }
+  const roundTo5 = (n) => Math.round(n / 5) * 5;
+
+  // Snap/clamp length into allowed range (optionally round to 5)
+  function coerceLength(prefix, rawVal, { round=true } = {}) {
+    const range = getMinMaxForPrefix(prefix);
+    if (!range) return { value: rawVal, changed: false };
+    let val = Number(rawVal);
+    if (!Number.isFinite(val)) return { value: rawVal, changed: false };
+    if (val < range.min) val = range.min;
+    if (val > range.max) val = range.max;
+    if (round) val = roundTo5(val);
+    return { value: val, changed: val !== Number(rawVal) };
+  }
+
+  // UI helpers
+  function showPriceSkeleton() { if (priceWrap) priceWrap.setAttribute('data-price-state', 'unknown'); }
+  function showPriceUI()       { if (priceWrap) priceWrap.setAttribute('data-price-state', 'ready');  }
+
+  // Reset visible price + hidden numeric
+  function restorePriceUI() {
+    priceSpans.forEach((el, i) => (el.innerHTML = originalPriceHTML[i] || originalPriceHTML[0]));
+    if (hiddenPrice) hiddenPrice.value = '';
+    showPriceSkeleton();
+    updateDisplayedCode && updateDisplayedCode();
+    syncATCDisabled && syncATCDisabled();
+
+  }
+
+  // Central calculator (smooth + watertight)
+  function computeAndRender(enforce=false) {
+    if (!rows.length) { restorePriceUI(); return; }
+
+    // Need a base SKU → prefix
+    const sku = baseSKU && baseSKU();
+    const prefix = prefixFromSku(sku);
+    const tiers = prefix ? byPrefix[prefix] : null;
+    if (!tiers) { restorePriceUI(); return; }
+
+    // Guard: no length field yet → unknown
+    if (!lengthInput || String(lengthInput.value).trim() === '') {
+      restorePriceUI();
+      return;
+    }
+
+    // If enforcing, snap/clamp the entered length to a valid in-range 5mm step
+    if (enforce) {
+      const snap = coerceLength(prefix, lengthInput.value, { round:true });
+      if (snap.changed) lengthInput.value = String(snap.value);
+    }
+
+    // If still out-of-range AND we’re not enforcing (mid-typing), keep skeleton
+    const range = getMinMaxForPrefix(prefix);
+    const L = Number(lengthInput.value);
+    if (!Number.isFinite(L) || L < range.min || L > range.max) {
+      if (!enforce) { restorePriceUI(); return; }
+    }
+
+    // Pick the price tier (largest defined length ≤ current)
+    const row = pickTier(tiers, L);
+    if (!row) { restorePriceUI(); return; }
+
+    const q = Math.max(1, Number(qtyInput?.value) || 1);
+    const price = priceForQty(row, q);
+    if (!Number.isFinite(price) || price <= 0) { restorePriceUI(); return; }
+
+    // Show solid UI
+    showPriceUI();
+    const cents = Math.round(Number(price) * 100);
+    __exLastCents = cents;
+    const tx = resolveTaxable();
+    window.__exLastCents = cents;
+    window.__exTaxable   = tx;
+    priceSpans.forEach(el => renderPriceBoth(el, cents, tx));
+    if (hiddenPrice) hiddenPrice.value = Number(price).toFixed(2);
+    updateDisplayedCode && updateDisplayedCode();
+    syncATCDisabled && syncATCDisabled();
+  }
+
+      // --------- LENGTH VALIDATION ----------
+
+      function showLengthError(msg) {
+        let el = document.getElementById('lengthError');
+        if (!el) {
+          el = document.createElement('div');
+          el.id = 'lengthError';
+          el.style.color = 'red';
+          el.style.fontSize = '0.9em';
+          el.style.marginTop = '4px';
+          lengthInput.insertAdjacentElement('afterend', el);
+        }
+        el.textContent = msg;
+      }
+
+      function clearLengthError() {
+        const el = document.getElementById('lengthError');
+        if (el) el.textContent = '';
+      }
+
+      function validateLength() {
+    if (!lengthInput) return true;
+    if (lengthInput.value === '') return true;
+
+    const sku = baseSKU && baseSKU();
+    const prefix = prefixFromSku(sku);
+    const range = getMinMaxForPrefix(prefix);
+    if (!range) return true;
+
+    const snap = coerceLength(prefix, lengthInput.value, { round:true });
+    if (snap.changed) lengthInput.value = String(snap.value);
+
+    const v = Number(lengthInput.value);
+    const ok = Number.isFinite(v) && v >= range.min && v <= range.max;
+    if (!ok) {
+      showLengthError(`Allowed range: ${range.min}–${range.max}mm`);
+    } else {
+      clearLengthError();
+    }
+    return ok;
+  }
+
+
+
+
+      // --------- EVENTS ----------
+  if (variantSelect) {
+    variantSelect.addEventListener('change', () => {
+      computeAndRender(true);
+    });
+  }
+
+  // Catch programmatic variant changes (themes often update selectedIndex without events)
+  if (variantSelect) {
+    let last = String(variantSelect.value);
+
+  const notify = () => {
+    const now = String(variantSelect.value);
+    if (now !== last) {
+      last = now;
+      coerceVisibleVariant();
+      updateDisplayedCode();
+      computeAndRender(true);
+    }
+  };
+
+
+    // Observe option 'selected' changes and child mutations
+    const mo = new MutationObserver(notify);
+    mo.observe(variantSelect, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['selected']
+    });
+
+    // Safety poll (some themes mutate internal state only)
+    setInterval(notify, 300);
+  }
+
+
+
+
+  if (lengthInput) {
+    lengthInput.addEventListener('input', () => {
+      clearLengthError();
+      updateDisplayedCode();
+      computeAndRender(false);
+    });
+    ['change', 'blur'].forEach((ev) =>
+      lengthInput.addEventListener(ev, () => {
+        validateLength();
+        computeAndRender(true);
+      })
+    );
+  }
+
+
+  if (qtyInput) {
+    const onQty = () => {
+      updateDisplayedCode();
+      computeAndRender(true);
+      if (typeof updateQtyTip === 'function') updateQtyTip();
+    };
+    qtyInput.addEventListener('input', onQty);
+    qtyInput.addEventListener('change', onQty);
+  }
+
+
+  if (typeof updateQtyTip === 'function') updateQtyTip();
+
+
+      // First paint
+  const initialVariant = findVariantByOptions(currentOptions());
+  applyVariant(initialVariant);
+  setTimeout(() => computeAndRender(true), 0);
+
+  // After your existing listeners, add:
+  const rootForm =
+    document.getElementById('addToCartForm-{{ section.id }}') ||
+    document.querySelector('form[data-product-form]');
+
+  if (rootForm) {
+    let _t;
+    ['input','change'].forEach(ev => {
+      rootForm.addEventListener(ev, (e) => {
+        const t = e.target;
+        if (!(t instanceof HTMLInputElement || t instanceof HTMLSelectElement)) return;
+
+        updateDisplayedCode();
+
+        if (ev === 'change') {
+          computeAndRender(true);
+        } else {
+          clearTimeout(_t);
+          _t = setTimeout(() => computeAndRender(false), 60);
+        }
+      }, true);
+    });
+  }
+
+
+
+  // --------- ADD TO CART (custom price via Worker, then cart) ----------
+  if (atcBtn) {
+    atcBtn.addEventListener('click', async function (e) {
+      // prevent double-clicks/races
+      if (this.dataset.exBusy === '1') return;
+  setBusy(this, true);
+
+
+      e.preventDefault();
+
+      // Grab current variant id the theme is using
+      const idField =
+        document.querySelector('form[action="/cart/add"] [name="id"]') ||
+        document.getElementById('productSelect-{{ section.id }}');
+      const variantId = Number(idField ? idField.value : '{{ product.selected_or_first_available_variant.id }}');
+
+      // Validate length (if present)
+      if (lengthInput) {
+        const ok = validateLength();
+        computeAndRender(true);
+        if (!ok) { setBusy(this, false); return; }
+      }
+
+  const currentV =
+    (typeof findVariantByOptions === 'function' && findVariantByOptions(currentOptions())) ||
+    (productData && productData.variants && productData.variants.find(x => String(x.id) === String(variantId))) ||
+    null;
+
+  document.dispatchEvent(new CustomEvent('variant:changed', { detail: { variant: currentV }}));
+
+
+  // Build line item properties we’ll keep on cart line
+  // IMPORTANT: always use the base SKU attribute (never the displayed text)
+  const baseSku = (skuEl && skuEl.getAttribute('data-base-sku')) || '';
+  const lenVal  = lengthInput ? String(lengthInput.value || '').trim() : '';
+
+  const props = {};
+  if (lenVal) props['Length'] = lenVal;
+  if (baseSku && lenVal) props['SKU'] = `${baseSku}-${lenVal}`;
+
+
+  // Parse numeric computed price we stored (no $, commas)
+  const computedPrice = hiddenPrice
+    ? Number(String(hiddenPrice.value || '').replace(/[^\d.]/g, ''))
+    : NaN;
+
+  if (!computedPrice || !isFinite(computedPrice)) {
+    console.error('[exInit] Missing/invalid computedPrice', hiddenPrice && hiddenPrice.value);
+    alert('Please select a valid length to calculate price.');
+  setBusy(this, false);
+  return;
+
+  }
+
+  // Quantity
+  const quantity = Math.max(1, Number(qtyInput?.value) || 1);
+
+  // Call your Worker (reuses/updates the single custom variant)
+  const WORKER_URL = 'https://custompricecheckout.marketingexcision.workers.dev/';
+
+  const workerPayload = {
+    variantId: Number(variantId),          // current selection; context only
+    productId: {{ product.id }},           // numeric
+    baseSku,                               // e.g. "60503014"
+    length: lenVal,                        // e.g. "2500"
+    quantity,
+    computedPrice,                         // per-unit numeric
+    properties: {
+      SKU: `${baseSku}-${lenVal}`,
+      Length: lenVal,
+      // NEW — parent product info so the cart can use the original image/title/link
+      _ex_parent_handle: {{ product.handle | json }},
+      _ex_parent_title:  {{ product.title  | json }},
+      _ex_parent_url:    {{ product.url    | json }}
+    }
+  };
+
+    let added = false; // <--- add this line
+
+  try {
+    const wRes = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(workerPayload)
+    });
+
+    if (!wRes.ok) {
+      const txt = await wRes.text().catch(()=>'');
+      console.error('[Worker] HTTP error', wRes.status, txt);
+      throw new Error('worker_http_' + wRes.status);
+    }
+
+    const data = await wRes.json().catch(()=> ({}));
+    console.log('[Worker] targetProductId →', data?.received?.targetProductId);
+    const finalVariantId = Number(data?.received?.variantId);
+    const lineQuantity   = Math.max(1, Number(data?.received?.quantity) || quantity);
+    const lineProperties = data?.received?.properties || props;
+
+    if (!finalVariantId) {
+      console.error('[Worker] Unexpected response', data);
+      throw new Error('worker_no_variant');
+    }
+
+  // ---- ADD TO CART (optimistic) ----
+  if (!finalVariantId) {
+    console.error('[Worker] No variantId in response:', data);
+    alert('Sorry, we could not prepare checkout. Please try again.');
+    setBusy(this, false);
+    // exHideATCOverlay && exHideATCOverlay(); // uncomment if you added the overlay helper
+    return;
+  }
+
+  // Add to cart right away for snappy UX
+  const cartRes = await fetch('/cart/add.js', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: finalVariantId,
+      quantity: lineQuantity,
+      properties: lineProperties
+    })
+  });
+  const cartData = await cartRes.json().catch(()=> ({}));
+
+  // --- Force popup to show the original product title/link ---
+  const addedItem = Array.isArray(cartData.items) ? cartData.items[0] : cartData;
+  if (addedItem && lineProperties) {
+    if (lineProperties._ex_parent_title) {
+      addedItem.title = lineProperties._ex_parent_title;
+      addedItem.product_title = lineProperties._ex_parent_title;
+    }
+    if (lineProperties._ex_parent_url) {
+      addedItem.url = lineProperties._ex_parent_url;
+      addedItem.product_url = lineProperties._ex_parent_url;
+    }
+  }
+
+  console.log('✅ Added to cart (optimistic):', cartData);
+  if (window.showCartPopup) window.showCartPopup(cartData);
+  added = true;
+
+
+  // ---- SHORT REPRICE LOOP (background) ----
+  (async () => {
+    async function getCart() {
+      const r = await fetch('/cart.js', { headers: { 'Accept': 'application/json' }});
+      if (!r.ok) return null;
+      return r.json().catch(() => null);
+    }
+    async function changeLine(index, qty) {
+      const r = await fetch('/cart/change.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ line: index, quantity: qty })
+      });
+      return r.ok ? r.json().catch(()=>null) : null;
+    }
+
+    const wantedSKU = String(lineProperties?.SKU || '');
+    const wantedLen = String(lineProperties?.Length || '');
+    const wantedId  = finalVariantId;
+    const expectedCents = Math.round(Number(computedPrice) * 100); // computedPrice is defined earlier
+
+    // Try ~3s total
+    for (let tries = 0; tries < 10; tries++) {
+      const cart = await getCart();
+      if (!cart || !Array.isArray(cart.items)) { await new Promise(r => setTimeout(r, 250)); continue; }
+
+      let idx = cart.items.findIndex(it =>
+        Number(it.id) === Number(wantedId) &&
+        (!wantedSKU || (it.properties && String(it.properties.SKU || '') === wantedSKU)) &&
+        (!wantedLen || (it.properties && String(it.properties.Length || '') === wantedLen))
+      );
+      if (idx === -1) idx = cart.items.findIndex(it => Number(it.id) === Number(wantedId));
+      if (idx === -1) { await new Promise(r => setTimeout(r, 250)); continue; }
+
+      const line = cart.items[idx];
+      const pre  = Number(line.price || line.original_price || 0); // cents
+      const post = Number(line.final_price || 0);                  // cents
+      const ok =
+        (expectedCents && Math.abs(pre  - expectedCents) <= 1) ||
+        (expectedCents && Math.abs(post - expectedCents) <= 1) ||
+        pre > 0;
+
+      if (ok) break;
+
+      // nudge recalculation
+      const q = Number(line.quantity) || 1;
+      await changeLine(idx + 1, q + 1);
+      await new Promise(r => setTimeout(r, 150));
+      await changeLine(idx + 1, q);
+      await new Promise(r => setTimeout(r, 250));
+    }
+
+    // Refresh your mini-cart UI if you have a hook
+    if (typeof refreshMiniCartUI === 'function') {
+      try { await refreshMiniCartUI(); } catch {}
+    }
+  })();
+
+  // TEMP: no auto-cleanup of svc variant. We'll clean these up out-of-band.
+  // (Auto-deleting here can make Shopify drop the cart line.)
+
+
+
+  } catch (err) {
+    console.error('❌ ATC flow failed:', err);
+    if (!added) {
+      alert('Sorry, we could not prepare checkout. Please try again.');
+    }
+  } finally {
+    setBusy(this, false);
+  }
+
+
+    });
+  }
+
+
+  }               // <-- NOW close exInit() exactly once, here.
+
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', exInit);
+    } else {
+      exInit();
+    }
+    </script>
+
+    <style>
+          [data-price] .ex-price-placeholder { display: none; }
+
+      /* default: price visible, placeholder hidden */
+      /* layout for the visible price row */
+      [data-price] .ex-price-visible {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+      }
+
+      /* hide the whole price row when unknown */
+      /* correct */
+      [data-price][data-price-state="unknown"] { display: none !important; }
+
+
+      /* when price unknown */
+      [data-price][data-price-state="unknown"] .ex-price-placeholder {
+        display: inline-flex;
+        align-items: center;
+        gap: 20px;
+        vertical-align: middle;
+      }
+      /* hide Ex GST bubble with placeholder */
+      [data-price][data-price-state="unknown"] .ex-gst-bubble { display:none !important; }
+
+      /* skeleton visuals */
+      .ex-price-skeleton {
+        position: relative;
+        height: 40px;
+        min-width: 110px;
+        border-radius: 20px;
+        overflow: hidden;
+        background: #f1f1f1;
+      }
+      .ex-price-skeleton::before {
+        content: "";
+        position: absolute;
+        top: 0; bottom: 0;
+        left: -120%;                     /* start well off-screen */
+        width: 240%;                     /* wider than pill so edges are off-screen */
+        background: linear-gradient(110deg,#f1f1f1 8%,#fafafa 18%,#f1f1f1 33%);
+        /* don't animate background-position anymore */
+        transform: translateX(0);
+        opacity: 0;
+        will-change: transform, opacity;
+        animation: exShimmerX 2.6s cubic-bezier(.22,.61,.36,1) infinite;
+      }
+      @keyframes exShimmerX {
+        0%   { transform: translateX(0);     opacity: 0; }   /* off-screen left (hidden) */
+        5%   { opacity: 1; }                                  /* fade in as it enters */
+        40%  { transform: translateX(100%); opacity: 1; }     /* sweep across */
+        41%  { transform: translateX(0);     opacity: 0; }    /* jump back off-screen + hide */
+        100% { transform: translateX(0);     opacity: 0; }    /* hold hidden (pause) */
+      }
+      .ex-price-warning { color:#666666; font-size:16px; }
+
+      .qty-wrap {
+        position: relative;
+      }
+
+      .qty-wrap input {
+      }
+
+      /* Parent highlight using :has() (Chrome/Edge/Safari/Firefox 121+) */
+      .qty-length:has(.qty__input:invalid) {
+        border-color: #e0592a;
+        background: rgba(224, 87, 42, .08);
+        box-shadow: inset 0 0 0 2px rgba(224, 89, 42, .15);
+      }
+      /* optional: stronger while focused */
+      .qty-length:has(.qty__input:invalid):focus-within {
+        box-shadow: inset 0 0 0 2px rgba(224, 89, 42, .3);
+      }
+
+      /* remove old per-input red underline if you still have it */
+      .length-wrapper input#length { border:0 !important; background:transparent !important; padding: 0; }
+      /* --- EX spinner for ATC button --- */
+      .ex-btn-busy {
+        position: relative;
+        pointer-events: none;
+        opacity: .75;
+      }
+      .ex-btn-busy .ex-spinner {
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        margin-left: .5em;
+        border: 2px solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        vertical-align: -0.125em;
+        animation: exSpin .7s linear infinite;
+      }
+      @keyframes exSpin { to { transform: rotate(360deg); } }
+    </style>
+  {% endif %}
+
+  {% unless product.tags contains 'Custom Length' %}
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // local busy-state helper (same as the one above)
+
+        function setBusy(btn, busy, labelWhenBusy = 'Adding to cart…', labelWhenReady = 'Add to Cart') {
+          if (!btn) return;
+          if (busy) {
+            btn.dataset.exBusy = '1';
+            btn.setAttribute('disabled', 'disabled');
+            if (!btn.dataset.exLabel) btn.dataset.exLabel = btn.textContent.trim();
+            btn.textContent = labelWhenBusy;
+            btn.classList.add('ex-btn-busy');
+            const sp = document.createElement('span');
+            sp.className = 'ex-spinner';
+            btn.appendChild(sp);
+            btn.setAttribute('aria-busy', 'true');
+          } else {
+            btn.dataset.exBusy = '0';
+            btn.removeAttribute('disabled');
+            const original = btn.dataset.exLabel || labelWhenReady;
+            btn.textContent = original;
+            btn.classList.remove('ex-btn-busy');
+            btn.removeAttribute('aria-busy');
+          }
+        }
+
+        if (!atcBtn) return;
+
+        atcBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+
+          // Guard against double clicks + show progress UI
+          if (this.dataset.exBusy === '1') return;
+          setBusy(this, true);
+
+          // Grab the current variant ID from the product form
+          const idField =
+            document.querySelector('form[action="/cart/add"] [name="id"]') ||
+            document.getElementById('productSelect-{{ section.id }}');
+
+          const variantId = Number(idField ? idField.value : '{{ product.selected_or_first_available_variant.id }}');
+
+          // Quantity
+          const qtyInput =
+            document.getElementById('quantity') ||
+            document.querySelector('input[name="quantity"]') ||
+            document.querySelector('[id^="Quantity-"]');
+
+          const quantity = Math.max(1, Number(qtyInput?.value) || 1);
+
+          // Add to cart using Shopify’s native endpoint
+          fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: variantId, quantity }),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              console.log('✅ Added to cart:', data);
+              // Show mini-cart popup (don’t redirect)
+              if (window.showCartPopup) window.showCartPopup(data);
+            })
+            .catch((err) => {
+              console.error('❌ Normal ATC failed:', err);
+              alert('Sorry, something went wrong. Please try again.');
+            })
+            .finally(() => {
+              setBusy(this, false);
+            });
+        });
+      });
+    </script>
+  {% endunless %}

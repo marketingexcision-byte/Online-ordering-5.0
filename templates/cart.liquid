@@ -1,0 +1,1906 @@
+<nav class="breadcrumb" role="navigation" aria-label="breadcrumbs">
+  <div class="container dt-prl-30">
+    <div class="row">
+      <div class="col-md-7">
+        <div class="placeholder">
+          <h1>Cart</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container dt-prl-30">
+  {% if cart.item_count > 0 %}
+    
+    <form action="{{ routes.cart_url }}" method="post" class="cart-form" data-cart-form novalidate>
+      
+      <!-- TWO COLUMNS -->
+      <div class="cart-columns">
+        <!-- LEFT: ITEMS -->
+        <div class="cart-left">
+          {%- assign cart_ex_total = 0 -%}
+          {%- assign cart_inc_total = 0 -%}
+          {% for item in cart.items %}
+            {% include 'wcp_discount' with item.product %}
+            {% include 'wcp_variant' with item.variant %}
+            {% include 'wcp_vd_discount' with item %}
+            {% assign wcp_line_price = wcp_v_price | minus: 0 | times: item.quantity %}
+            {%- assign ex_title = item.properties._ex_parent_title -%}
+            {%- assign ex_url = item.properties._ex_parent_url -%}
+
+            {%- assign base_url = ex_url | default: item.url -%}
+            {%- if item.properties.Length -%}
+              {%- if base_url contains '?' -%}
+                {%- assign link_url = base_url | append: '&length=' | append: item.properties.Length -%}
+              {%- else -%}
+                {%- assign link_url = base_url | append: '?length=' | append: item.properties.Length -%}
+              {%- endif -%}
+            {%- else -%}
+              {%- assign link_url = base_url -%}
+            {%- endif -%}
+
+            <div class="cart-row" data-line="{{ forloop.index }}" data-taxable="{{ item.variant.taxable | json }}">
+              <div class="item-main">
+                {% assign parent_handle = item.properties._ex_parent_handle %}
+                <a href="{{ link_url }}" class="thumb">
+                  {% assign parent_handle = item.properties._ex_parent_handle %}
+                  {% assign line_image = item.image | default: item.product.featured_image %}
+
+                  {% if parent_handle and all_products[parent_handle] %}
+                    {% assign parent = all_products[parent_handle] %}
+                    <img
+                      src="{{ parent.featured_image | img_url: '300x' }}"
+                      alt="{{ item.properties._ex_parent_title | default: parent.title | escape }}"
+                      class="thumb__img"
+                      loading="lazy"
+                    >
+
+                  {% elsif line_image %}
+                    <img
+                      src="{{ line_image | img_url: '300x' }}"
+                      alt="{{ item.title | escape }}"
+                      class="thumb__img"
+                      loading="lazy"
+                    >
+
+                  {% else %}
+                    {%- comment -%} Use your provided logo on the standard tile background {%- endcomment -%}
+                    {% assign img_bg = settings.color_image_background
+                      | default: settings.card_image_background
+                      | default: settings.color_image_bg
+                      | default: '#f1f1f1'
+                    %}
+
+                    <span class="thumb__fallback" style="background: {{ img_bg }};">
+                      <img
+                        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Excision_Logo_2025_400px.png?v=1745463485"
+                        alt="{{ shop.name | escape }} logo"
+                        class="thumb__logo"
+                        loading="lazy"
+                      >
+                    </span>
+                  {% endif %}
+                </a>
+
+                <div class="meta">
+                  <a href="{{ link_url }}">{{ ex_title | default: item.product.title }}</a>
+
+{% unless item.product.tags contains 'Custom Length' %}
+{%- comment -%} Show Option 1 / 2 / 3 names + values for this line item {%- endcomment -%}
+{%- assign opt1_name = item.product.options[0] -%}
+{%- assign opt2_name = item.product.options[1] -%}
+{%- assign opt3_name = item.product.options[2] -%}
+
+{%- if item.variant.option1 and item.variant.option1 != '' 
+      and item.variant.option1 != 'Default Title'
+      and opt1_name and opt1_name != 'Title' -%}
+  <div class="line-prop">
+    {{ opt1_name }}: {{ item.variant.option1 }}
+  </div>
+{%- endif -%}
+
+{%- if item.variant.option2 and item.variant.option2 != '' 
+      and item.variant.option2 != 'Default Title'
+      and opt2_name and opt2_name != 'Title' -%}
+  <div class="line-prop">
+    {{ opt2_name }}: {{ item.variant.option2 }}
+  </div>
+{%- endif -%}
+
+{%- if item.variant.option3 and item.variant.option3 != '' 
+      and item.variant.option3 != 'Default Title'
+      and opt3_name and opt3_name != 'Title' -%}
+  <div class="line-prop">
+    {{ opt3_name }}: {{ item.variant.option3 }}
+  </div>
+{%- endif -%}
+{% endunless %}
+
+
+{%- comment -%} Excision: detect custom/service variant ( · svc ) {%- endcomment -%}
+{%- assign is_custom_svc = false -%}
+{%- if item.variant.option1 and item.variant.option1 contains ' · svc' -%}
+  {%- assign is_custom_svc = true -%}
+{%- endif -%}
+
+{%- comment -%} Excision: Cart stock badge w/ YG-1 thresholds + bulk pools {%- endcomment -%}
+{%- assign is_yg1 = false -%}
+{%- for t in item.product.tags -%}
+  {%- if t == 'YG-1' -%}{%- assign is_yg1 = true -%}{%- break -%}{%- endif -%}
+{%- endfor -%}
+
+{%- comment -%} Excision: MTO when product has tag 'custom length' {%- endcomment -%}
+{%- assign is_mto = false -%}
+{%- assign _tags = item.product.tags | join: '||' | downcase -%}
+{%- if _tags contains 'custom length' -%}
+  {%- assign is_mto = true -%}
+{%- endif -%}
+
+{%- comment -%} ==== NEW: figure out effective qty with bulk pooling ==== {%- endcomment -%}
+{%- assign inv_base = item.variant.inventory_quantity | default: 0 -%}
+{%- assign inv_eff  = inv_base -%}
+
+{%- if item.variant.inventory_management -%}
+  {%- assign tags_down = item.product.tags | join: '||' | downcase -%}
+
+  {%- assign is_coolant = false -%}
+  {%- if tags_down contains 'coolant'
+     or tags_down contains 'coolants'
+     or tags_down contains 'soluble oils'
+     or tags_down contains 'cutting fluid' -%}
+    {%- assign is_coolant = true -%}
+  {%- endif -%}
+
+  {%- assign is_coldsaw = false -%}
+  {%- if tags_down contains 'coldsaw blades'
+     or tags_down contains 'hss blades - toothed'
+     or tags_down contains 'hss blades' -%}
+    {%- assign is_coldsaw = true -%}
+  {%- endif -%}
+
+  {%- if is_coolant -%}
+    {%- comment -%}
+      Coolants: pool litres from:
+        • metafield custom.is_open (inventory_quantity = litres on hand)
+        • metafield custom.is_decant_source (units * litres_per_unit)
+      Then convert pooled litres → extra units for the CURRENT variant.
+    {%- endcomment -%}
+    {%- assign this_lpu = item.variant.metafields.custom.litres_per_unit | default: 0 | plus: 0 -%}
+    {%- assign pool_litres = 0 -%}
+
+    {%- for v in item.product.variants -%}
+      {%- if v.id != item.variant.id and v.inventory_management -%}
+        {%- assign v_is_open = false -%}
+        {%- assign v_is_decant = false -%}
+
+        {%- if v.metafields.custom.is_open == true
+           or v.metafields.custom.is_open.value == true
+           or v.metafields.custom.is_open == 'true' -%}
+          {%- assign v_is_open = true -%}
+        {%- endif -%}
+
+        {%- if v.metafields.custom.is_decant_source == true
+           or v.metafields.custom.is_decant_source.value == true
+           or v.metafields.custom.is_decant_source == 'true' -%}
+          {%- assign v_is_decant = true -%}
+        {%- endif -%}
+
+        {%- if v_is_open -%}
+          {%- assign pool_litres = pool_litres | plus: (v.inventory_quantity | default: 0 | plus: 0) -%}
+        {%- elsif v_is_decant -%}
+          {%- assign units = v.inventory_quantity | default: 0 | plus: 0 -%}
+          {%- assign lpu   = v.metafields.custom.litres_per_unit | default: 0 | plus: 0 -%}
+          {%- assign add_l = units | times: lpu -%}
+          {%- assign pool_litres = pool_litres | plus: add_l -%}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- if this_lpu > 0 -%}
+      {%- assign add_units = pool_litres | divided_by: this_lpu -%}
+      {%- assign inv_eff = inv_eff | plus: add_units -%}
+    {%- endif -%}
+
+  {%- elsif is_coldsaw -%}
+    {%- comment -%}
+      Coldsaw blades: add units from variants flagged as blanks.
+      Priority:
+        1) metafield custom.is_blank (boolean)
+        2) fallback: SKU suffix BLAH/BLAC
+      Only pool blanks in the same 7-char family as the line item's SKU.
+    {%- endcomment -%}
+    {%- assign key_len = 7 -%}
+    {%- assign family_key = item.variant.sku | default: '' | slice: 0, key_len -%}
+    {%- assign add_blank = 0 -%}
+
+    {%- for v in item.product.variants -%}
+      {%- if v.id != item.variant.id and v.inventory_management -%}
+        {%- assign v_is_blank = false -%}
+
+        {%- assign mf_blank = v.metafields.custom.is_blank -%}
+        {%- if mf_blank == true or mf_blank.value == true or mf_blank == 'true' -%}
+          {%- assign v_is_blank = true -%}
+        {%- endif -%}
+
+        {%- if v_is_blank != true -%}
+          {%- assign vsku = v.sku | default: '' | upcase -%}
+          {%- if vsku ends_with 'BLAH' or vsku ends_with 'BLAC' -%}
+            {%- assign v_is_blank = true -%}
+          {%- endif -%}
+        {%- endif -%}
+
+        {%- if v_is_blank -%}
+          {%- assign vkey = v.sku | default: '' | slice: 0, key_len -%}
+          {%- if vkey == family_key -%}
+            {%- assign add_blank = add_blank | plus: (v.inventory_quantity | default: 0) -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- assign inv_eff = inv_eff | plus: add_blank -%}
+  {%- endif -%}
+{%- endif -%}
+{%- comment -%} ==== /effective qty with bulk pooling ==== {%- endcomment -%}
+
+
+
+{%- assign ex_stock_status = '' -%}
+{%- capture ex_stock_text -%}
+  {%- if is_mto -%}
+    {%- assign ex_stock_status = 'mto' -%}Made to order
+  {%- elsif item.variant.inventory_management -%}
+    {%- assign inv = inv_eff -%}
+
+    {%- if is_yg1 -%}
+      {%- if inv >= 2 -%}
+        {%- assign ex_stock_status = 'green' -%}In stock
+      {%- elsif inv >= 1 -%}
+        {%- assign ex_stock_status = 'orange' -%}Low stock
+      {%- else -%}
+        {%- if item.variant.incoming and item.variant.next_incoming_date -%}
+          {%- assign ex_stock_status = 'blue' -%}Restocking
+        {%- elsif item.variant.inventory_policy == 'continue' -%}
+          {%- assign ex_stock_status = 'yellow' -%}5 days
+        {%- else -%}
+          {%- assign ex_stock_status = 'red' -%}No stock
+        {%- endif -%}
+      {%- endif -%}
+    {%- else -%}
+      {%- if inv > 5 -%}
+        {%- assign ex_stock_status = 'green' -%}In stock
+      {%- elsif inv > 0 -%}
+        {%- assign ex_stock_status = 'orange' -%}Low stock
+      {%- else -%}
+        {%- if item.variant.incoming and item.variant.next_incoming_date -%}
+          {%- assign ex_stock_status = 'blue' -%}Restocking
+        {%- elsif item.variant.inventory_policy == 'continue' -%}
+          {%- assign ex_stock_status = 'red' -%}Order in
+        {%- else -%}
+          {%- assign ex_stock_status = 'red' -%}No stock
+        {%- endif -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- else -%}
+    {%- assign ex_stock_status = 'grey' -%}Quantity unavailable
+  {%- endif -%}
+{%- endcapture -%}
+
+<div class="ex-card-badge ex-card-badge--cart"
+     data-status="{{ ex_stock_status | strip }}"
+     data-effective-qty="{{ inv_eff }}"
+     aria-label="Stock status: {{ ex_stock_text | strip }}">
+  {{ ex_stock_text | strip }}
+  {%- if ex_stock_status == 'blue' and item.variant.next_incoming_date and is_custom_svc != true -%}
+    <span class="ex-badge-note">ETA {{ item.variant.next_incoming_date | date: "%-d %b" }}</span>
+  {%- endif -%}
+</div>
+
+
+                  {%- comment -%} 1) Other visible properties (exclude Length  any SKU-ish keys) {%- endcomment -%}
+                  {%- if item.properties and item.properties.size > 0 -%}
+                    {%- assign skip = 'length,custom length,blade length,length (mm),sku,_sku,code,product code,part no,mpn,vendor_sku,supplier_sku'
+                      | split: ','
+                    -%}
+                    {%- for p in item.properties -%}
+                      {%- assign key = p.first | strip -%}
+                      {%- assign key_lc = key | downcase -%}
+                      {%- assign first_char = key | slice: 0, 1 -%}
+                      {%- unless p.last == blank or first_char == '_' or skip contains key_lc -%}
+                        <div class="line-prop">
+                          {{ key }}:
+                          {%- if p.last contains '/uploads/' -%}
+                            <a href="{{ p.last }}">{{ p.last | split: '/' | last }}</a>
+                          {%- else -%}
+                            {{ p.last }}
+                          {%- endif -%}
+                        </div>
+                      {%- endunless -%}
+                    {%- endfor -%}
+                  {%- endif -%}
+
+                  {% if item.properties.SKU %}
+                    <div class="line-prop">Product Code: {{ item.properties.SKU }}</div>
+                  {% endif %}
+                  {% if item.properties.Length %}
+                    <div class="line-prop">Length: {{ item.properties.Length }}</div>
+                  {% endif %}
+
+                  {%- comment -%} 3) Product Code LAST (with fallbacks) {%- endcomment -%}
+                  {%- assign line_sku = item.variant.sku -%}
+                  {%- if line_sku == blank and item.properties != blank -%}
+                    {%- assign sku_keys = 'sku,_sku,code,item code,product code,part no,mpn,vendor_sku,supplier_sku'
+                      | split: ','
+                    -%}
+                    {%- for p in item.properties -%}
+                      {%- assign key = p.first | downcase -%}
+                      {%- if sku_keys contains key and p.last != blank -%}
+                        {%- assign line_sku = p.last -%}
+                        {%- break -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                  {%- endif -%}
+                  {%- if line_sku == blank -%}
+                    {%- assign line_sku = item.variant.metafields.custom.sku
+                      | default: item.product.metafields.custom.sku
+                      | default: item.variant.barcode
+                    -%}
+                  {%- endif -%}
+                  {% unless item.properties.SKU %}
+                    <div class="line-sku">Product Code: {{ line_sku | default: '—' }}</div>
+                  {% endunless %}
+
+                  {%- assign line_taxable = item.variant.taxable -%}
+
+                  {%- comment -%}
+  Prefer a real “compare-at”:
+  If the variant has a higher compare_at_price than the current unit price,
+  show it as the strike-through (quantity-aware).
+{%- endcomment -%}
+{%- assign unit_now   = wcp_v_price -%}                         
+{%- assign unit_comp  = item.variant.compare_at_price -%}     
+{%- assign qty        = item.quantity | plus: 0 -%}
+
+{%- if unit_comp and unit_comp > unit_now -%}
+  {%- assign strong_cents = unit_now | times: qty -%}
+  {%- assign strike_cents = unit_comp | times: qty -%}
+{%- else -%}
+  {%- comment -%}Fallback to “was original_line_price, now WCP” heuristic{%- endcomment -%}
+  {%- if item.original_line_price != wcp_line_price -%}
+    {%- assign strong_cents = wcp_line_price -%}
+    {%- assign strike_cents = item.original_line_price -%}
+  {%- else -%}
+    {%- assign strong_cents = item.original_line_price -%}
+    {%- assign strike_cents = 0 -%}
+  {%- endif -%}
+{%- endif -%}
+
+
+                  {%- comment -%} split strong into ex/inc once on the server (integer math) {%- endcomment -%}
+                  {%- assign strong_ex = strong_cents -%}
+                  {%- assign strong_inc = strong_cents -%}
+                  {%- if line_taxable -%}
+                    {%- if shop.taxes_included -%}
+                      {%- assign strong_inc = strong_cents -%}
+                      {%- assign strong_ex = strong_cents | times: 10 | divided_by: 11 -%}
+                    {%- else -%}
+                      {%- assign strong_ex = strong_cents -%}
+                      {%- assign strong_inc = strong_cents | times: 11 | divided_by: 10 -%}
+                    {%- endif -%}
+                  {%- endif -%}
+
+                  {%- assign cart_ex_total = cart_ex_total | plus: strong_ex -%}
+                  {%- assign cart_inc_total = cart_inc_total | plus: strong_inc -%}
+
+                  {%- comment -%} same for struck price if it exists {%- endcomment -%}
+                  {%- assign strike_ex = strike_cents -%}
+                  {%- assign strike_inc = strike_cents -%}
+                  {%- if strike_cents > 0 and line_taxable -%}
+                    {%- if shop.taxes_included -%}
+                      {%- assign strike_inc = strike_cents -%}
+                      {%- assign strike_ex = strike_cents | times: 10 | divided_by: 11 -%}
+                    {%- else -%}
+                      {%- assign strike_ex = strike_cents -%}
+                      {%- assign strike_inc = strike_cents | times: 11 | divided_by: 10 -%}
+                    {%- endif -%}
+                  {%- endif -%}
+
+                  {{ NextDiscountHtml }}
+                </div>
+              </div>
+
+              <div class="item-actions">
+                <div class="quantity_wrapper qty-wrap">
+                  <div class="qty" data-line="{{ forloop.index }}">
+                    <!-- minus -->
+                    <button type="button" class="qty__btn minus" aria-label="Decrease quantity">
+                      <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2"></path>
+                      </svg>
+                    </button>
+
+                    <input
+                      id="updates_{{ item.key }}"
+                      name="updates[]"
+                      class="qty__input"
+                      type="number"
+                      value="{{ item.quantity }}"
+                      min="1"
+                      step="1"
+                      inputmode="numeric"
+                      pattern="[0-9]*"
+                      aria-live="polite"
+                      aria-label="{{ 'products.product.quantity' | t }}"
+                      data-line="{{ forloop.index }}"
+                      style="border-bottom: unset !important; margin: 0; padding: 0; min-height: auto;"
+                    >
+
+                    <!-- plus (same path, mirrored) -->
+                    <button type="button" class="qty__btn plus" aria-label="Increase quantity">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        style="transform: scaleX(-1);"
+                      >
+                        <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="price">
+                  {%- if strike_cents > 0 -%}
+                    <small>
+                      <s
+                        class="js-line-price--strike"
+                        data-ex="{{ strike_ex }}"
+                        data-inc="{{ strike_inc }}"
+                      >
+                        {% if shop.taxes_included %}
+                          {{ strike_inc | money }}
+                        {% else %}
+                          {{ strike_ex | money }}
+                        {% endif %}
+                      </s>
+                    </small>
+                  {%- endif -%}
+
+                  <strong
+                    class="js-line-price"
+                    data-ex="{{ strong_ex }}"
+                    data-inc="{{ strong_inc }}"
+                  >
+                    {% if shop.taxes_included %}
+                      {{ strong_inc | money }}
+                    {% else %}
+                      {{ strong_ex | money }}
+                    {% endif %}
+                  </strong>
+
+                  {% if item.variant.available and item.variant.unit_price_measurement %}
+                    {% include 'product-unit-price', variant: item, available: item.variant.available %}
+                  {% endif %}
+
+                  {% if item.line_level_discount_allocations != blank %}
+                    <ul class="order-discount order-discount--list order-discount--cart-list order-discount--title">
+                      {% for discount_allocation in item.line_level_discount_allocations %}
+                        <li class="order-discount__item">
+                          <span class="icon icon-saletag" aria-hidden="true"></span>
+                          {{ discount_allocation.discount_application.title }} (-
+                          {{- discount_allocation.amount | money -}}
+                          )
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                </div>
+
+                <button
+                  type="button"
+                  class="ex-remove-one"
+                  data-key="{{ item.key }}"
+                  data-line="{{ forloop.index }}"
+                  aria-label="Remove"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          {% endfor %}
+
+          <button
+            type="submit"
+            class="btn clear-cart"
+            formaction="/cart/clear"
+            formmethod="post"
+            data-js-clear
+          >
+            Clear all products
+          </button>
+        </div>
+
+        <!-- RIGHT: SUMMARY -->
+        <aside class="cart-right">
+
+
+        
+
+{%- assign pc_id   = cart.attributes._precart_id          | default: cart.attributes.precart_id          | strip -%}
+{%- assign pc_by   = cart.attributes._precart_created_by  | default: cart.attributes.precart_created_by  | strip -%}
+{%- assign pc_for  = cart.attributes._precart_created_for | default: cart.attributes.precart_created_for | strip -%}
+{%- assign pc_note = cart.attributes._precart_note        | default: cart.attributes.precart_note        | strip -%}
+{%- assign pc_show = cart.attributes._precart_show | default: '' | strip -%}
+
+{%- capture pc_any -%}{{ pc_id }}{{ pc_by }}{{ pc_for }}{{ pc_note }}{%- endcapture -%}
+{%- assign pc_any = pc_any | strip -%}
+
+{%- if pc_show == '1' and pc_any != '' -%}
+  <div class="cart-summary precart">
+    <div class="precart-panel">
+      <div class="precart-title">
+        PreCart{% if pc_id != '' %} <span class="precart-number">#{{ pc_id }}</span>{% endif %}
+      </div>
+      <div class="precart-meta">
+        {% if pc_by  != '' %}<span class="precart-created">Created by <strong>{{ pc_by }}</strong></span>{% endif %}
+        {% if pc_for != '' %}<span class="precart-created">Created for <strong>{{ pc_for }}</strong></span>{% endif %}
+      </div>
+      <div class="precart-msg">
+        {% if pc_note != '' %}<div class="precart-note">{{ pc_note }}</div>{% endif %}
+        <div class="precart-standard">Feel free to add and remove products or change quantities. Simply hit checkout when you're ready to place the order.</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 2) SELF-DESTRUCT the show flag immediately after first render -->
+  <script>
+    // Clear the visibility flag so future cart views won’t render the panel
+    (function () {
+      try {
+        fetch('/cart/update.js', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ attributes: { _precart_show: '' } })
+        });
+      } catch (_) {}
+    })();
+  </script>
+{%- endif -%}
+
+
+
+
+
+          <div class="cart-summary">
+
+          {% liquid
+            assign StopCredit = false
+            assign CreditLimit = 0
+            assign CreditBalance = 0
+            assign CreditTerm = ''
+            
+            if customer and customer.tags.size > 0
+              for tag in customer.tags
+                if tag == 'Stop Credit'
+                  assign StopCredit = true
+                elsif tag contains 'CreditLimit:'
+                  assign credit_limit_parts = tag | split: ':'
+                  if credit_limit_parts.size > 1
+                    assign CreditLimit = credit_limit_parts[1] | plus: 0 | default: '—'
+                  endif
+                elsif tag contains 'CreditBalance:'
+                  assign credit_balance_parts = tag | split: ':'
+                  if credit_balance_parts.size > 1
+                    assign CreditBalance = credit_balance_parts[1] | plus: 0 | default: '—'
+                  endif
+                elsif tag contains 'CreditTerm:'
+                  assign credit_term_parts = tag | split: ':'
+                  if credit_term_parts.size > 1
+                    assign CreditTerm = credit_term_parts[1] | default: '—'
+                  endif
+                endif
+              endfor
+            endif
+          %}
+          {% if customer and (StopCredit or CreditTerm != '' or CreditBalance != 0) %}
+            <div class="account-summary {% unless StopCredit %}p-bottom{% endunless %}">
+              <h2 class="h3"><strong>Account Summary</strong></h2>
+
+              <p class="m-text">
+                <strong>Credit Terms:</strong> {{ CreditTerm }}
+              </p>
+              <p class="m-text">
+                <strong>Current Balance:</strong> {{ CreditBalance | money }}
+              </p>
+              {% if StopCredit %}
+              <div class="account-summary-msg">
+                <div class="account-summary-msg-item">
+                  <div class="inner-wrap">
+                    <h3>STOP CREDIT</h3>
+                    <p>Your account currently requires payment to continue paying on invoice. You can still checkout with cash payment.</p>
+                
+                    <a href="/checkout"
+                      rel="noopener"
+                      class="btn btn-accent">
+                      Make a Payment
+                    </a>
+            
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+              {% unless StopCredit %}
+    <span class="shipping-pill shipping-pill--free">
+                  <svg class="shipping-pill__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="12" cy="12" r="11" fill="currentColor"></circle>
+                    <path d="M7 12.5l3 3.5 7-8" />
+                  </svg>
+                  <strong>Pay on invoice</strong>
+                </span>
+{% endunless %}
+
+            </div>
+          {% endif %}
+            {% comment %}
+=== ACCOUNT CREDIT BOX ===
+{% endcomment %}
+{% comment %}
+{% if customer and customer.tags contains "Account Valid" %}
+  {% assign credit_terms    = customer.metafields.custom.credit_terms %}
+  {% assign current_balance = customer.metafields.custom.current_balance %}
+  {% assign normalized_tags = customer.tags | join: ',' | downcase %}
+  {% assign stop_credit = false %}
+  {% if normalized_tags contains 'stop credit' %}
+    {% assign stop_credit = true %}
+  {% endif %}
+
+
+  {% assign payment_link = customer.metafields.custom.payment_link %}
+
+  
+  <h3 style="margin-top:0;">Account Summary</h3>
+
+  <p style="margin-bottom: var(--space-1)">
+    <strong>Credit Terms:</strong> {{ credit_terms | default: "—" }}
+  </p>
+
+  <p>
+    <strong>Current Balance:</strong>
+    {% if current_balance %}
+      {{ current_balance | times: 100 | money }}
+    {% else %}
+      —
+    {% endif %}
+  </p>
+
+  {% if stop_credit %}
+    <div class="ex-eta" style="--stripe-color:#d52e30; margin-bottom: var(--space-5);">
+      <h3 style="color:#d40000; margin-top:0;">STOP CREDIT</h3>
+      <p>Your account currently requires payment to continue paying on invoice. You can still checkout with cash payment.</p>
+
+      {% if payment_link %}
+        <p>
+          <a href="{{ payment_link }}"
+            target="_blank"
+            rel="noopener"
+            class="btn btn-accent"
+            style="background:white;">
+            Make a Payment
+          </a>
+        </p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+{% endif %}
+{% endcomment %}
+
+
+            {%- comment -%} Collect applied codes (cart-level + line-level). Heuristic: one-word titles = manual codes. {%- endcomment -%}
+            {%- assign _codes = '' -%}
+            {%- assign _sep = '' -%}
+            {%- for da in cart.cart_level_discount_applications -%}
+              {%- assign t = da.title | strip -%}
+              {%- assign parts = t | split: ' ' -%}
+              {%- if parts.size == 1 -%}
+                {%- unless _codes contains '"' | append: t | append: '"' -%}
+                  {%- assign _codes = _codes | append: _sep | append: '"' | append: t | append: '"' -%}
+                  {%- assign _sep = ',' -%}
+                {%- endunless -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {%- for item in cart.items -%}
+              {%- for alloc in item.line_level_discount_allocations -%}
+                {%- assign t = alloc.discount_application.title | strip -%}
+                {%- assign parts = t | split: ' ' -%}
+                {%- if parts.size == 1 -%}
+                  {%- unless _codes contains '"' | append: t | append: '"' -%}
+                    {%- assign _codes = _codes | append: _sep | append: '"' | append: t | append: '"' -%}
+                    {%- assign _sep = ',' -%}
+                  {%- endunless -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endfor -%}
+            {%- assign active_codes_json = '[' | append: _codes | append: ']' -%}
+
+            {%- comment -%} === Excision: Cart Discount Code (with error + remove) === {%- endcomment -%}
+            <div class="ex-discount" data-discount-root data-active-codes="{{ active_codes_json | escape }}">
+              <label for="ex-discount-code" class="ex-discount__label">Have a coupon?</label>
+
+              <div class="ex-discount__row">
+                <input
+                  id="ex-discount-code"
+                  class="ex-input"
+                  type="text"
+                  inputmode="text"
+                  autocomplete="off"
+                  placeholder="Enter code"
+                  aria-describedby="ex-discount-msg"
+                >
+                <button type="button" class="btn ex-apply" data-apply-discount>Apply</button>
+                <button type="button" class="btn ex-remove" data-remove-discount hidden>Remove</button>
+              </div>
+
+              <p id="ex-discount-msg" class="ex-discount__note" aria-live="polite">Codes can be removed at checkout.</p>
+
+              <!-- Error alert -->
+              <div class="ex-eta" data-discount-error hidden role="alert" aria-live="assertive"></div>
+            </div>
+            {%- comment -%} === /Excision: Cart Discount Code === {%- endcomment -%}
+
+            {% if cart.cart_level_discount_applications != blank %}
+              <div class="order-discount-cart-wrapper">
+                {% for discount_application in cart.cart_level_discount_applications %}
+                  <div class="row-discount">
+                    <span class="order-discount order-discount--title">
+                      <span class="icon icon-saletag" aria-hidden="true"></span>
+                      {{- discount_application.title -}}
+                    </span>
+                    <span class="order-discount order-discount--cart-price"
+                      >-{{ discount_application.total_allocated_amount | money -}}
+                    </span>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <div class="subtotal">
+              <div class="subtotal-row">
+              <div>
+                <span>{{ 'cart.general.subtotal' | t }}</span>
+                    <span class="ex-price__label">EX GST</span>
+              </div>
+                <span class="subtotal-value">
+                  {% if shop.taxes_included %}
+                    {{ cart_inc_total | money }}
+                    <span class="inc-price__label">INC GST</span>
+                  {% else %}
+                    {{ cart_ex_total | money }}
+                  {% endif %}
+                </span>
+              </div>
+              <div class="additional-notes">
+
+                <span class="wcp-minimums-note"></span>
+                <span class="wcp-extra-note"></span>
+              </div>
+
+{%- comment -%} Excision: Minimum Order progress (server baseline) {%- endcomment -%}
+{%- assign MIN_CENTS = 20000 -%}
+{%- assign subtotal_cents = cart.total_price -%}
+{%- assign remaining_cents = MIN_CENTS | minus: subtotal_cents -%}
+{%- if remaining_cents < 0 -%}{%- assign remaining_cents = 0 -%}{%- endif -%}
+{%- assign pct = subtotal_cents | times: 100 | divided_by: MIN_CENTS -%}
+{%- if pct > 100 -%}{%- assign pct = 100 -%}{%- endif -%}
+
+{%- comment -%} Flag set by PreCart override. 1 = waived {%- endcomment -%}
+{%- assign ex_min_override = cart.attributes.ex_min_order_override | default: '' | strip -%}
+
+
+
+            </div>
+
+            {%- comment -%} === Discount-aware totals (compute BEFORE GST & Total rows) === {%- endcomment -%}
+            {%- assign line_disc_ex_total = 0 -%}
+            {%- assign line_disc_inc_total = 0 -%}
+            {% for item in cart.items %}
+              {%- assign _ld = 0 -%}
+              {% for alloc in item.line_level_discount_allocations %}
+                {%- assign _ld = _ld | plus: alloc.amount -%}
+              {% endfor %}
+
+              {%- assign _ex = _ld -%}
+              {%- assign _inc = _ld -%}
+              {% if item.variant.taxable %}
+                {% if shop.taxes_included %}
+                  {%- assign _inc = _ld -%}
+                  {%- assign _ex = _ld | times: 10 | divided_by: 11 -%}
+                {% else %}
+                  {%- assign _ex = _ld -%}
+                  {%- assign _inc = _ld | times: 11 | divided_by: 10 -%}
+                {% endif %}
+              {% endif %}
+
+              {%- assign line_disc_ex_total = line_disc_ex_total | plus: _ex -%}
+              {%- assign line_disc_inc_total = line_disc_inc_total | plus: _inc -%}
+            {% endfor %}
+
+            {%- assign cart_disc_total = 0 -%}
+            {% for da in cart.cart_level_discount_applications %}
+              {%- assign cart_disc_total = cart_disc_total | plus: da.total_allocated_amount -%}
+            {% endfor %}
+
+            {%- assign cart_disc_ex = 0 -%}
+            {%- assign cart_disc_inc = 0 -%}
+            {% if shop.taxes_included %}
+              {%- assign cart_disc_inc = cart_disc_total -%}
+              {%- if cart_inc_total > 0 -%}
+                {%- assign cart_disc_ex = cart_disc_total | times: cart_ex_total | divided_by: cart_inc_total -%}
+              {%- endif -%}
+            {% else %}
+              {%- assign cart_disc_ex = cart_disc_total -%}
+              {%- if cart_ex_total > 0 -%}
+                {%- assign cart_disc_inc = cart_disc_total | times: cart_inc_total | divided_by: cart_ex_total -%}
+              {%- endif -%}
+            {% endif %}
+
+            {%- assign discounted_ex_total = cart_ex_total | minus: line_disc_ex_total | minus: cart_disc_ex -%}
+            {%- assign discounted_inc_total = cart_inc_total | minus: line_disc_inc_total | minus: cart_disc_inc -%}
+            {%- assign gst_after = discounted_inc_total | minus: discounted_ex_total -%}
+
+{%- comment -%}
+  Freight (EX GST) based on discounted EX GST subtotal.
+  GST on freight will be added into gst_after.
+{%- endcomment -%}
+
+{%- assign freight_threshold_ex_cents = 50000 -%} 
+{%- assign freight_ex_cents            = 2650  -%}  
+
+{%- assign subtotal_for_freight_ex_cents = discounted_ex_total -%}
+
+{%- if subtotal_for_freight_ex_cents >= freight_threshold_ex_cents -%}
+  {%- assign freight_ex_cents = 0 -%}
+{%- endif -%}
+
+{%- comment -%} GST on freight: 10% {%- endcomment -%}
+{%- assign freight_gst_cents = freight_ex_cents | divided_by: 10 -%}
+
+{%- comment -%}
+  Add freight GST to the existing GST component from goods.
+{%- endcomment -%}
+{%- assign gst_total_cents = gst_after | plus: freight_gst_cents -%}
+
+{%- comment -%}
+  Grand total INC GST = goods EX + freight EX + ALL GST.
+{%- endcomment -%}
+{%- assign grand_total_cents =
+    discounted_ex_total
+    | plus: freight_ex_cents
+    | plus: gst_total_cents
+-%}
+
+
+
+
+
+
+
+
+            {%- comment -%} === Compute discounted totals (ex/inc) === {%- endcomment -%}
+            {%- assign line_disc_ex_total = 0 -%}
+            {%- assign line_disc_inc_total = 0 -%}
+            {% for item in cart.items %}
+              {%- assign _ld = 0 -%}
+              {% for alloc in item.line_level_discount_allocations %}
+                {%- assign _ld = _ld | plus: alloc.amount -%}
+              {% endfor %}
+
+              {%- assign _ex = _ld -%}
+              {%- assign _inc = _ld -%}
+              {% if item.variant.taxable %}
+                {% if shop.taxes_included %}
+                  {%- assign _inc = _ld -%}
+                  {%- assign _ex = _ld | times: 10 | divided_by: 11 -%}
+                {% else %}
+                  {%- assign _ex = _ld -%}
+                  {%- assign _inc = _ld | times: 11 | divided_by: 10 -%}
+                {% endif %}
+              {% endif %}
+
+              {%- assign line_disc_ex_total = line_disc_ex_total | plus: _ex -%}
+              {%- assign line_disc_inc_total = line_disc_inc_total | plus: _inc -%}
+            {% endfor %}
+
+            {%- assign cart_disc_total = 0 -%}
+            {% for da in cart.cart_level_discount_applications %}
+              {%- assign cart_disc_total = cart_disc_total | plus: da.total_allocated_amount -%}
+            {% endfor %}
+
+            {%- assign cart_disc_ex = 0 -%}
+            {%- assign cart_disc_inc = 0 -%}
+            {% if shop.taxes_included %}
+              {%- assign cart_disc_inc = cart_disc_total -%}
+              {%- if cart_inc_total > 0 -%}
+                {%- assign cart_disc_ex = cart_disc_total | times: cart_ex_total | divided_by: cart_inc_total -%}
+              {%- endif -%}
+            {% else %}
+              {%- assign cart_disc_ex = cart_disc_total -%}
+              {%- if cart_ex_total > 0 -%}
+                {%- assign cart_disc_inc = cart_disc_total | times: cart_inc_total | divided_by: cart_ex_total -%}
+              {%- endif -%}
+            {% endif %}
+
+            {%- assign discounted_ex_total = cart_ex_total | minus: line_disc_ex_total | minus: cart_disc_ex -%}
+            {%- assign discounted_inc_total = cart_inc_total | minus: line_disc_inc_total | minus: cart_disc_inc -%}
+            {%- assign gst_after = discounted_inc_total | minus: discounted_ex_total -%}
+<!-- SHIPPING BASED ON EX GST DISCOUNTED SUBTOTAL -->
+{% if freight_ex_cents == 0 %}
+  <div class="shipping-row shipping-row--free">
+    <span>Shipping</span>
+     <span class="shipping-pill shipping-pill--free">
+                  <svg class="shipping-pill__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="12" cy="12" r="11" fill="currentColor"></circle>
+                    <path d="M7 12.5l3 3.5 7-8" />
+                  </svg>
+                  <strong>Free freight</strong>
+                </span>
+  </div>
+{% else %}
+  <div class="shipping-row">
+    <span>Shipping</span>
+    <span>{{ freight_ex_cents | money }}</span>
+  </div>
+  <div class="shipping-row__note">Spend $500 EX GST for free freight</div>
+{% endif %}
+
+            <div class="gst-row" style="display:flex;justify-content:space-between;margin-top:8px;">
+              {%- assign gst_component = gst_after -%}
+              {% if shop.taxes_included %}
+                <span>GST (included)</span>
+                <span>{{ gst_total_cents | money }}</span>
+              {% else %}
+                <span>GST</span>
+                <span>{{ gst_total_cents | money }}</span>
+              {% endif %}
+            </div>
+
+
+
+<!-- FINAL TOTAL INCLUDING FREIGHT -->
+<div class="total-row"
+     style="display:flex;justify-content:space-between;margin-top:12px;margin-bottom:10px;font-size:24px;font-family:'Humanist777BT-Bold';">
+  <span>Total <span class="inc-price__label">INC GST</span></span>
+  <span>{{ grand_total_cents | money }}</span>
+</div>
+
+            {% capture taxes_shipping_checkout %}
+            {% if shop.taxes_included and shop.shipping_policy.body != blank %}
+              {{ 'cart.general.taxes_included_and_shipping_policy_html' | t: link: shop.shipping_policy.url }}
+            {% elsif shop.taxes_included %}
+              {{ 'cart.general.taxes_included_but_shipping_at_checkout' | t }}
+            {% elsif shop.shipping_policy.body != blank %}
+              {{ 'cart.general.taxes_and_shipping_policy_at_checkout_html' | t: link: shop.shipping_policy.url }}
+            {% else %}
+              <label>{{ 'cart.general.taxes_and_shipping_at_checkout' | t }}</label>
+            {% endif %}
+          {% endcapture %}
+
+            <div
+  id="ex-min-order-cart"
+  class="ex-min-order{% if remaining_cents == 0 %} ex-min-order--ok{% endif %}{% if ex_min_override == '1' %} ex-min-order--waived{% endif %}"
+  data-min="{{ MIN_CENTS }}"
+  data-override="{{ ex_min_override }}"
+  aria-live="polite"
+>
+  {% if ex_min_override == '1' %}
+    <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Double_Arrow_Orange.png?v=1763521880" height="25">
+    <div class="ex-min-order__waived-msg">
+      Your minimum order value has been waived{% if pc_by != '' %} by {{ pc_by }}{% endif %}
+    </div>
+  {% else %}
+    <div class="ex-min-order__row">
+      <div class="ex-min-order__label">
+        Minimum order: <strong>{{ MIN_CENTS | money }}</strong>
+      </div>
+      <div class="ex-min-order__value">
+        <span data-remaining>{{ remaining_cents | money }}</span> to go
+      </div>
+    </div>
+    <div
+      class="ex-min-order__bar"
+      role="progressbar"
+      aria-valuemin="0"
+      aria-valuemax="{{ MIN_CENTS }}"
+      aria-valuenow="{{ subtotal_cents }}"
+    >
+      <div class="ex-min-order__active" style="flex-basis: {{ pct }}%"></div>
+      <div class="ex-min-order__rest" style="flex-basis: {{ 100 | minus: pct }}%"></div>
+    </div>
+
+    <div class="ex-min-order__note" data-note>
+      {% if remaining_cents == 0 %}
+        You’ve reached the $200 minimum. you can checkout.
+      {% else %}
+        Add {{ remaining_cents | money }} more to enable checkout.
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+
+            <div style="display: flex; gap: 10px;">
+              <input
+                type="submit"
+                name="update"
+                class="btn"
+                value="{{ 'cart.general.update' | t }}"
+              >
+              <button
+  type="submit"
+  name="checkout"
+  id="ex-checkout"
+  class="btn checkout"
+  {% if remaining_cents > 0 and ex_min_override != '1' %}
+    disabled aria-disabled="true"
+  {% endif %}
+>
+  Checkout
+</button>
+
+            </div>
+          </div>
+        </aside>
+      </div>
+      <!-- /cart-columns -->
+    </form>
+  {% else %}
+    <div class="cart-empty" id="EmptyCart">
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Shopping_Cart_White_Bold.svg?v=1759450598"
+        style="width: 50px; margin-bottom: 20px;"
+      >
+      <p class="cart--empty-message">{{ 'cart.general.empty' | t }}</p>
+      <p class="cart--cookie-message">{{ 'cart.general.cookies_required' | t }}</p>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+  .ex-card-badge {
+  margin: 8px 0;
+  }
+    @media only screen and (max-width: 768px) {
+    nav.breadcrumb {
+    padding: 0px;
+  }
+  .cart-row {
+  flex-direction: column;
+  }
+  }
+      p.cart--empty-message {
+      margin-bottom: 0;
+    }
+      .btn.clear-cart {
+      border: 2px solid #e8e8e8;
+      border-radius: 23px;
+      padding: 10px 16px;
+      line-height: 1;
+      font-size: 16px;
+      background: white;
+    }
+    .btn:hover { opacity: 0.85; }
+
+      /* Thumbnail wrapper you already have */
+    .thumb {
+      display: block;
+      width: 140px;
+    }
+
+    /* Normalize all thumbs */
+    .thumb__img,
+    .thumb__fallback {
+      width: 140px;
+      height: 140px;
+      display: block;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    /* Real product images */
+    .thumb__img {
+      object-fit: cover;
+      background: #f1f1f1; /* will be visually hidden when image fills; safe default */
+    }
+
+    /* Fallback tile (uses theme bg color via inline style) */
+    .thumb__fallback {
+      display: grid;
+      place-items: center;
+    }
+
+    /* Logo inside fallback: scale to fit, not crop */
+    .thumb__logo {
+      max-width: 65%;
+      max-height: 65%;
+      object-fit: contain;
+      filter: none; /* keep original logo colors */
+    }
+
+.ex-min-order--waived {
+    background: #f88d2b;
+    color: #ffffff;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.ex-min-order--waived .ex-min-order__waived-msg {
+    font-size: 16px;
+    font-family: 'Humanist777BT-Bold';
+}
+
+.ex-min-order--waived .ex-min-order__label,
+.ex-min-order--waived .ex-min-order__value,
+.ex-min-order--waived [data-note] {
+  color: #ffffff;
+}
+
+
+    .ex-remove-one {
+        display: inline-block;
+        padding: 4px 8px;
+        text-decoration: none;
+        background: none;
+        border: none;
+    }
+      .btn.checkout {
+      border: 2px solid #e0592a;
+      background: #e0592a;
+      color: white;
+      border-radius: 25px !important;
+      flex: 50;
+      font-family: 'Humanist777BT-Bold'
+    }
+    /* --- two-column split --- */
+    .cart-columns{display:flex;gap:40px;align-items:flex-start; margin-top: -2rem;}
+    .cart-left {
+        flex: 0 1 66%;
+        max-width: 66%;
+        background: white;
+        padding: 30px;
+        border: 2px solid #e8e8e8;
+        border-radius: 15px;
+    }
+    .cart-empty {
+        background: white;
+        padding: 30px;
+        border: 2px solid #e8e8e8;
+        border-radius: 15px;
+        min-height: 250px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .cart-right{flex:0 1 34%;max-width:34%;}
+    /* --- item rows --- */
+    .cart-row{display:flex;justify-content:space-between;gap:20px;padding:30px 0;border-top: 2px solid #e8e8e8;}
+    .item-main{display:flex;gap:16px;flex:70;align-items:flex-start;}
+    .meta {
+        flex: 1;
+    }
+    .thumb img {
+        width: 140px;
+        height: auto;
+        display: block;
+        background: #f1f1f1;
+    }
+    .item-actions{
+        display: flex;
+        gap: 12px;
+        justify-content: space-between;
+        flex: 30;
+        align-items: flex-end;
+        height: min-content;
+        flex-direction: column;
+    }
+    .item-actions .price{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+    .remove{display:inline-block;padding:4px 8px;text-decoration:none;}
+    /* --- account summary --- */
+    /* .account-summary{border:2px solid #e8e8e8;background:#fff;border-radius:15px;padding:30px;top:24px;margin-bottom:30px;} */
+    .account-summary {
+      margin-bottom: 30px;
+    }
+    .account-summary.p-bottom {
+      padding-bottom: 5px;
+    }
+    .account-summary .h3 {
+      margin-bottom: 15px;
+    }
+    .account-summary .account-summary-msg {
+      background-color: #f8f8f8;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    .account-summary .m-text {
+      font-size: 17px;
+      line-height: 20px;
+      margin-bottom: 10px;
+    }
+    .account-summary .account-summary-msg .account-summary-msg-item {
+      border-left: 6px solid #d23535;
+    }
+    .account-summary .account-summary-msg .account-summary-msg-item h3 {
+      color: #d23535;
+    }
+    .account-summary .account-summary-msg .account-summary-msg-item p {
+      font-size: 15px;
+    }
+    .account-summary .account-summary-msg .account-summary-msg-item .inner-wrap {
+      padding: 20px;
+    }
+    .account-summary .account-summary-msg .account-summary-msg-item .btn {
+      background: #fff;
+      transition: all 0.3s ease;
+    }
+    .account-summary .account-summary-msg .account-summary-msg-item .btn:hover {
+      background: #e8e8e8;
+    }
+    /* --- summary --- */
+    .cart-summary{border:2px solid #e8e8e8;background:#fff;border-radius:15px;padding:30px;top:24px;margin-bottom:30px;}
+    .subtotal .label {
+        margin-bottom: 6px;
+        font-family: 'Humanist777BT-Bold';
+    }.row-discount{display:flex;justify-content:space-between;margin-bottom:6px; width:100%;}
+    /* --- responsive --- */
+    @media (max-width: 900px){
+      .cart-columns{flex-direction:column;}
+      .cart-left,.cart-right{max-width:100%;flex:1 1 100%;}
+    }
+    main.wrapper.main-content {
+        background: #0069a7;
+    }
+    .cart-row a {
+    font-family: 'Humanist777BT-Bold'}
+    input.btn {
+        font-size: 16px;
+        font-weight: 100;
+        border: 2px solid #e8e8e8;
+        flex: 50;
+        border-radius: 23px !important;
+        background: white;
+        color: black;
+    }
+    input.btn:hover {
+    opacity: 85%;
+    background: white !important;
+    color: black !important;
+    }
+    .btn :hover {
+    opacity: 85% !important;}
+    main.wrapper.main-content {
+        min-height: 85vh;
+    }
+    .ex-eta{
+    /* tweakables */
+    --radius: 7px;
+    --stripe: 7px;                  /* bar width */
+    --stripe-color: #d52e30;         /* bar colour */
+    --card-bg:rgba(241, 241, 241, 0.5);              /* card background */
+
+    border-radius: var(--radius);
+    padding: 20px 20px 15px calc(20px + var(--stripe));
+    background:
+      /* left bar */
+      linear-gradient(var(--stripe-color), var(--stripe-color)) left/var(--stripe) 100% no-repeat,
+      /* card background */
+      var(--card-bg);
+      font-size: 16px;
+      min-height: 82px;
+      margin-bottom: 20px;
+      margin-top: 10px;
+  }
+  /* PreCart panel - styled to match the summary card */
+
+.precart-title{
+  font-family:'Humanist777BT-Bold';
+  margin:0 0 6px;
+  font-size:24px;
+  display: flex;
+  justify-content: space-between;
+}
+.precart-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:15px;
+  font-size:18px;
+  margin-bottom:20px;
+  margin-top: 20px;
+}
+.precart-created{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 16px;
+    border-bottom: 2px solid #e8e8e8;
+    padding-bottom: 10px;
+}
+
+.precart-msg{ font-size:14px; line-height:1.5; }
+.precart-note{     margin-bottom: 10px;
+    font-size: 17px;
+    margin-top: 10px; }
+
+    .account-ok {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: #e6f6ec; /* soft green background */
+  color: #109954;      /* your existing green tone from [data-m="N"] */
+  font-family: var(--font-bold);
+  font-size: var(--fs-p1);
+}
+
+.account-ok__icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.account-ok__text {
+  line-height: 1.2;
+}
+
+      .shipping-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+  }
+
+  .shipping-row__note {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--color-secondary-iron, #555);
+  }
+
+  .shipping-pill__icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+
+.shipping-pill--free {
+    color: #109954;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+  .shipping-pill--free .shipping-pill__icon path {
+    stroke: white;
+    stroke-width: 2.5;
+    fill: none;
+  }
+
+      .subtotal-row {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:6px;
+    }
+
+    .subtotal-value {
+      display:flex;
+      gap:6px;
+      align-items:center;
+      font-weight:normal;
+    }
+
+</style>
+
+<script>
+  window.EX_MIN_ORDER_OVERRIDE = {{ cart.attributes.ex_min_order_override | default: '' | strip | json }};
+</script>
+
+
+<script>
+  // Remove only the clicked line using the *line item key* (preferred), else line index
+  document.addEventListener(
+    'click',
+    async (e) => {
+      const btn = e.target.closest('.ex-remove-one');
+      if (!btn) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (btn.disabled) return;
+      btn.disabled = true;
+
+      const key = btn.dataset.key || null; // UNIQUE line-item key
+      const line = parseInt(btn.dataset.line || '0', 10) || null; // fallback index
+      const payload = key ? { id: key, quantity: 0 } : { line, quantity: 0 };
+
+      try {
+        const res = await fetch('/cart/change.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error('change_failed_' + res.status);
+        location.reload();
+      } catch (err) {
+        // Hard fallback: POST a form to /cart/change using KEY (if present)
+        try {
+          if (key) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/cart/change';
+            form.innerHTML =
+              '<input type="hidden" name="id" value="' + key + '"><input type="hidden" name="quantity" value="0">';
+            document.body.appendChild(form);
+            form.submit();
+            return;
+          }
+        } catch (_) {}
+
+        // Last-resort (older themes: line param)
+        if (line) {
+          window.location.href = '{{ routes.cart_change_url }}?line=' + line + '&quantity=0';
+        } else {
+          location.reload();
+        }
+      }
+    },
+    true
+  );
+</script>
+
+<script>
+  (function () {
+    async function updateQty(input, newVal) {
+      const min = Math.max(1, parseInt(input.min || '1', 10));
+      const val = Math.max(min, parseInt(newVal, 10) || min);
+      input.value = String(val);
+
+      // Try Ajax change via key parsed from input id="updates_{{ item.key }}"
+      const m = (input.id || '').match(/^updates_(.+)$/);
+      const key = m && m[1];
+
+      try {
+        if (key) {
+          const res = await fetch('/cart/change.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ id: key, quantity: val }),
+          });
+          if (!res.ok) throw new Error('qty_failed_' + res.status);
+          location.reload();
+          return;
+        }
+      } catch (_) {
+        // fall back to regular form submit
+      }
+
+      const form = input.closest('form');
+      const updateBtn = form && form.querySelector('[name="update"]');
+      if (form) {
+        if (updateBtn && updateBtn.requestSubmit) updateBtn.requestSubmit();
+        else form.submit();
+      }
+    }
+
+    // +/- clicks
+    document.addEventListener('click', function (e) {
+      const btn = e.target.closest('.qty__btn');
+      if (!btn) return;
+
+      const wrap = btn.closest('.qty');
+      const input = wrap && wrap.querySelector('.qty__input');
+      if (!input) return;
+
+      const min = Math.max(1, parseInt(input.min || '1', 10));
+      const step = Math.max(1, parseInt(input.step || '1', 10));
+      let val = Math.max(min, parseInt(input.value || String(min), 10));
+
+      if (btn.classList.contains('minus')) val = Math.max(min, val - step);
+      if (btn.classList.contains('plus')) val = val + step; // ← fixed
+
+      updateQty(input, val);
+    });
+
+    // Sanitize typing + debounce update
+    let typingTimer;
+    document.addEventListener('input', function (e) {
+      const el = e.target;
+      if (!el.classList || !el.classList.contains('qty__input')) return;
+
+      const min = Math.max(1, parseInt(el.min || '1', 10));
+      let v = parseInt(String(el.value).replace(/[^\d]/g, ''), 10);
+      if (isNaN(v) || v < min) v = min;
+      el.value = String(v);
+
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(() => updateQty(el, v), 400);
+    });
+  })();
+</script>
+
+<script>
+  (function () {
+    const root = document.querySelector('[data-discount-root]');
+    if (!root) return;
+
+    const input       = root.querySelector('#ex-discount-code');
+    const applyBtn    = root.querySelector('[data-apply-discount]');
+    const removeBtn   = root.querySelector('[data-remove-discount]');
+    const noteEl      = root.querySelector('.ex-discount__note');
+    const errorEl     = root.querySelector('[data-discount-error]');
+    const checkoutBtn = document.getElementById('ex-checkout') ||
+                        document.querySelector('.btn.checkout[name="checkout"], .btn.checkout');
+
+    const codePattern       = /^[A-Za-z0-9][A-Za-z0-9_\-+]{1,63}$/;
+    const ATTEMPT_KEY       = 'ex_attempt_code';
+    const REMOVED_KEY       = 'ex_removed_code';
+    const REMOVE_STAGE_KEY  = 'ex_remove_stage_idx';   // index into attempts[]
+    const BEFORE_CODES_KEY  = 'ex_before_codes';       // codes we saw before removing
+    const RETURN_TO_KEY     = 'ex_return_origin';
+    const SHOPIFY_SHOP      = (window.Shopify && Shopify.shop) || ''; // e.g. your-store.myshopify.com
+
+    /* ---------- helpers ---------- */
+
+    const setStatus = (msg, state) => { if (noteEl) noteEl.textContent = msg || ''; root.dataset.state = state || ''; };
+    const showError = (msg) => { if (!errorEl) return; errorEl.textContent = msg; errorEl.hidden = false; root.dataset.state = 'error'; };
+    const hideError = () => { if (!errorEl) return; errorEl.hidden = true; errorEl.textContent = ''; if (root.dataset.state === 'error') root.dataset.state = ''; };
+
+    const parseCodesFromAttr = () => {
+      const raw = root.getAttribute('data-active-codes') || '[]';
+      try { return JSON.parse(raw.replace(/&quot;/g, '"')).filter(Boolean); } catch (_) { return []; }
+    };
+    const readDiscountFromLocation = () => {
+      const m = location.pathname.match(/\/discount\/([^/]+)/i);
+      if (m && m[1]) return decodeURIComponent(m[1]);
+      const q = new URLSearchParams(location.search).get('discount');
+      return q ? q.trim() : '';
+    };
+    // Also scan the visible discount chips just in case our attr missed it
+    const parseCodesFromDOM = () => {
+      const items = Array.from(document.querySelectorAll('.order-discount-cart-wrapper .order-discount__item, .order-discount--cart-list .order-discount__item'));
+      const codes = items.map(el => (el.textContent || '').trim().split(/\s/)[0]).filter(Boolean);
+      return codes;
+    };
+
+    const getActiveCodes = () => {
+      const fromAttr = parseCodesFromAttr();
+      const fromURL  = readDiscountFromLocation();
+      const fromDOM  = parseCodesFromDOM();
+      const set = new Set([ ...fromAttr, ...fromDOM ]);
+      if (fromURL) set.add(fromURL);
+      return Array.from(set).filter(Boolean);
+    };
+
+    // figure base domain (handles com.au, co.uk, etc.)
+    const getBaseDomain = (host) => {
+      const sldTlds = ['com.au','net.au','org.au','co.uk','org.uk','ac.uk','gov.uk','co.nz','com.br','com.mx','com.tr','com.ar','com.pl','com.sa','com.sg','com.my','com.hk','com.tw','co.jp'];
+      const parts = host.split('.');
+      if (parts.length >= 3) {
+        const last2 = parts.slice(-2).join('.');
+        const last3 = parts.slice(-3).join('.');
+        if (sldTlds.includes(last2) && parts.length >= 3) return parts.slice(-3).join('.');
+        if (sldTlds.includes(last3)) return last3;
+      }
+      return parts.slice(-2).join('.');
+    };
+    const killCookieEverywhere = (name) => {
+      try {
+        const host = location.hostname;               // e.g. www.excision.com.au
+        const base = getBaseDomain(host);             // excision.com.au
+        const past = 'Thu, 01 Jan 1970 00:00:00 GMT';
+        const targets = [
+          {domain: ''},                         // host only
+          {domain: '.' + host},
+          {domain: '.' + base},
+        ];
+        for (const t of targets) {
+          const dom = t.domain ? `; domain=${t.domain}` : '';
+          document.cookie = `${name}=; Max-Age=0; expires=${past}; path=/${dom}`;
+          document.cookie = `${name}=; Max-Age=0; expires=${past}; path=/; Secure${dom}`;
+        }
+      } catch (_) {}
+    };
+
+    const syncUI = () => {
+      const codes = getActiveCodes();
+      const attempted   = (sessionStorage.getItem(ATTEMPT_KEY) || '').trim();
+      const justRemoved = sessionStorage.getItem(REMOVED_KEY) === '1';
+
+      // If you prefer Remove always visible, comment this next line:
+      removeBtn.hidden = codes.length === 0;
+
+      if (codes[0] && !input.value) input.value = codes[0];
+
+      if (attempted) {
+        const matched = codes.some(c => c.toLowerCase() === attempted.toLowerCase());
+        if (matched) { hideError(); setStatus(`Code “${attempted}” applied to your cart.`, 'applied'); }
+        else { showError(`We couldn’t apply “${attempted}”. It may be invalid, expired, or not applicable to your cart.`); }
+        sessionStorage.removeItem(ATTEMPT_KEY);
+      }
+
+      if (justRemoved) {
+        // Only say "removed" if the previous codes really disappeared
+        const before = JSON.parse(sessionStorage.getItem(BEFORE_CODES_KEY) || '[]');
+        const after  = getActiveCodes();
+        const stillThere = before.some(c => after.some(a => a.toLowerCase() === c.toLowerCase()));
+        if (!stillThere) { hideError(); setStatus('Coupon removed. You can enter a new one anytime.', ''); }
+        sessionStorage.removeItem(REMOVED_KEY);
+        sessionStorage.removeItem(BEFORE_CODES_KEY);
+      }
+    };
+
+    // Build the sequence of URLs to try for removal
+    const buildRemovalAttempts = () => {
+      const attempts = [];
+      const origin   = location.origin;                // https://excision.com.au
+      const host     = location.hostname;              // excision.com.au or www.excision.com.au
+      const base     = getBaseDomain(host);            // excision.com.au
+      const www      = 'https://www.' + base;
+      const apex     = 'https://' + base;
+
+      const pushPair = (baseURL) => {
+        attempts.push(baseURL + '/cart?discount=');
+        attempts.push(baseURL + '/cart?discount_code=');
+      };
+
+      // current origin first
+      pushPair(origin);
+
+      // try the other host variant (www vs apex)
+      if (origin !== www) pushPair(www);
+      if (origin !== apex) pushPair(apex);
+
+      // then myshopify
+      if (SHOPIFY_SHOP) {
+        pushPair('https://' + SHOPIFY_SHOP);
+      }
+
+      // de-dup while preserving order
+      const seen = new Set();
+      return attempts.filter(u => (seen.has(u) ? false : (seen.add(u), true)));
+    };
+
+    const removalAttempts = buildRemovalAttempts();
+
+    // After each redirect, check if the before-codes still exist; if yes, try next URL
+    const maybeContinueRemoval = () => {
+      const idxStr = sessionStorage.getItem(REMOVE_STAGE_KEY);
+      if (!idxStr) return;
+
+      const idx = parseInt(idxStr, 10) || 0;
+      const before = JSON.parse(sessionStorage.getItem(BEFORE_CODES_KEY) || '[]');
+      const now    = getActiveCodes();
+
+      const stillThere = before.some(c => now.some(a => a.toLowerCase() === c.toLowerCase()));
+      if (!stillThere) {
+        // success
+        sessionStorage.removeItem(REMOVE_STAGE_KEY);
+        sessionStorage.removeItem(BEFORE_CODES_KEY);
+        const back = localStorage.getItem(RETURN_TO_KEY) || '';
+        if (back && location.origin !== back) {
+          localStorage.removeItem(RETURN_TO_KEY);
+          location.replace(back + '/cart');
+        }
+        return;
+      }
+
+      // try next attempt if available
+      const nextIdx = idx + 1;
+      if (nextIdx < removalAttempts.length) {
+        sessionStorage.setItem(REMOVE_STAGE_KEY, String(nextIdx));
+        location.replace(removalAttempts[nextIdx]);
+      } else {
+        // all attempts done, show message
+        sessionStorage.removeItem(REMOVE_STAGE_KEY);
+        showError('We couldn’t remove the code automatically. Please try clearing it at checkout.');
+      }
+    };
+
+    /* ---------- events ---------- */
+
+    // Apply (stay on cart)
+    applyBtn?.addEventListener('click', () => {
+      const code = (input.value || '').trim();
+      if (!code) { setStatus('Enter a code first.', 'error'); input.focus(); return; }
+      if (!codePattern.test(code)) { showError('That doesn’t look like a valid code format.'); return; }
+      sessionStorage.setItem(ATTEMPT_KEY, code);
+      location.href = `/discount/${encodeURIComponent(code)}?redirect=/cart`;
+    });
+
+    // REMOVE — cookies + staged multi-host clean
+    removeBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      // remember codes we saw so we can verify removal
+      const before = getActiveCodes();
+      sessionStorage.setItem(BEFORE_CODES_KEY, JSON.stringify(before));
+
+      // clear likely cookies on this domain (host + base)
+      killCookieEverywhere('discount_code');
+      killCookieEverywhere('discount');
+
+      // mark for UI and start staged attempts
+      sessionStorage.setItem(REMOVED_KEY, '1');
+      sessionStorage.setItem(REMOVE_STAGE_KEY, '0');
+      localStorage.setItem(RETURN_TO_KEY, location.origin);
+
+      // tidy current URL (drop ?discount= if present)
+      try { const url = new URL(location.href); url.searchParams.delete('discount'); history.replaceState(null, '', url); } catch(_) {}
+
+      // fire first attempt
+      location.replace(removalAttempts[0]);
+    });
+
+    // Checkout: carry typed code if present
+    checkoutBtn?.addEventListener('click', (e) => {
+      if (checkoutBtn.hasAttribute('disabled') || checkoutBtn.getAttribute('aria-disabled') === 'true') return;
+      const code = (input.value || '').trim();
+      if (!code) return;
+      e.preventDefault(); e.stopPropagation();
+      location.href = `/discount/${encodeURIComponent(code)}?redirect=/checkout`;
+    });
+
+    // boot
+    syncUI();
+    maybeContinueRemoval();
+  })();
+</script>
+
+<!-- PreCart: read ?pc/&created/&for/&note, save to cart, then clean URL -->
+<script>
+(function () {
+  const qp = new URLSearchParams(location.search);
+  const pcId      = (qp.get('pc') || '').trim();
+  const createdBy = (qp.get('created') || '').trim();
+  const createdFor= (qp.get('for') || '').trim();
+  const note      = (qp.get('note') || '').trim();
+  // Only run when at least one param is present
+  if (!pcId && !createdBy && !createdFor && !note) return;
+
+  const noteBits = [];
+  if (createdBy) noteBits.push('Created by: ' + createdBy);
+  if (createdFor) noteBits.push('For: ' + createdFor);
+  if (note)      noteBits.push(note);
+
+  (async () => {
+    try {
+      await fetch('/cart/update.js', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          note: noteBits.join(' | '),
+          attributes: {
+            _precart_id: pcId || '',
+            _precart_created_by: createdBy || '',
+            _precart_created_for: createdFor || '',
+            _precart_note: note || '',
+            _precart_show: '1'                 // <<< visibility flag set ONLY on link land
+          }
+        })
+      });
+    } catch (_) {}
+
+    // Clean the URL and reload to render with the show flag
+    try {
+      const url = new URL(location.href);
+      ['pc','created','for','note'].forEach(k => url.searchParams.delete(k));
+      location.replace(url.toString());
+    } catch (_) { location.reload(); }
+  })();
+})();
+</script>
+
+
+<script>
+(function () {
+  const params = new URLSearchParams(location.search);
+  const add = params.get('add');
+  if (!add) return;
+
+  const lines = add.split(',').map(s => {
+    const [id, q] = s.split(':');
+    return { id: Number(id), quantity: Math.max(1, Number(q) || 1) };
+  }).filter(l => l.id && l.quantity > 0);
+
+  (async () => {
+    for (const line of lines) {
+      try {
+        await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(line)
+        });
+      } catch(e) {}
+    }
+    // clean the URL and stay on cart
+    const url = new URL(location.href);
+    url.searchParams.delete('add');
+    location.replace(url.toString());
+  })();
+})();
+</script>
+
+<script>
+(async () => {
+  const params = new URLSearchParams(location.search);
+  const custom = params.get('custom');
+  if (!custom) return;
+
+  try {
+    const decoded = JSON.parse(decodeURIComponent(escape(atob(custom))));
+    for (const it of decoded) {
+      const payload = {
+        variantId: 0,
+        productId: 0,
+        baseSku: it.baseSku,
+        length: it.len,
+        quantity: it.qty,
+        computedPrice: 0, // optional if your worker recomputes
+        properties: {
+          _custom_length_mm: it.len,
+          _base_sku: it.baseSku
+        }
+      };
+      await fetch('https://custompricecheckout.marketingexcision.workers.dev/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    }
+  } catch (e) {
+    console.error('Failed to add custom items:', e);
+  }
+})();
+</script>
+
+<script>
+(function hideBadOptions() {
+  // list of forbidden option labels (case-insensitive)
+  const blocked = ['OPEN', 'BLAC', 'BLAH'];
+  const normalize = s => (s || '').trim().toUpperCase();
+
+  function scrub(root = document) {
+    root.querySelectorAll('select option').forEach(opt => {
+      const text = normalize(opt.label || opt.textContent);
+      if (blocked.includes(text)) {
+        opt.remove(); // or opt.hidden = true / opt.disabled = true
+      }
+    });
+  }
+
+  // initial run
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', scrub);
+  } else {
+    scrub();
+  }
+
+  // handle dynamically inserted selects/options
+  const mo = new MutationObserver(muts => {
+    for (const m of muts) {
+      m.addedNodes.forEach(node => {
+        if (node.nodeType !== 1) return;
+        if (node.matches?.('select, option')) scrub(node);
+        node.querySelectorAll?.('select, option').forEach(() => scrub(node));
+      });
+    }
+  });
+  mo.observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>

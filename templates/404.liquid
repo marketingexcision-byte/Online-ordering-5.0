@@ -1,0 +1,45 @@
+   <section class="hero-banner ">
+      <div class="hero-wrapper">
+         <div class="breadcrumbs-wrapper">
+            <div class="breadcrumbs container dt-prl-30">
+               <div class="row">
+                 <div class="col-md-12">
+                 <div class="w-btn-wrapper">
+                    <a class="w-btn icon_atleft" href="{{ shop.url }}"><span class="w-btn-label font-bold"><em>←</em> Back to Home</span></a>
+                 </div>
+              </div>
+            {% comment %}
+                  <ul class="col s12">
+                     <li class="home">
+                        <a href="/" title="Go to Home Page">Home</a>
+                        <span>| </span>
+                     </li>
+                     <li class="cms_page">
+                        <strong> 404 Not Found </strong>
+                     </li>
+                  </ul>
+                  {% endcomment %}
+               </div>
+            </div>
+         </div>
+         <div class="container dt-prl-30">
+            <div class="row ">
+               <div class="col-md-7">
+                  <div class="placeholder">
+                     <h1>{{ 'general.404.title' | t }}</h1>
+                     <p></p>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+</section>
+
+<div class="error-wrapper">
+  <div class="grid">
+    <div class="grid-item large--two-thirds push--large--one-sixth text-center">
+      <h2 class="h1">This Page Not Found</h1>
+      <p>{{ 'general.404.subtext_html' | t: link: routes.all_products_collection_url }}</p>
+    </div>
+  </div>
+</div>

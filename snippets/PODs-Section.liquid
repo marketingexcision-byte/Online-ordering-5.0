@@ -1,0 +1,12 @@
+{% assign content_blocks = product.metafields.custom.pods_section | split: "<h3>" %}
+<div class="product-pods-columns" style="display: flex; gap: 20px; flex-wrap: wrap;">
+  {% for block in content_blocks %}
+    {% if block contains "</h3>" and block contains "<p>" %}
+      {% assign h3_split = block | split: "</h3>" %}
+      <div class="pod-column" style="flex: 1; min-width: 250px; border: 2px solid #e8e8e8; padding: 20px; border-radius: 15px;">
+        <h3>{{ h3_split[0] | strip }}</h3>
+        {{ h3_split[1] | strip }}
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>

@@ -1,0 +1,416 @@
+<div class="contact_us_outer_wrapper simple-lazyload">
+  <div class="container dt-prl-30 content">
+   <div class="row">
+      <div class="col-md-12">
+         <div class="row contact-details">
+            <div class="col-12 col-sm-6 left-main-div lazyload-element">
+               <section class="inner-wrapper">
+                  <h1>Coolant Concentration<br>Calculator</h1>
+                  <p class="font-bold">Use this calculator to determine how much cutting fluid and water to add to your tank when you top up.</p>
+                  <ul>
+                     <p>Not sure how to test your concentration? <a href="https://excision.com.au/blogs/blog/how-to-test-the-concentration-level-in-my-coolant">Learn more here.</a></p>
+                  </ul>                 
+               </section>              
+            </div>
+            <div class="col-12 col-sm-6 lazyload-element">
+      <div class="rte">
+         {% comment %}{{ page.content }}{% endcomment %}
+         <div class="coolant_concentration_calculater">
+            <div class="row">
+               <div class="col-6 col-sm-8">
+                  <p>Type of Coolant</p>
+               </div>
+               <div class="col-6 col-sm-4">
+                  <label>
+                     <select name="typeOfCoolant" id="typeOfCoolant">
+                        <option value="1">XDP 1000</option>
+                        <option value="0.99">XDP 1400</option>
+                        <option value="1.78">XDP 2000</option>
+                        <option value="1.81">XDP 2100</option>
+                        <option value="1.25">XDP 2400</option>
+                        <option value="3">XDP 3000</option>
+                        <option value="1.78">XDP 3200</option>
+                        <option value="3">XDP 3400</option>
+                        <option value="1.7">XDP 3500</option>
+                        <option value="1.72">XDP 3800</option>
+                     </select>
+                  </label>
+               </div>
+               <div class="col-6 col-sm-8">
+                  <p>Capacity of tank</p>
+               </div>
+               <div class="col-6 col-sm-4">
+                  <label><input type="text" id="capacityOfTank" required> <span>L</span></label>
+               </div>
+               <div class="col-6 col-sm-8">
+                  <p>Current volume in tank</p>
+               </div>
+               <div class="col-6 col-sm-4">
+                  <label><input type="text" id="volumeOfTank" required> <span>L</span></label>
+               </div>
+               <div class="col-6 col-sm-8">
+                  <p>Refractometer Reading</p>
+               </div>
+               <div class="col-6 col-sm-4">
+                  <label><input type="text" id="refractometerReading" required> <span>%</span></label>
+               </div>
+               <div class="col-6 col-sm-8">
+                  <p>Actual concentration</p>
+               </div>
+               <div class="col-6 col-sm-4">
+                  <label><div id="actualConcentration"></div><span>%</span></label>
+               </div>
+               <div class="col-6 col-sm-8">
+                  <p>Desired concentration</p>
+               </div>
+               <div class="col-6 col-sm-4">
+                  <label><input type="text" id="desiredConcentration" required> <span>%</span></label>
+               </div>
+            </div>
+           
+            <div class="row">
+               <div class="col-6 col-sm-8">
+                  <p>Top up amount</p>
+               </div>
+               <div class="col-6 col-sm-4">
+                  <label><div id="topUpAmount"></div><span>L</span></label>
+               </div>
+               <div class="col-6 col-sm-8">
+                  <p>Top up ratio</p> 
+               </div>
+               <div class="col-6 col-sm-4">
+                  <label><div id="topUpRatio"></div><span>%</span></label>
+               </div>
+               <div class="col-6 col-sm-8">
+                  <p><b class="font-bold">Concentrate Amount</b></p>
+               </div>
+               <div class="col-6 col-sm-4">
+                  <label><div id="concentrateAmount"></div><span><b class="font-bold">L</b></span></label>
+               </div>
+               <div class="col-6 col-sm-8">
+                  <p><b class="font-bold">Water Amount</b></p>
+               </div>
+               <div class="col-6 col-sm-4">
+                  <label><div id="waterAmount"></div><span><b class="font-bold">L</b></span></label>
+               </div>
+
+               <div class="col-sm-12">
+                 <div id="error_msg" style="display:none;"><p>It is not possible to adjust to your desired concentration in one top-up. The minimum top-up ratio is 0.5%</p></div>
+               </div> 
+            </div>
+           
+            <div class="row hidden_val">
+               <div id="B21"></div>
+               <div id="B22"></div>
+               <div id="C21"></div>
+               <div id="C22"></div>
+            </div>
+           
+            <div class="btn-wrapper">
+               <button id="btn" class="btn" onclick="calculateBMI()">Calculate</button>
+               <button id="clearBtn" class="btn" onclick="ClearFields()">Clear</button>
+            </div>
+            <div class="contact_us_call font-bold"> <i class="fa fa-phone" aria-hidden="true"></i> Having trouble? Call us on <a href="tel:+61355514555">+61 (03) 5551 4555</a></div>
+            </div>
+            </div> 
+         </div>
+       </div>
+     </div>
+    </div>
+  </div>
+</div>
+ 
+<div class="template-product cc-calculator-page-sec simple-lazyload">
+  <div class="grid grid-border">
+    <div class="related-article__outer-wrapper">
+       <div class="sppbp__outer-wrapper">
+        <div class="container dt-prl-30 single-product-page-blog-posts lazyload-element">
+         <div class="sppbp__inner">
+            <h2 class="related_article_heading">Resources</h2>
+             <div class="grid-uniform_none blog-items rla_regular">
+              {% for article in blogs.learning-centre.articles limit:16 %}
+                {% if article.tags contains "Coolant" %} 
+                  {% include 'product-articles-by-tag' %}     
+                  {% endif %}
+              {% endfor %}
+             </div>
+           </div>
+         </div>
+       </div>
+    </div>
+  </div>
+</div> 
+
+<script>
+function ClearFields() {
+     document.getElementById("typeOfCoolant").value = "1";
+     document.getElementById("capacityOfTank").value = "";
+     document.getElementById("volumeOfTank").value = "";
+     document.getElementById("refractometerReading").value = "";
+     document.getElementById("actualConcentration").innerHTML = "";
+     document.getElementById("desiredConcentration").value = "";
+	 document.getElementById("topUpAmount").innerHTML = "";
+     document.getElementById("topUpRatio").innerHTML = "";
+     document.getElementById("concentrateAmount").innerHTML = "";
+     document.getElementById("waterAmount").innerHTML = "";
+     document.getElementById("B21").innerHTML = "";
+     document.getElementById("B22").innerHTML = "";
+     document.getElementById("C21").innerHTML = "";
+     document.getElementById("C22").innerHTML = "";
+     $("#error_msg").css("display", "none");
+}
+
+function calculateBMI() {
+   // Get Top up amount
+	let capacityOfTank = parseInt(document
+			.querySelector("#capacityOfTank").value);
+	let volumeOfTank = parseInt(document
+			.querySelector("#volumeOfTank").value);       
+	let topUpAmount = document.querySelector("#topUpAmount");
+	// value or not
+	if (capacityOfTank === "" || isNaN(capacityOfTank))
+		  topUpAmount.innerHTML = "Provide a valid value";
+	else if (volumeOfTank === "" || isNaN(volumeOfTank))
+		  topUpAmount.innerHTML = "Provide a valid value";
+	// If both input is valid, calculate the bmi
+	else {	
+		  let bmi = ((capacityOfTank - volumeOfTank));
+		  topUpAmount.innerHTML = `<span>${bmi}</span>`;          
+	}
+
+// Actual concentration
+let selectElement = document.querySelector('#typeOfCoolant');
+let typeOfCoolant = parseFloat(selectElement.value);  
+let refractometerReading = parseFloat(document.querySelector("#refractometerReading").value);
+let desiredConcentration = parseFloat(document.querySelector("#desiredConcentration").value);
+let actualConcentration = document.querySelector("#actualConcentration");
+let B21 = document.querySelector("#B21");  
+let B22 = document.querySelector("#B22");
+let C21 = document.querySelector("#C21");
+let C22 = document.querySelector("#C22");
+let topUpRatio = document.querySelector("#topUpRatio");
+let concentrateAmount = document.querySelector("#concentrateAmount");
+let waterAmount = document.querySelector("#waterAmount");    
+
+// Check for valid input
+if (isNaN(refractometerReading) || isNaN(desiredConcentration)) {
+    actualConcentration.innerHTML = "Provide valid values";
+} else {
+    let bmi = (refractometerReading * typeOfCoolant).toFixed(3);
+    actualConcentration.innerHTML = `<span>${bmi}</span>`;
+ 
+    // Perform other calculations here using appropriate variables
+    //let volumeOfTank = 300; // Example value, replace with actual value
+    //let capacityOfTank = 200; // Example value, replace with actual value 
+
+    let bmi1 = (volumeOfTank * (bmi / 100));
+    B21.innerHTML = `<span>${bmi1.toFixed(2)}</span>`;
+
+    let bmi2 = (capacityOfTank * (desiredConcentration / 100));
+    let bmi3 = (volumeOfTank - bmi1);
+    let bmi4 = (capacityOfTank - bmi2);
+    let bmi5 = bmi2 - bmi1;
+    let bmi6 = bmi4 - bmi3;
+    let bmi7 = bmi5 / bmi6;
+
+    // Display results in respective HTML elements
+    B22.innerHTML = `<span>${bmi2.toFixed(2)}</span>`;
+    C21.innerHTML = `<span>${bmi3.toFixed(2)}</span>`;
+    C22.innerHTML = `<span>${bmi4.toFixed(2)}</span>`;
+    concentrateAmount.innerHTML = `<span>${bmi5.toFixed(3)}</span>`;
+    waterAmount.innerHTML = `<span>${bmi6.toFixed(3)}</span>`;
+    topUpRatio.innerHTML = `<span>${(bmi7 * 100).toFixed(0)}</span>`;
+
+    if (bmi7 * 100 < 0.5) {
+        $("#error_msg").css("display", "block");
+    }
+}
+}
+</script>
+ 
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.5.9/slick.min.css'>
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.5.9/slick-theme.min.css'>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js'></script> 
+<script> 
+    $(document).ready(function(){  
+      $(".rla_regular").slick({
+        dots: false,
+        arrows: true,
+        infinite: false,
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        nextArrow: '<i class="fa fa-angle-right slick-next"></i>',
+        prevArrow: '<i class="fa fa-angle-left slick-prev"></i>',
+        responsive: [
+        {
+          breakpoint: 1024,
+          settings: {
+            slidesToShow: 2,
+            slidesToScroll: 1,
+            dots: true,
+            arrows: false
+          }
+        },
+        {
+          breakpoint: 600,
+          settings: {
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            dots: true,
+            arrows: false
+          }
+        }
+      ]
+      });
+    });
+</script>
+
+<style>
+div.grid {margin: 0px !important;}
+  
+  .coolant_concentration_calculater {
+      width: 100%;
+      padding: 40px 40px 20px;
+      background: white;
+      border-radius: 15px;
+  }
+  .coolant_concentration_calculater label{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+  .coolant_concentration_calculater label input {
+      margin-bottom: 0;
+      border-bottom: 2px solid #f1f1f1;
+      background: transparent;
+  }
+  #topUpAmount {
+      width: 100%;
+      background: #f1f1f1;
+      padding: 5px 10px;
+      height: 36px;
+      font-weight: 600;  
+      overflow: hidden;
+      border-radius: 10px;
+    
+  }
+  #actualConcentration {
+      width: 100%;
+      background: #f1f1f1;
+      padding: 5px 10px;
+      height: 36px;
+      font-weight: 600;  
+      overflow: hidden;
+      border-radius: 10px;
+    
+  }
+  #topUpRatio {
+      width: 100%;
+      background: #f1f1f1;
+      padding: 5px 10px;
+      height: 36px;
+      font-weight: 600; 
+      overflow: hidden;
+      border-radius: 10px;
+    
+  }
+  #concentrateAmount{
+      width: 100%;
+      background: #f1f1f1;
+      padding: 5px 10px;
+      height: 36px;
+      font-size: 18px;
+      font-weight: 700;  
+      overflow: hidden;
+      border-radius: 10px;
+      
+  }
+  #waterAmount {
+      width: 100%;
+      background: #f1f1f1;
+      padding: 5px 10px;
+      height: 36px;
+      font-size: 18px;
+      font-weight: 700;  
+      overflow: hidden;
+      border-radius: 10px;
+  }
+  .col-sm-8 p {
+    color: black;
+  }
+  .coolant_concentration_calculater label span {
+      width: 10%;
+      text-align: left;
+      padding-left: 5px;
+  }
+  .coolant_concentration_calculater .col-sm-4 select{
+      text-align: center;
+  }
+  .coolant_concentration_calculater .col-sm-4,
+  .coolant_concentration_calculater .col-sm-4 input {
+      text-align: right; 
+  }
+  .main-content h1 {
+    color: white;
+  }
+  #error_msg p {
+      color: red;
+      font-weight: 500;
+      line-height: 20px;
+      padding: 10px 0 0;
+  }
+  .row.hidden_val {
+      display: none;
+  }
+  .row.hidden_val > div{
+      display: block;
+      width:100%;
+  }
+  .coolant_concentration_calculater .btn-wrapper {
+      width: 100%;
+      text-align: center;
+      margin-top: 40px;
+      margin-bottom: 40px;
+  }
+  .coolant_concentration_calculater .btn {
+      background-color: #e0592a;
+      color: #fff;
+      min-width: 150px;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 1rem;
+  }
+  .coolant_concentration_calculater .btn:hover {
+      background-color: #e3693f;
+      color: #fff;
+  }
+  p a {
+    border-bottom: 2px solid #e0592a;
+  }
+  #clearBtn{
+     margin-left: 15px;
+    background: transparent;
+    border: 2px solid #f1f1f1;
+    color: black;
+  }
+
+    #clearBtn:hover {
+     margin-left: 15px;
+    background: #f1f1f1;
+    border: 2px solid #f1f1f1;
+  }
+  
+  @media (max-width: 350px) {
+    .coolant_concentration_calculater .btn-wrapper button {
+        width: 85%;
+        margin: 0 0 15px 0 !importa;
+    } 
+  }
+  
+  @media (min-width: 768px) {
+    .coolant_concentration_calculater{
+        margin: 0 auto;
+    }
+  }
+</style>
+

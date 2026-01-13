@@ -1,0 +1,110 @@
+<script>
+(function exAttachHelp() {
+  var scope = document.getElementById('ex-help-scope-{{ section.id }}');
+  if (!scope || scope.hasAttribute('hidden')) return;
+
+  // Map label text (case-insensitive) -> help copy + step number
+  var helpMap = [
+    { match: /length\b/i,   text: 'Enter the custom length of your blade', step: 1 },
+    { match: /width\b/i,    text: 'Select the width of your bandsaw blade', step: 2 },
+    { match: /thickness\b/i, text: 'Select the thickness of your bandsaw blade', step: 3 },
+    { match: /(tpi|teeth per inch)/i, text: 'Select the TPI of your bandsaw blade', step: 4 },
+    { match: /quantity\b/i, text: 'Select the quantity — price breaks at 5 and 10', step: 5 }
+  ];
+
+  // Find label+control blocks inside our scope
+  // Works with label[for] + input/select, or label wrapped around its control
+  function findFieldFromLabel(label) {
+    var forId = label.getAttribute('for');
+    if (forId) {
+      var ctrl = scope.querySelector('#' + CSS.escape(forId));
+      if (ctrl) return ctrl.closest('div, .selector-wrapper') || ctrl.parentElement;
+    }
+    // fallback: control as a sibling/child
+    return label.closest('div') || label.parentElement;
+  }
+
+  // For each label, if it matches one in the map, wrap into a row and add help box
+  Array.prototype.forEach.call(scope.querySelectorAll('label'), function(label) {
+    var text = (label.textContent || '').trim();
+    var cfg = helpMap.find(function(h){ return h.match.test(text); });
+    if (!cfg) return;
+
+    var fieldBlock = findFieldFromLabel(label);
+    if (!fieldBlock) return;
+
+    // Already wrapped?
+    if (fieldBlock.classList.contains('ex-field-row')) return;
+
+    // Make a row wrapper and move the field into column 1
+    var row = document.createElement('div');
+    row.className = 'ex-field-row';
+    fieldBlock.parentNode.insertBefore(row, fieldBlock);
+    row.appendChild(fieldBlock);
+
+    // Add help box in column 2
+    var help = document.createElement('div');
+    help.className = 'ex-help-box';
+    help.setAttribute('data-step', cfg.step);
+    help.textContent = cfg.text;
+    row.appendChild(help);
+  });
+})();
+</script>
+
+<style>
+    /* rows: control (left) + help (right) */
+.ex-field-row {
+  display: grid;
+  grid-template-columns: 1fr minmax(220px, 320px);
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+/* look of the help boxes */
+.ex-help-box {
+  background: #d85d31;          /* Excision orange-ish */
+  color: #fff;
+  border: 2px solid #7a2f18;
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* number dot (optional) */
+.ex-help-box::before {
+  content: attr(data-step) ". ";
+  font-weight: 700;
+}
+
+/* mobile: stack */
+@media (max-width: 720px) {
+  .ex-field-row { grid-template-columns: 1fr; }
+  .ex-help-box { margin-top: 8px; }
+}
+
+/* don’t flash on non-custom-length pages */
+#ex-help-scope-[id][hidden] { display: none !important; }
+
+.ex-config-grid{
+  display:flex;
+  gap: 30px;
+  align-items:start;
+  margin-top: 40px;
+}
+.ex-config-left > * + *{ margin-top:20px; } /* tidy vertical spacing */
+.ex-config-left {flex: 50;}
+.ex-config-help{ flex: 50; }
+
+.ex-help-card + .ex-help-card{ margin-top:20px; }
+
+@media (max-width: 900px){
+  .ex-config-grid{ grid-template-columns:1fr; }
+  .ex-config-help{ position:static; }
+}
+
+</style>

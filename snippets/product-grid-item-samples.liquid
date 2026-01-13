@@ -1,0 +1,215 @@
+{% render 'wcp_discount' with product %}
+{% assign current_variant = product.selected_or_first_available_variant %}
+{% render 'wcp_variant' with current_variant %}
+
+{% assign temp_wcp_v_price = wcp_v_price %}
+{% assign temp_wcp_v_compare_at_price = wcp_v_compare_at_price %}
+{% unless grid_item_width %}
+  {% assign grid_item_width = 'large--one-quarter medium-down--one-half' %}
+{% endunless %}
+
+{% unless image_size %}
+  {% assign image_size = '600x600' %}
+{% endunless %}
+
+{% unless current_collection %}
+  {% assign current_collection = collection %}
+{% endunless %}
+
+{% assign on_sale = false %}
+{% if wcp_compare_at_price > wcp_price %}
+  {% assign on_sale = true %}
+{% endif %}
+
+<div class="grid-item {{ grid_item_width }}{% if on_sale %} on-sale{% endif %}">
+  
+    <div class="product-grid-image">
+      <div class="product-grid-image--centered">
+        {% if product.tags contains 'New' %}
+          <span class="new-badge font-bold">New</span>
+        {% endif %}
+
+
+        {% if product.featured_image %}
+          {% assign first_image = product.featured_image %}
+
+          {% if product.images.size > 1 %}
+            {% assign second_image = product.images[1] %}
+            <div class="product-image-wrapper">
+              <!-- First (Default) Image -->
+              <img
+                class="product-image front lazyload"
+                data-src="{{ first_image | img_url: '540x' }}"
+                data-widths="[125, 180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                data-sizes="auto"
+                alt="{{ first_image.alt | escape }}"
+              >
+
+              <!-- Second (Hover) Image -->
+              <img
+                class="product-image back lazyload"
+                data-src="{{ second_image | img_url: '540x' }}"
+                data-widths="[125, 180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                data-sizes="auto"
+                alt="{{ second_image.alt | escape }}"
+              >
+            </div>
+          {% else %}
+            <div class="product-image-wrapper" style="transition: none;">
+              <!-- Single Image (No Hover Effect) -->
+              <img
+                class="product-image single lazyload"
+                data-src="{{ first_image | img_url: '540x' }}"
+                data-widths="[125, 180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                data-sizes="auto"
+                alt="{{ first_image.alt | escape }}"
+              >
+            </div>
+          {% endif %}
+        {% else %}
+          <div>
+            <img
+              class="product-placeholder-image"
+              src=" https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Excision_Logo_2025.svg?v=1745463654"
+              alt="Excision"
+            >
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <p class="font-bold {% if product.metafields.custom.title.value != blank %} cpgs_title{% endif %}">
+      {{ product.title }}
+    </p>
+
+
+    <a href="{{ product.url | within: current_collection }}" class="button learn-more">
+      Learn more
+    </a>
+
+      <style>
+                  .product-item--price small {
+                    font-size: 18px;
+                  }
+                  .product-item--price small:hover {
+                    color: black;
+                  }
+                  div.product-item--price {
+                    text-align: left;
+                  }
+                  .product-item--price span {
+                    display: flex;
+                    line-height: unset;
+                    flex-direction: column;
+                  }
+                  a:hover {
+                    color: unset;
+                  }
+                  /* default: no footprint */
+        .icon-container{
+          min-height: 0;
+          position: absolute;
+        }
+
+        /* show + space only when it actually has element children */
+        .icon-container:has(> *){
+          position: relative;
+        }
+
+        /* fallback for older browsers; may miss whitespace-only nodes */
+        .icon-container:empty{ display:none; }
+
+        .card-variants {
+          margin-bottom: 15px;
+        }
+
+        .card-variants-label {
+            font-size: 16px !important;
+            font-weight: 400 !important;
+            color: #666666;
+            margin-bottom: 7px !important;
+            text-align: start;
+        }
+
+        .card-variants-chips {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 9px;
+        }
+
+        .variant-chip {
+            padding: 8px 12px;
+            border: 2px solid #e8e8e8;
+            border-radius: 99px;
+            white-space: nowrap;
+            line-height: 1;
+            min-height: 40px;
+            align-content: center;
+        }
+
+        .variant-chip--more {
+            color: #666666;
+            border: 2px solid #f1f1f1;
+        }
+
+        a.button.learn-more {
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    background: #e8e8e8;
+}
+      </style>
+
+
+</div>
+
+  <style>
+    /* Ensure the hover effect only applies to the image container */
+    .product-image-wrapper {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      padding-top: 100%; /* Maintain aspect ratio */
+    }
+
+    .product-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: none !important;
+    }
+
+    /* Default image visible, second image hidden */
+    .product-image.front {
+      opacity: 1;
+      z-index: 2;
+    }
+
+    .product-image.back {
+      opacity: 0;
+      z-index: 100;
+      transform: scale(1.04);
+    }
+
+    /* Hide default image and show hover image on hover */
+    .product-grid-item:hover .product-image-wrapper .product-image.front {
+      opacity: 0 !important;
+    }
+
+    .product-grid-item:hover .product-image-wrapper .product-image.back {
+      opacity: 1 !important;
+      transform: scale(1);
+      transition: 0.3s ease !important;
+
+    }
+
+    /* Single image stays visible without hover effect */
+    .product-image.single {
+      opacity: 1;
+      z-index: 2;
+    }
+  </style>

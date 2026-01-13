@@ -1,0 +1,96 @@
+<section class="store-finder mini valign-wrapper card hoverable">
+  <div class="inner-wrapper">
+    <div class="heading">
+      <div class="excision-badge"></div>
+      <h2>Find a Distributor Near You</h2>
+      <p>Enter your state and postcode and let us help you find one of our<br> 100 suppliers in the country at a convenient location near you.</p>
+      <a href="/pages/store-locator" class="btn waves-effect waves-light" type="submit">
+		<span class="hide-on-small-only"> Find a Distributor </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Home Distributor Find",
+  "max_blocks": 9,
+  "blocks": [
+    {
+      "type": "html",
+      "name": "Custom HTML",
+      "settings": [
+        {
+          "type": "html",
+          "id": "code",
+          "label": "HTML",
+          "default": "<div style='text-align:center;'><h2>Use HTML to format your text so it can be easily read.</h2>This text can be used to share information about your brand with customers.</div>"
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "Container width",
+          "default": "100%",
+          "options": [
+            {
+              "value": "25%",
+              "label": "25%"
+            },
+            {
+              "value": "33%",
+              "label": "33%"
+            },
+            {
+              "value": "50%",
+              "label": "50%"
+            },
+            {
+              "value": "66%",
+              "label": "66%"
+            },
+            {
+              "value": "75%",
+              "label": "75%"
+            },
+            {
+              "value": "100%",
+              "label": "100%"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Vertical alignment",
+          "default": "top-middle",
+          "options": [
+            {
+              "value": "top-middle",
+              "label": "Top"
+            },
+            {
+              "value": "center",
+              "label": "Middle"
+            },
+            {
+              "value": "bottom-middle",
+              "label": "Bottom"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home Distributor Find",
+      "category": "Advanced layout",
+      "blocks": [
+        {
+          "type": "html"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

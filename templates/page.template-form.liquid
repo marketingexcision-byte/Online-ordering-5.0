@@ -1,0 +1,66 @@
+<div class="contact_us_outer_wrapper simple-lazyload">
+  <div class="container dt-prl-30 content">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="row contact-details lazyload-element">
+          <div class="col-12 col-sm-6 left-main-div">
+            <section class="inner-wrapper lazyload-element">
+              <h1 style="color: #fff;">{{ page.title }}</h1>
+              <div class="rte" style="color: #fff;">{{ page.content }}</div>
+            </section>
+          </div>
+          <div class="col-12 col-sm-6 lazyload-element">
+            <div id="formID-{{ page.metafields.custom.form_id }}" class="contact-form-wrapper net-promoter-score-form">
+              <h2>{{ page.metafields.custom.form_title }}</h2>
+              <div id="contactFormWrapper" class="hs_EnquiryForm ">
+              <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
+                <script>
+                  hbspt.forms.create({
+                    region: "na1",
+                    portalId: "2595431",
+                    formId: "{{ page.metafields.custom.form_id }}",
+                    onFormReady: function($form, ctx) {
+                      var npsURLValue = document.URL;
+                      var npsURLValueGet = npsURLValue.substring(npsURLValue.indexOf("=") + 1);
+                      $( 'input[value="'+ npsURLValueGet +'"]' ).prop( "checked", true );
+                      $('input[name="net_promoter_score"]').change(function(){
+                        var npsValue = $(this).val();
+                        window.location.href = "{{ page.url }}" + "?nps=" + npsValue; 
+                      });                   
+                    },                    
+                    onFormSubmit: function($form){
+                        setTimeout( function() {
+                          var netPromoterScore = $('input[name="net_promoter_score"]:checked').val();
+                          var redirectBase = '{{ page.url }}';
+                          window.location = redirectBase + '?nps=' + netPromoterScore;
+                        }, 250 );
+                      }
+                    });                  
+                </script> 
+              
+                {% if page.metafields.custom.show_contact_phone == true %}
+                <div class="contact_us_call font-bold">
+                  <i class="fa fa-phone" aria-hidden="true"></i> Or Phone us on <a href="tel:+61355514555">+61 (03) 5551 4555</a>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{ page.metafields.custom.extra_code | raw }}
+</div>
+
+
+<style>
+main.wrapper.main-content {
+    max-width: 100%;
+    padding: 0;
+}
+.inner-wrapper h1{
+    margin-bottom: 20px;
+} 
+</style>
+  

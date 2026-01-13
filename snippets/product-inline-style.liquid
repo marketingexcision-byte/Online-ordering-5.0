@@ -1,0 +1,768 @@
+<style>
+  h1{
+    font-size: 48px !important;
+  }
+  /* Image container background and border radius */
+  .has-image[data-image-fit="contain"] .fancybox__image {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  /* Backdrop styling */
+  .fancybox__backdrop {
+    background: white;
+  }
+
+  /* Navigation button styling */
+  .carousel__button svg {
+    stroke: #000000;
+    background: #f1f1f1;
+    filter: none;
+    border-radius: 50%;
+    width: 46px !important;
+    height: 46px !important;
+    padding: 12px;
+  }
+
+  @media screen and (max-width: 769px){
+  .fancybox__nav .carousel__button.is-next{
+    display: none;
+  }
+    .fancybox__nav .carousel__button.is-prev {
+      display: none;
+    }
+  }
+
+  /* Toolbar styling */
+  .fancybox__toolbar {
+    background: none;
+  }
+
+  /* Thumbnail background */
+  .fancybox__thumb {
+    background-color: #f1f1f1;
+      height: var(--fancybox-thumbs-width, 96px);
+        padding-top: 0;
+  }
+
+  /* Thumbnails carousel slides */
+  .fancybox__thumbs .carousel__slide {
+    height: var(--fancybox-thumbs-width, 96px);
+    padding: 0;
+    margin-right: 5px;
+  }
+
+  /* Adjust carousel viewport margin */
+  .carousel__viewport {
+    margin-bottom: 20px;
+  }
+
+  /* Remove border effect from selected thumbnail */
+  .fancybox__thumbs .carousel__slide .fancybox__thumb::after {
+    border-width: 0;
+  }
+
+  .fancybox__counter {
+    text-shadow: none;
+    color: black;
+  }
+</style>
+
+<style>
+                /* Inline Container */
+        .tooltip-inline {
+          display: inline-flex;
+          align-items: center;
+        }
+
+        /* Tooltip Container */
+        .tooltip-container {
+          position: relative;
+          display: inline-block;
+          cursor: pointer;
+          margin-left: 5px; /* Space between text and icon */
+        }
+
+        /* Tooltip Icon */
+        .tooltip-icon {
+          display: inline-block;
+          color: black;
+          font-size: 17px;
+          text-align: center;
+          width: 20px;
+          height: 20px;
+          line-height: 20px;
+        }
+
+        /* Tooltip Content */
+        .tooltip-content {
+          visibility: hidden;
+          width: 200px;
+          background-color: white;
+          color: black;
+          text-align: left;
+          padding: 10px;
+          border-radius: 6px;
+          font-size: 14px;
+          position: absolute;
+          top: 25px; /* Adjust based on your needs */
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 1;
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+          margin-top: 5px;
+        }
+
+        /* Show Tooltip on Hover */
+        .tooltip-container:hover .tooltip-content {
+          visibility: visible;
+        }
+          .carousel-inner {
+              transition: height 0.5s ease; /* Smooth transition for height */
+              overflow: hidden; /* Prevents overflow during transition */
+          }
+
+              .stp {
+                margin-top: 45px;
+              }
+              div#smart-tabs-content-0 a {
+                display: none;
+              }
+              div#smart-tabs-content-1 {
+                background: none !important;
+                padding: 14px 0px 0px 0px !important;
+              }
+              .smart-tabs-navigation-li-active {
+                border-bottom: 2px solid #e8e8e8 !important;
+              }
+              div#smart-tabs-content-0 {
+                border-radius: 0px;
+                padding: 14px 0px 30px 0px !important;
+                background: none !important;
+              }
+              div#fg a {
+                 display: inline-block;
+                 text-align: center;
+                 vertical-align: middle;
+              }
+
+               td {
+                  padding: 10px !important;
+                  border: 2px solid #e8e8e8 !important;
+               }
+        button.add-to-compare {
+            padding: 10px 15px;
+            border-radius: 25px;
+            border: 2px solid black;
+            background: white;
+            line-height: 1;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .add-to-compare.is-added {
+      background: black;
+      color: white;
+      border: 2px solid black;
+    }
+          div.product-comparison {
+            padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+          }
+          a.view-compare {
+        color: black;
+        border-bottom: 2px solid;
+          }
+    button:hover {
+      opacity: 85% !important;
+    }
+    .add-to-compare img {
+    transition: transform 0.3s ease;
+  }
+
+  .add-to-compare:hover img {
+    transform: rotate(90deg);
+  }
+
+  .add-to-compare.is-added:hover img {
+    transform: none; /* Don’t rotate when it says "Remove" */
+  }
+  .add-to-compare {
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+
+  .compare-text {
+    transition: opacity 0.2s ease;
+    display: inline-block;
+  }
+
+  .add-to-compare.is-added .compare-text,
+  .add-to-compare:not(.is-added) .compare-text {
+    opacity: 1;
+  }
+</style>
+<style>
+      .product-submenu-div {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1000;
+    margin-top: 60px;
+  }
+
+  .product-submenu {
+    background: white;
+    padding: 20px 0px;
+    display: flex;
+    gap: 20px;
+    border-bottom: 2px solid #e8e8e8;
+  }
+
+  @media screen and (max-width: 480px) {
+    .product-submenu {
+    overflow: scroll;
+  }
+  }
+
+
+  .product-submenu a {
+    text-decoration: none;
+    color: black;
+    padding: 7px 15px;
+    border-radius: 22px;
+    transition: 0.3s ease-in-out;
+    white-space: nowrap;
+  }
+
+  .product-submenu a.active {
+    background: #e0592a;
+    color: white;
+  }
+
+  .product-submenu a:hover {
+    background: #f1f1f1;
+  }
+</style>
+<style>
+  .search-wrapper {
+    margin-bottom: 30px;
+  }
+
+  #search-bar {
+    max-width: 300px;
+    outline: none;
+    padding: 10px 0px;
+  }
+      #search-bar:focus {
+    border-bottom: 2px solid #e0592a !important;
+    border: 0;
+      }
+      .table-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 10px;
+      }
+      input#search-bar-specifications {
+    max-width: 300px;
+}
+
+      .variants-title {
+          font-size: 1.5em;
+          font-weight: bold;
+          margin: 0;
+      }
+
+      .table-notes {
+          text-align: right;
+      }
+
+      .note-text {
+          font-family: "Humanist777BT-Bold";
+      }
+
+      .note-text,
+      .unit-text {
+          margin: 0;
+          font-size: 0.9em;
+      }
+
+      .series-details-table-wrap {
+          width: 100%;
+          margin-top: 20px;
+      }
+
+      .table-scrollable-wrapper {
+          overflow-x: auto;
+          overflow-y: auto;
+        max-height: 1000px;
+      }
+
+      .table-type01 {
+          width: 100%;
+          border-collapse: collapse;
+          text-align: left;
+      }
+
+      .table-type01 th, .table-type01 td {
+          padding: 10px;
+          border: 2px solid #e8e8e8;
+      }
+
+      .table-type01 th {
+          background-color: #f4f4f4;
+          font-family: "Humanist777BT-Bold";
+      }
+
+      th {
+          position: relative;
+          max-height: 50px !important;
+          height: 50px !important;
+          line-height: 1.2em !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          vertical-align: middle !important;
+      }
+
+      th.sorted-asc::after {
+          content: '\25B2'; /* Upward triangle */
+          position: absolute;
+          right: 10px; /* Adjust this to position the arrow correctly */
+          font-size: 0.8em; /* Make the arrow smaller if needed */
+      }
+
+      th.sorted-desc::after {
+          content: '\25BC'; /* Downward triangle */
+          position: absolute;
+          right: 10px; /* Adjust this to position the arrow correctly */
+          font-size: 0.8em; /* Make the arrow smaller if needed */
+      }
+      .plyr {
+              box-shadow: 0 0 20px #0000000f !important;
+        }
+      .plyr__video-embed {
+        position: relative;
+        z-index: 10;
+      }
+
+      .plyr__video-embed iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10; /* Ensure it is on top */
+      }
+      @media screen and (max-width: 768px){
+        .operation {
+              flex: 0 0 calc(50% - 20px) !important;
+        }
+        .steel-progress {
+          flex: 1 1 calc(50% - 20px) !important;
+        }
+        .product-distributor-info {
+          flex-direction: column;
+        }
+        .service-delivery {
+          display: flex;
+          flex-direction: column;
+        }
+      }
+</style>
+<style>
+  div#feeds-calculator-initialised td {
+      padding: 15px 15px 15px 0px !important;
+      border-left: 0px !important;
+      border-right: 0px !important;
+      border-top: 0px !important;
+  }
+      .speeds-feeds-hidden {
+    display: none;
+  }
+  .tabs-wrapper {
+    display: flex;
+    margin-bottom: 30px;
+  }
+
+  .tab-button {
+    padding: 10px 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-family: "Humanist777BT-Bold";
+    margin-right: 10px;
+  }
+
+  .tab-button:focus {
+    outline: none !important;
+  }
+
+  .tab-button.active {
+    border-bottom: 2px solid #e8e8e8;
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+</style>
+<style>
+    .faq-item {
+    border-bottom: 2px solid #e8e8e8;
+    padding: 10px 0;
+    border-top: 2px solid #e8e8e8;
+    margin-top: -2px;
+  }
+
+  .faq-question {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .faq-answer {
+    margin-top: 10px;
+    font-size: 0.95rem;
+  }
+
+  .arrow {
+    transition: transform 0.2s ease;
+  }
+
+  .faq-question[aria-expanded="true"] .arrow {
+    transform: rotate(180deg);
+  }
+    /* Main section takes up full width */
+    .work-material-section {
+      width: 100%;
+      padding: 20px 0; /* Vertical padding for spacing */
+    }
+
+    .work-material-cont {
+      width: 100%;
+      margin: 0 auto; /* Centers the container horizontally */
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px; /* Space between items */
+    }
+
+    .steel-progress {
+      display: flex;
+      flex-direction: column;
+      flex: 0 0 calc(50% - 20px); /* Flex basis to take half of the container width minus the gap */
+      margin-bottom: 10px;
+      padding: 20px;
+      box-sizing: border-box;
+      background: #f1f1f1; /* Light background for better visibility */
+      border-radius: 10px;
+    }
+
+      div.download-card {
+      display: flex;
+      flex-direction: row;
+      flex: 0 0 calc(50% - 20px); /* Flex basis to take half of the container width minus the gap */
+      margin-bottom: 30px;
+      padding: 30px;
+      box-sizing: border-box;
+      background: #f1f1f1; /* Light background for better visibility */
+      border-radius: 15px;
+      gap: 40px;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+  .preview{
+    position:relative;
+    width:150px;          /* visual width */
+    overflow:visible;     /* nothing clipped here */
+  }
+
+  /* height of the visible “window” inside the card */
+  .window{
+    height:130px;         /* adjust to taste */
+  }
+
+  /* your existing image styles */
+  img.download-preview{
+    display:block;
+    width:100%;
+    transform: rotateX(7deg) rotateY(-20deg) translateZ(54px) translate(0px, -25px);
+      box-shadow: 0 20px 20px rgba(0, 0, 0, .05);
+      rotate: 7deg;
+      border-radius: 5px;
+
+    /* lift the picture so its top peeks out, bottom stays inside .window */
+    margin-top:-30px;     /* same amount that pokes out the top */
+  }
+
+    .download-name-button .button {
+      padding: 10px 15px;
+      border: 2px solid #0069a7;
+      color: black;
+      border-radius: 23px;
+      line-height: 1;
+    }
+
+    div.download-name-button {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .file-name {
+      font-size: 24px;
+      font-family: Humanist777BT-Bold;
+    }
+
+      .operation {
+      display: flex;
+      flex-direction: column;
+      flex: 0 0 calc(25% - 20px); /* Flex basis to take half of the container width minus the gap */
+      margin-bottom: 10px;
+      padding: 20px;
+      box-sizing: border-box;
+      background: #f1f1f1; /* Light background for better visibility */
+      border-radius: 10px;
+    }
+
+    .work-material-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+      .operation-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .graph-name {
+      display: flex;
+      align-items: center;
+      font-family: "Humanist777BT-Bold";
+      font-size: 16px;
+    }
+
+      .operation-name {
+      display: flex;
+      align-items: center;
+      font-family: "Humanist777BT-Bold";
+    }
+
+    .graph-icon {
+      font-family: "Humanist777BT-Bold";
+      background: #3498db; /* Blue color similar to the image */
+      padding: 8px;
+      border-radius: 5px;
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      color: white;
+      margin-right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .rating-label {
+      font-size: 16px;
+      font-family: "Humanist777BT-Bold";
+    }
+
+    .progress-wrap {
+      background: white; /* Light grey background */
+      height: 35px;
+      border-radius: 25px;
+      margin: 10px 0;
+      position: relative;
+      width: 100%;
+      padding: 7px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      border-radius: 10px;
+    }
+
+    .progress.Good .progress-bar {
+      background-color: #3498db; /* Blue for progress */
+    }
+
+    .progress.Excellent .progress-bar {
+      background-color: #3498db; /* Blue for progress */
+    }
+
+    .graph-table {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: #555;
+      margin-top: 5px;
+    }
+
+    .tab-nav {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 1rem;
+      flex-wrap: nowrap;
+      overflow: scroll;
+    }
+    .tab-nav .tab {
+      cursor: pointer;
+      padding: 10px 0px;
+    }
+    .tab-nav .tab:hover {
+      border-bottom: 2px solid #e8e8e8;
+    }
+  
+    .tab-nav .tab.active {
+      border-bottom: 2px solid #e0592a;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+      margin-top: 40px;
+      min-height: 300px;
+    }
+    .tab-split {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 100px;
+    }
+    .tab-split > * {
+      flex: 1 1 45%;
+    }
+    li.downloads-item {
+    margin-bottom: 20px;
+    }
+    li.downloads-item:hover {
+    opacity: 85%;
+    }
+    span.download-text {
+        color: black;
+    }
+    a.download-link {
+    gap: 15px;
+    display: inline-flex;
+    align-items: center;
+}
+
+
+
+/* container re-use of your returns-box look */
+.returns-box.ex-returns{
+  display:flex;
+  font-size:16px;
+  flex-direction: column;
+  gap: 15px;
+}
+.ex-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px 16px;
+    align-items: center;
+    padding-bottom: 15px;
+}
+.ex-title{display:flex;align-items:center;gap:10px;font-weight:600;}
+.ex-content{grid-column:1 / -1;margin-left:36px;} /* indent to align under titles */
+.ex-hr{border:0;border-top:2px solid #e8e8e8;margin:16px 0;}
+/* badge circle for returns (!) and warranty number */
+.returns-icon,.ex-badge{
+  display:flex;align-items:center;justify-content:center;
+  width:24px;height:24px;border-radius:50%;
+  font-size:14px;line-height:1;flex-shrink:0;color:#fff;background:#f88d2b;
+}
+.product-origin{display:flex;flex-wrap:wrap;gap:10px 16px;}
+.product__label--origin{display:inline-flex;align-items:center;gap:8px;}
+.product__label--warranty{display:flex;align-items:center;}
+
+.ex-stock-wrap {
+margin-bottom: 20px;}
+.ex-stock-badge{
+  display:flex; align-items:center; gap:15px;
+}
+.ex-stock-badge::before{
+  content:""; width:12px; height:12px; border-radius:50%;
+  flex:0 0 12px; display:inline-block;
+}
+.ex-stock-badge[data-status="green"]::before  { background: #109954; }
+.ex-stock-badge[data-status="yellow"]::before { background: #f6b519; }
+.ex-stock-badge[data-status="orange"]::before { background: #f88d2b; }
+.ex-stock-badge[data-status="red"]::before    { background: #d52e30; }
+.ex-stock-badge[data-status="blue"]::before   { background: #3995e6; }
+.ex-stock-badge[data-status="grey"]::before {
+  background:#666666;
+}
+.ex-qty-warning{ margin-top:6px; font-size:.95rem; color: #d52e30; }
+.ex-eta{
+  /* tweakables */
+  --radius: 7px;
+  --stripe: 7px;                  /* bar width */
+  --stripe-color: #f88d2b;         /* bar colour */
+  --card-bg: #f1f1f1;              /* card background */
+
+  border-radius: var(--radius);
+  padding: 20px 20px 15px calc(20px + var(--stripe));
+  background:
+    /* left bar */
+    linear-gradient(var(--stripe-color), var(--stripe-color)) left/var(--stripe) 100% no-repeat,
+    /* card background */
+    var(--card-bg);
+    font-size: 16px;
+    min-height: 82px;
+}
+.ex-eta p {
+margin-bottom: 10px;
+}
+.ex-eta-btn {
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 20px;
+    background: #fff;
+    color: black;
+}
+.ex-cutoff {
+  color: #3995e6;
+  border-bottom: 2px solid #3995e6;
+  font-family: 'Humanist777BT-Bold';
+}
+.ex-eta-hero { font-size: 22px; margin: 0 0 4px; }
+.ex-eta .ex-cutoff { white-space: nowrap; }
+
+  /* collapse behaviour */
+  .ex-opt .ex-opt-btn.is-collapsed { display: none; }
+
+  /* optional: subtle separator + button style */
+  .ex-opt-toggle {
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 1;
+    background: none;
+    border: 0;
+    color: #0b63ce;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+</style>

@@ -1,0 +1,22 @@
+{% section 'blog' %}
+{% section 'home-newsletter' %}
+
+<script>
+   $(document).ready(function() {
+     var url = document.URL
+     var urlDia = url.substr(url.lastIndexOf('_') + 1);
+     //var findDia = $(".list-group-item .option-name").text().indexOf(urlDia) > -1;      
+     $('.list-group-item .option-name').each(function() {
+       if( $( this ).text()==urlDia) {
+          $( this ).parent().addClass( "activeFilter" );
+       }
+     });
+
+     var sidebarLength = $(".sidebar > .grid-uniform > div").length;         
+     if (sidebarLength == 0) {
+        $(".sidebar.collection-filters").addClass( "disableSidebar");
+        $(".grid-item.collection_content").addClass( "large--one-whole");
+        $(".grid-item.collection_content").removeClass( "large--four-fifths");
+     }
+   });
+</script>

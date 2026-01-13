@@ -1,0 +1,1970 @@
+{% assign lengths = 'Throw Away|Stub|Short|Long|Extra Long|Long Reach|Extended Neck' | split: '|' %}
+{% assign types = 'Center Match|Rib Processing|Miniature|High Feed|Sharp Corner Removal|Taper Neck|Center Cut'
+  | split: '|'
+%}
+
+<section
+  class="section"
+  id="endmill-selector"
+  data-section-id="{{ section.id }}"
+  data-collection-handle="{{ section.settings.collection.handle | default: 'all-endmills' }}"
+>
+  <div class="container layout-constrained">
+    <header class="section__header">
+      <h2 class="section__title h2">Find the right endmill</h2>
+      <p class="section__intro">Answer four quick questions. We’ll show endmills that match.</p>
+    </header>
+
+    <!-- Progress -->
+    <div class="w-btn-wrapper" style="display:flex;gap:10px;align-items:center;">
+      <div id="es-progress" style="flex:1;height:6px;background:#eee;border-radius:999px;overflow:hidden;">
+        <div
+          id="es-progress-bar"
+          style="width:0%;height:100%;background:var(--color-primary-orange);transition:width .35s ease;"
+        ></div>
+      </div>
+      <span id="es-step-label" style="min-width:90px;text-align:right;font-variant-numeric:tabular-nums;"
+        >Step 1 of 4</span
+      >
+    </div>
+
+    <!-- Wizard -->
+    <div class="es-steps" style="position:relative;">
+      <!-- 1. Operation -->
+      <article class="card es-step" data-step="1" aria-hidden="false">
+        <h3 class="h3" style="margin-top:0;">What operation are you doing?</h3>
+        <div class="rc-row" role="listbox" aria-label="Operation">
+          {% assign ops = 'Profiling|Side Milling|Small Part|Slotting|Die Sinking|Facing|Corner|Helical-Interpol|Trochoidal|Side Taper'
+            | split: '|'
+          %}
+          {% for op in ops %}
+            {% assign tag = op | replace: ' ', '_' %}
+            <button type="button" class="rc-item es-op" data-tag="Operation_{{ op }}" aria-selected="false">
+              <div class="rc-item__label h5">{{ op }}</div>
+            </button>
+          {% endfor %}
+        </div>
+
+        <div style="display:flex;gap:12px;justify-content:space-between;align-items:center;margin:var(--space-6) 0;">
+          <span class="rc-item__text">Pick one</span>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="btn es-skip">Skip</button>
+            <button type="button" class="btn btn-primary es-next" disabled>Next</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- 2. Material (New intuitive version) -->
+      <article
+        class="card es-step"
+        data-step="2"
+        aria-hidden="true"
+        style="position:absolute;inset:0;opacity:0;pointer-events:none;"
+      >
+        <h3 class="h3" style="margin-top:0;">What material are you machining?</h3>
+
+        <p class="rc-item__text" style="margin-bottom:16px;">
+          Start with the broad group. Then choose a specific grade if you want. We’ll map it to the correct VDI
+          automatically.
+        </p>
+
+        <!-- ISO Level -->
+        <div class="material-groups">
+          {% assign iso_groups = '
+      P:Steels;
+      M:Stainless Steels;
+      K:Cast Irons;
+      N:Aluminium & Soft Metals;
+      S:Titanium & Super Alloys;
+      H:Hardened Steels
+    '
+            | split: ';'
+          %}
+
+          {% for g in iso_groups %}
+            {% assign parts = g | split: ':' %}
+            {% assign iso = parts[0] | strip %}
+            {% assign label = parts[1] | strip %}
+
+            <div class="material-group-card es-iso-card" data-iso="{{ iso }}">
+              <div class="mgc-header">
+                <span class="mgc-iso">{{ iso }}</span>
+                <span class="mgc-title">{{ label }}</span>
+              </div>
+            </div>
+          {% endfor %}
+
+          <!-- Unknown -->
+          <div class="material-group-card mgc-unknown es-iso-card" data-iso="ANY">
+            <div class="mgc-header">
+              <span class="mgc-iso">?</span>
+              <span class="mgc-title">Not sure</span>
+            </div>
+            <div class="mgc-examples">General-purpose steels</div>
+          </div>
+        </div>
+
+        <!-- Subgrade list (hidden until ISO selected) -->
+        <div id="es-material-subgrades" style="display:none;margin-top:20px;">
+          <h4 class="h5" style="margin-bottom:10px;">Select grade</h4>
+          <div id="es-material-grid" class="material-groups"></div>
+        </div>
+
+        <div style="display:flex;gap:12px;justify-content:space-between;align-items:center;margin:var(--space-6) 0;">
+          <button type="button" class="btn btn-outline es-prev">Back</button>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="btn es-skip">Skip</button>
+            <button type="button" class="btn btn-primary es-next" disabled>Next</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- 3. Cutting shape -->
+      <article
+        class="card es-step"
+        data-step="3"
+        aria-hidden="true"
+        style="position:absolute;inset:0;opacity:0;pointer-events:none;"
+      >
+        <h3 class="h3" style="margin-top:0;">What cutting shape?</h3>
+        <div class="rc-row" role="listbox" aria-label="Cutting shape">
+          {% assign shapes = 'Square|Ball Nose|Corner Radius|Ripper / Rougher|Chamfer Prep' | split: '|' %}
+          {% for s in shapes %}
+            <button type="button" class="rc-item es-shape" data-tag="Cutting Shape_{{ s }}" aria-selected="false">
+              <div class="rc-item__label h5">{{ s }}</div>
+            </button>
+          {% endfor %}
+        </div>
+
+        <div style="display:flex;gap:12px;justify-content:space-between;align-items:center;margin:var(--space-6) 0;">
+          <button type="button" class="btn btn-outline es-prev">Back</button>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="btn es-skip">Skip</button>
+            <button type="button" class="btn btn-primary es-next" disabled>Next</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- 4. Length or Type -->
+      <article
+        class="card es-step"
+        data-step="4"
+        aria-hidden="true"
+        style="position:absolute;inset:0;opacity:0;pointer-events:none;"
+      >
+        <h3 class="h3" style="margin-top:0;">Length or Type</h3>
+        <div class="rc-item__text" style="margin-bottom:var(--space-4);">
+          Pick one from Length or Type. If you choose one. the other is set to Any.
+        </div>
+
+        <div class="rc-row" role="listbox" aria-label="Length" style="margin-bottom:var(--space-6);">
+          {% for L in lengths %}
+            <button type="button" class="rc-item es-length" data-tag="Length_{{ L }}" aria-selected="false">
+              <div class="rc-item__label h5">{{ L }}</div>
+            </button>
+          {% endfor %}
+        </div>
+
+        <div class="rc-row" role="listbox" aria-label="Type">
+          {% for T in types %}
+            <button type="button" class="rc-item es-type" data-tag="Type_{{ T }}" aria-selected="false">
+              <div class="rc-item__label h5">{{ T }}</div>
+            </button>
+          {% endfor %}
+        </div>
+
+        <div style="display:flex;gap:12px;justify-content:space-between;align-items:center;margin:var(--space-6) 0;">
+          <button type="button" class="btn btn-outline es-prev">Back</button>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="btn es-skip">Skip</button>
+            <button type="button" class="btn btn-primary es-next" disabled>Next</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- 5. Diameter -->
+      <article
+        class="card es-step"
+        data-step="5"
+        aria-hidden="true"
+        style="position:absolute;inset:0;opacity:0;pointer-events:none;"
+      >
+        <h3 class="h3" style="margin-top:0;">Diameter</h3>
+
+        <div style="display:grid;gap:14px;max-width:520px;">
+          <label class="rc-item__label" for="es-dia">Mill Diameter (mm)</label>
+          <input
+            id="es-dia"
+            type="number"
+            class="form-input"
+            step="0.01"
+            min="0"
+            placeholder="Optional. e.g. 6 or 6.35"
+          >
+          <div class="rc-item__text">Leave blank if you’re flexible.</div>
+        </div>
+
+        <div style="display:flex;gap:12px;justify-content:space-between;align-items:center;margin:var(--space-6) 0;">
+          <button type="button" class="btn btn-outline es-prev">Back</button>
+          <button type="button" class="btn btn-primary es-finish">Show results</button>
+        </div>
+      </article>
+    </div>
+
+    <!-- Active filters summary -->
+    <div id="es-chips" style="display:none;gap:8px;flex-wrap:wrap;margin:22px 0;">
+      <span class="wm-chip-group">
+        <span class="wm-chip work-mat__chip" id="chip-iso" data-m="P" style="display:none;">ISO</span>
+      </span>
+      <button class="btn btn-outline" id="es-reset" type="button">Reset</button>
+    </div>
+
+    <!-- Results -->
+    <div id="es-results">
+      <div style="display: flex;
+    justify-content: space-between;
+    align-items: center;">
+      <h3 class="h3" style="margin-top:0;">Results</h3>
+
+      <div id="es-sort-bar">
+  <label for="es-sel-sort">Sort:</label>
+  <select id="es-sel-sort">
+      <option value="default">Recommended</option>
+      <option value="alpha-asc">A → Z</option>
+      <option value="alpha-desc">Z → A</option>
+      <option value="price-asc" selected>Price: Low → High</option>
+      <option value="price-desc">Price: High → Low</option>
+  </select>
+</div>
+</div>
+
+
+      {%- comment -%} Editable summary controls shown on results {%- endcomment -%}
+      {% assign iso_tabs = 'P|M|K|N|S|H' | split: '|' %}
+      {% assign ops = 'Profiling|Side Milling|Small Part|Slotting|Die Sinking|Facing|Corner|Helical-Interpol|Trochoidal|Side Taper'
+        | split: '|'
+      %}
+      {% assign shapes = 'Square|Ball Nose|Corner Radius|Ripper / Rougher|Chamfer Prep' | split: '|' %}
+
+      <div id="es-editable-summary" class="card" style="display:none;margin:16px 0 22px;">
+        <h4 class="h4" style="margin-top:0;">Your selections</h4>
+
+
+        <div class="rc-row">
+          <label class="rc-item">
+            <span class="rc-item__label">Operation</span>
+            <select id="es-sel-operation" class="form-input">
+              <option value="">Any</option>
+              {% for op in ops %}
+                {% assign tag = op | replace: ' ', '_' %}
+                <option value="Operation_{{ tag }}">{{ op }}</option>
+              {% endfor %}
+            </select>
+          </label>
+
+          <label class="rc-item">
+            <span class="rc-item__label">ISO</span>
+            <select id="es-sel-iso" class="form-input">
+              {% for i in iso_tabs %}
+                <option value="{{ i }}">{{ i }}</option>
+              {% endfor %}
+            </select>
+          </label>
+
+          <label class="rc-item">
+            <span class="rc-item__label">Material</span>
+            <select id="es-sel-material" class="form-input">
+              <option value="">Any</option>
+              {# options filled by JS based on ISO. label shows “User · VDI n” #}
+            </select>
+          </label>
+
+          <label class="rc-item">
+            <span class="rc-item__label">Cutting shape</span>
+            <select id="es-sel-shape" class="form-input">
+              <option value="">Any</option>
+              {% for s in shapes %}
+                <option value="Cutting Shape_{{ s }}">{{ s }}</option>
+              {% endfor %}
+            </select>
+          </label>
+
+          <label class="rc-item">
+            <span class="rc-item__label">Length</span>
+            <select id="es-sel-length" class="form-input">
+              <option value="">Any</option>
+              {% for L in lengths %}
+                <option value="Length_{{ L }}">{{ L }}</option>
+              {% endfor %}
+            </select>
+          </label>
+
+          <label class="rc-item">
+            <span class="rc-item__label">Type</span>
+            <select id="es-sel-type" class="form-input">
+              <option value="">Any</option>
+              {% for T in types %}
+                <option value="Type_{{ T }}">{{ T }}</option>
+              {% endfor %}
+            </select>
+          </label>
+
+          <label class="rc-item">
+            <span class="rc-item__label">Diameter (mm)</span>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input id="es-sel-dia" type="number" class="form-input" step="0.01" min="0" placeholder="Any">
+              <button type="button" class="btn btn-outline" id="es-dia-clear">Clear</button>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div id="es-empty" class="collection-card__description" style="display:none;">
+        No matching products. Loosen a filter or clear Diameter.
+      </div>
+      <div id="es-grid" class="collection-grid"></div>
+
+      {%- comment -%}
+        Hidden prototype card that uses the full Liquid snippet.
+        JS will clone this for each result.
+      {%- endcomment -%}
+      <div id="es-prototype" style="display:none;">
+        {% assign fallback_collection = section.settings.collection | default: collections['all-endmills'] %}
+        {% if fallback_collection and fallback_collection.products_count > 0 %}
+          {% assign sample_product = fallback_collection.products.first %}
+          {% render 'product-grid-item-endmill-selector', product: sample_product %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {%- comment -%}Templates will be filled by JS after fetching all pages{%- endcomment -%}
+  <template id="es-products-json"></template>
+  <div id="es-product-templates" style="display:none;"></div>
+
+  {% comment %} ====== MATERIAL TABLE (VDI → ISO + Label) ====== {% endcomment %}
+  <script type="application/json" id="es-vdi-table">
+    [
+      {
+        "vdi": 1,
+        "iso": "P",
+        "desc": "Non-alloy steel · ~0.15% C · Annealed",
+        "hrc": 9,
+        "user": "Mild Steel (Low Carbon)"
+      },
+      {
+        "vdi": 2,
+        "iso": "P",
+        "desc": "Non-alloy steel · ~0.45% C · Annealed",
+        "hrc": 13,
+        "user": "Medium Carbon Steel"
+      },
+      {
+        "vdi": 3,
+        "iso": "P",
+        "desc": "Non-alloy steel · ~0.45% C · Quenched & Tempered",
+        "hrc": 25,
+        "user": "Medium Carbon Steel (Q&T)"
+      },
+      { "vdi": 4, "iso": "P", "desc": "Non-alloy steel · ~0.75% C · Annealed", "hrc": 28, "user": "High Carbon Steel" },
+      {
+        "vdi": 5,
+        "iso": "P",
+        "desc": "Non-alloy steel · ~0.75% C · Quenched & Tempered",
+        "hrc": 32,
+        "user": "High Carbon Steel (Q&T)"
+      },
+      { "vdi": 6, "iso": "P", "desc": "Low alloy steel · Annealed", "hrc": 10, "user": "Low Alloy Steel" },
+      { "vdi": 7, "iso": "P", "desc": "Low alloy steel · Quenched & Tempered", "hrc": 29, "user": "Alloy Steel (Q&T)" },
+      {
+        "vdi": 8,
+        "iso": "P",
+        "desc": "Low alloy steel · Quenched & Tempered",
+        "hrc": 32,
+        "user": "Alloy Steel (Toughened)"
+      },
+      {
+        "vdi": 9,
+        "iso": "P",
+        "desc": "Low alloy steel · Quenched & Tempered",
+        "hrc": 38,
+        "user": "High Strength Steel / Wear Plate"
+      },
+      {
+        "vdi": 10,
+        "iso": "P",
+        "desc": "High alloyed steel, tool steel · Annealed",
+        "hrc": 15,
+        "user": "Tool Steel (Annealed)"
+      },
+      {
+        "vdi": 11,
+        "iso": "P",
+        "desc": "High alloyed steel, tool steel · Quenched & Tempered",
+        "hrc": 35,
+        "user": "Tool Steel (Hardened)"
+      },
+      {
+        "vdi": 12,
+        "iso": "M",
+        "desc": "Stainless steel · Ferritic/Martensitic · Annealed",
+        "hrc": 15,
+        "user": "Stainless Steel (Hard Grades)"
+      },
+      {
+        "vdi": 13,
+        "iso": "M",
+        "desc": "Stainless steel · Martensitic · Quenched & Tempered",
+        "hrc": 23,
+        "user": "Stainless Steel (Hardened)"
+      },
+      {
+        "vdi": 14,
+        "iso": "M",
+        "desc": "Stainless steel · Austenitic",
+        "hrc": 10,
+        "user": "Stainless Steel (Austenitic 304/316)"
+      },
+      { "vdi": 15, "iso": "K", "desc": "Grey cast iron · Pearlitic/Ferritic", "hrc": 10, "user": "Cast Iron (Soft)" },
+      {
+        "vdi": 16,
+        "iso": "K",
+        "desc": "Grey cast iron · Pearlitic (Martensitic)",
+        "hrc": 26,
+        "user": "Cast Iron (Hard)"
+      },
+      { "vdi": 17, "iso": "K", "desc": "Nodular cast iron · Ferritic", "hrc": 3, "user": "Ductile Iron (Soft)" },
+      { "vdi": 18, "iso": "K", "desc": "Nodular cast iron · Pearlitic", "hrc": 25, "user": "Ductile Iron (Hard)" },
+      { "vdi": 19, "iso": "K", "desc": "Malleable cast iron · Ferritic", "hrc": 0, "user": "Malleable Iron (Soft)" },
+      { "vdi": 20, "iso": "K", "desc": "Malleable cast iron · Pearlitic", "hrc": 21, "user": "Malleable Iron (Hard)" },
+      {
+        "vdi": 21,
+        "iso": "N",
+        "desc": "Aluminum-wrought alloy · Not curable",
+        "hrc": 0,
+        "user": "Aluminium (Soft Wrought)"
+      },
+      {
+        "vdi": 22,
+        "iso": "N",
+        "desc": "Aluminum-wrought alloy · Curable · Hardened",
+        "hrc": 0,
+        "user": "Aluminium (Heat-Treated 6061/7075)"
+      },
+      {
+        "vdi": 23,
+        "iso": "N",
+        "desc": "Aluminum-cast, alloyed ≤12% Si · Not Curable",
+        "hrc": 0,
+        "user": "Cast Aluminium (Low Si)"
+      },
+      {
+        "vdi": 24,
+        "iso": "N",
+        "desc": "Aluminum-cast, alloyed ≤12% Si · Curable · Hardened",
+        "hrc": 0,
+        "user": "Cast Aluminium (Treated)"
+      },
+      {
+        "vdi": 25,
+        "iso": "N",
+        "desc": "Aluminum-cast, alloyed >12% Si · Not Curable",
+        "hrc": 0,
+        "user": "Cast Aluminium (High Si)"
+      },
+      {
+        "vdi": 26,
+        "iso": "N",
+        "desc": "Copper and Copper Alloys · Cutting alloys · Pb>1%",
+        "hrc": 0,
+        "user": "Free-Cutting Brass / Bronze"
+      },
+      {
+        "vdi": 27,
+        "iso": "N",
+        "desc": "Copper and Copper Alloys (Bronze/Brass) · CuZn, CuSnZn",
+        "hrc": 0,
+        "user": "Brass & Bronze (General)"
+      },
+      {
+        "vdi": 28,
+        "iso": "N",
+        "desc": "Copper and Copper Alloys · CuSn, lead-free copper",
+        "hrc": 0,
+        "user": "Copper (Pure & Lead-Free)"
+      },
+      {
+        "vdi": 29,
+        "iso": "N",
+        "desc": "Non Metallic Materials · Durolastic, Fiber Reinforced Plastic",
+        "hrc": null,
+        "user": "Composites (FRP / Reinforced Plastics)"
+      },
+      {
+        "vdi": 30,
+        "iso": "N",
+        "desc": "Non Metallic Materials · Rubber, Wood, etc.",
+        "hrc": null,
+        "user": "Non-Metallic (Plastics / Rubber / Wood)"
+      },
+      {
+        "vdi": 31,
+        "iso": "S",
+        "desc": "Heat Resistant Super Alloys · Fe Based · Annealed",
+        "hrc": 15,
+        "user": "Iron-Based Super Alloys"
+      },
+      {
+        "vdi": 32,
+        "iso": "S",
+        "desc": "Heat Resistant Super Alloys · Fe Based · Cured",
+        "hrc": 30,
+        "user": "Iron-Based Super Alloys (Treated)"
+      },
+      {
+        "vdi": 33,
+        "iso": "S",
+        "desc": "Heat Resistant Super Alloys · Ni or Co Based · Annealed",
+        "hrc": 25,
+        "user": "Nickel & Cobalt Alloys"
+      },
+      {
+        "vdi": 34,
+        "iso": "S",
+        "desc": "Heat Resistant Super Alloys · Ni or Co Based · Cured",
+        "hrc": 38,
+        "user": "Nickel & Cobalt Alloys (Hardened)"
+      },
+      {
+        "vdi": 35,
+        "iso": "S",
+        "desc": "Heat Resistant Super Alloys · Ni or Co Based · Cast",
+        "hrc": 34,
+        "user": "Nickel & Cobalt Alloys (Cast)"
+      },
+      {
+        "vdi": 36,
+        "iso": "S",
+        "desc": "Titanium Alloys · Pure Titanium",
+        "hrc": null,
+        "user": "Titanium (Commercially Pure)"
+      },
+      {
+        "vdi": 37,
+        "iso": "S",
+        "desc": "Titanium Alloys · Alpha + Beta Alloys · Hardened",
+        "hrc": null,
+        "user": "Titanium (Alloyed / Hardened)"
+      },
+      { "vdi": 38, "iso": "H", "desc": "Hardened steel · Hardened", "hrc": 55, "user": "Hardened Steel (≈55 HRC)" },
+      { "vdi": 39, "iso": "H", "desc": "Hardened steel · Hardened", "hrc": 60, "user": "Hardened Steel (≈60 HRC)" },
+      { "vdi": 40, "iso": "H", "desc": "Chilled Cast Iron · Cast", "hrc": 42, "user": "Chilled Cast Iron" },
+      { "vdi": 41, "iso": "H", "desc": "Hardened Cast Iron · Hardened", "hrc": 55, "user": "Hardened Cast Iron" }
+    ]
+  </script>
+
+  {% comment %} ====== JS ====== {% endcomment %}
+  <script>
+    // Fetch ALL products in the collection via JSON (no 250 limit per page).
+    async function ES_loadAllProducts(collectionHandle) {
+      const handle = collectionHandle || 'all-endmills'; // fallback
+      const limit = 250;
+      let page = 1;
+      let allProducts = [];
+
+      while (true) {
+        const url = `/collections/${handle}/products.json?limit=${limit}&page=${page}`;
+        const res = await fetch(url);
+        if (!res.ok) break;
+
+        const json = await res.json();
+        const products = json.products || [];
+        allProducts = allProducts.concat(products);
+
+        if (products.length < limit) break; // last page
+        page += 1;
+      }
+
+      console.log('[ES] Loaded products from JSON endpoint:', allProducts.length, 'from handle:', handle);
+      return allProducts;
+    }
+
+    (function () {
+      const el = (sel, root = document) => root.querySelector(sel);
+      const els = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+      const sectionRoot = document.getElementById('endmill-selector');
+      const COLLECTION_HANDLE = sectionRoot?.dataset.collectionHandle || 'all-endmills';
+
+      const steps = els('.es-step');
+      const protoRoot = el('#es-prototype');
+      const protoCard = protoRoot ? protoRoot.querySelector('.grid-item') : null;
+      const bar = el('#es-progress-bar');
+      const stepLabel = el('#es-step-label');
+      let step = 1;
+
+      // Global-ish data for this module
+      let PRODUCT_DATA = [];
+      let DATASET = [];
+      let PRODUCTS_READY = false;
+
+      const selected = {
+        operationTag: null,
+        iso: 'P',
+        vdi: null,
+        vdis: null,
+        materialLabel: null,
+        materialBucketId: null,
+        shapeTag: null,
+        lengthTag: null,
+        typeTag: null,
+        diameter: null,
+        sort: 'price-asc',
+      };
+
+function variantHasValidPrice(v) {
+  if (!v) return false;
+
+  // case 1 – cents number
+  if (typeof v.price === "number" && v.price > 0) return true;
+
+  // case 2 – moneyV2 { amount: "X.YY" }
+  if (v.price && typeof v.price.amount === "string") {
+    const n = Number(v.price.amount);
+    return Number.isFinite(n) && n > 0;
+  }
+
+  return false;
+}
+
+function pickVariantForCard(product) {
+  const variants = product.variants || [];
+  if (!variants.length) return null;
+
+  // Desired diameter
+  const targetDia = selected.diameter;
+
+  // If diameter is chosen, match EXACT first
+  if (targetDia != null) {
+    const exact = variants.find(v => v.dia_mm != null && Number(v.dia_mm) === Number(targetDia));
+    if (exact) return exact;
+  }
+
+  // Otherwise: pick the FIRST variant that has a real price
+  const firstPriced = variants.find(variantHasValidPrice);
+  if (firstPriced) return firstPriced;
+
+  // LAST RESORT: return the very first variant (but it will be handled as “quote”)
+  return variants[0];
+}
+
+
+      // ---------- Helpers for tags / product classification ----------
+      function normalizeTag(t) {
+        return String(t)
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, '');
+      }
+
+      function isEndmill(p) {
+        // Same logic you had before: has a Cutting Shape_ tag
+        return (p.tags || []).some((t) => /^Cutting Shape_/i.test(t));
+      }
+
+      function hasExcludedTag(p) {
+        const t = (p.tags || []).map(normalizeTag);
+        return t.includes('operationblinddrilling') || t.includes('operationthroughdrilling');
+      }
+
+      // ---------- Progress ----------
+      const setStep = (n) => {
+        step = n;
+        steps.forEach((s) => {
+          const active = Number(s.dataset.step) === n;
+          s.style.opacity = active ? 1 : 0;
+          s.style.pointerEvents = active ? 'auto' : 'none';
+          s.style.position = active ? 'relative' : 'absolute';
+          s.setAttribute('aria-hidden', String(!active));
+        });
+        bar.style.width = ((n - 1) / 5) * 100 + '%';
+        stepLabel.textContent = `Step ${n} of 5`;
+      };
+
+      // ---------- Wizard click wiring (unchanged) ----------
+      els('.es-op').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          els('.es-op').forEach((b) => b.setAttribute('aria-selected', 'false'));
+          btn.setAttribute('aria-selected', 'true');
+          selected.operationTag = btn.dataset.tag;
+          btn.closest('.es-step').querySelector('.es-next').disabled = false;
+        });
+      });
+
+      const MAT = JSON.parse(el('#es-vdi-table').textContent);
+
+      function deriveIsoCodes(product, tags) {
+        const allTags = Array.isArray(tags) ? tags : [];
+
+        const getIsosFromVdi = () => {
+          const allVdis = [];
+          const pushFromField = (val) => {
+            if (!val || typeof val !== 'string') return;
+            try {
+              const arr = JSON.parse(val);
+              if (Array.isArray(arr)) {
+                arr.forEach((n) => {
+                  const num = Number(n);
+                  if (!Number.isNaN(num)) allVdis.push(num);
+                });
+              }
+            } catch (e) {
+              // ignore parse errors
+            }
+          };
+
+          pushFromField(product.vdi_good);
+          pushFromField(product.vdi_excellent);
+
+          if (!allVdis.length) return [];
+
+          const isoSet = new Set();
+          allVdis.forEach((v) => {
+            const row = MAT.find((m) => m.vdi === v);
+            if (row && row.iso) isoSet.add(row.iso);
+          });
+          return Array.from(isoSet);
+        };
+
+        const getIsosFromTags = () => {
+          const isoSet = new Set();
+
+          const want = (regex, iso) => {
+            if (allTags.some((t) => regex.test(t))) isoSet.add(iso);
+          };
+
+          // P: steels
+          want(/Carbon Steels|Alloy Steels|Tool Steel|Wear Plate|Prehardened Steels/i, 'P');
+          // M: stainless
+          want(/Stainless Steels?/i, 'M');
+          // K: cast irons
+          want(/Cast Iron|Ductile Iron|Malleable Iron/i, 'K');
+          // N: non-ferrous / soft
+          want(/Aluminium|Aluminum|Copper|Brass|Bronze|Plastics?|Composites?|FRP|Non Metallic|Rubber|Wood/i, 'N');
+          // S: super alloys / Ti
+          want(/Inconel|Super Alloy|Titanium|Nickel|Cobalt/i, 'S');
+          // H: hardened
+          want(/Hardened Steels?|\(HRc[0-9]/i, 'H');
+
+          return Array.from(isoSet);
+        };
+
+        const isoFromVdi = getIsosFromVdi();
+        if (isoFromVdi.length) return isoFromVdi;
+
+        return getIsosFromTags();
+      }
+
+      const MATERIAL_BUCKETS = [
+        // P. Steels
+        {
+          id: 'P-mild-medium',
+          iso: 'P',
+          label: 'Mild & medium steels',
+          hint: 'e.g. 1018, 1020, 1045 bar and plate',
+          vdis: [1, 2, 3, 6, 7],
+        },
+        {
+          id: 'P-tool-alloy',
+          iso: 'P',
+          label: 'Tool & alloy steels',
+          hint: 'e.g. high carbon, O1, D2, H13 annealed or toughened',
+          vdis: [4, 5, 8, 10, 11],
+        },
+        {
+          id: 'P-wear-plate',
+          iso: 'P',
+          label: 'High strength & wear plate',
+          hint: 'e.g. Hardox, Bisalloy, wear plate',
+          vdis: [9],
+        },
+        // M. Stainless
+        {
+          id: 'M-304-316',
+          iso: 'M',
+          label: 'Stainless 304 / 316',
+          hint: 'Most general stainless sheet, bar, tube',
+          vdis: [14],
+        },
+        {
+          id: 'M-hard-stainless',
+          iso: 'M',
+          label: 'Harder stainless (420 / 431)',
+          hint: 'Knives, shafts, hardened stainless parts',
+          vdis: [12, 13],
+        },
+        // K. Cast irons
+        {
+          id: 'K-soft-iron',
+          iso: 'K',
+          label: 'Soft / normal cast iron',
+          hint: 'Grey iron, softer ductile iron',
+          vdis: [15, 17, 19],
+        },
+        {
+          id: 'K-hard-iron',
+          iso: 'K',
+          label: 'Hard cast & ductile iron',
+          hint: 'Hard pearlitic ductile or grey iron',
+          vdis: [16, 18, 20],
+        },
+        // N. Aluminium & soft metals
+        {
+          id: 'N-soft-aluminium',
+          iso: 'N',
+          label: 'Soft wrought aluminium',
+          hint: 'e.g. 1050, 5083 plate, extrusion',
+          vdis: [21],
+        },
+        {
+          id: 'N-hard-aluminium',
+          iso: 'N',
+          label: 'Heat treated aluminium 6061 / 7075',
+          hint: 'Stronger tempers like T6, T651',
+          vdis: [22],
+        },
+        {
+          id: 'N-cast-aluminium',
+          iso: 'N',
+          label: 'Cast aluminium',
+          hint: 'Engine blocks, sand or die castings',
+          vdis: [23, 24, 25],
+        },
+        {
+          id: 'N-brass-bronze',
+          iso: 'N',
+          label: 'Brass & bronze',
+          hint: 'Bushes, fittings, bearing bronze',
+          vdis: [26, 27],
+        },
+        { id: 'N-copper', iso: 'N', label: 'Copper', hint: 'Pure copper, electrical copper', vdis: [28] },
+        {
+          id: 'N-plastics',
+          iso: 'N',
+          label: 'Plastics, composites, wood',
+          hint: 'Plastics, FRP, laminates, timber',
+          vdis: [29, 30],
+        },
+        // S. Titanium & super alloys
+        {
+          id: 'S-superalloy-annealed',
+          iso: 'S',
+          label: 'Nickel & cobalt alloys. annealed',
+          hint: 'Inconel, Hastelloy before hard service',
+          vdis: [31, 33],
+        },
+        {
+          id: 'S-superalloy-hard',
+          iso: 'S',
+          label: 'Nickel & cobalt alloys. hardened',
+          hint: 'Inconel in service, turbine parts',
+          vdis: [32, 34, 35],
+        },
+        {
+          id: 'S-titanium',
+          iso: 'S',
+          label: 'Titanium alloys',
+          hint: 'Commercially pure and Ti-6Al-4V etc',
+          vdis: [36, 37],
+        },
+        // H. Hardened
+        {
+          id: 'H-hardened-steel-55',
+          iso: 'H',
+          label: 'Hardened steel around 55 HRC',
+          hint: 'Die steel. moulds. through hardened parts',
+          vdis: [38, 41],
+        },
+        {
+          id: 'H-hardened-steel-60',
+          iso: 'H',
+          label: 'Hardened steel around 60 HRC',
+          hint: 'Very hard tool steels. thin case hardened',
+          vdis: [39, 40],
+        },
+      ];
+
+      const isoCards = els('.es-iso-card');
+      const subgradeWrap = el('#es-material-subgrades');
+      const subgradeGrid = el('#es-material-grid');
+
+      isoCards.forEach((card) => {
+        card.addEventListener('click', () => {
+          const rawIso = card.dataset.iso || '';
+          const iso = rawIso.trim();
+
+          isoCards.forEach((c) => c.classList.remove('active'));
+          card.classList.add('active');
+
+          selected.iso = iso === 'ANY' ? null : iso;
+          selected.vdi = null;
+          selected.vdis = null;
+          selected.materialLabel = null;
+
+          if (iso === 'ANY') {
+            subgradeWrap.style.display = 'none';
+            card.closest('.es-step').querySelector('.es-next').disabled = false;
+            return;
+          }
+
+          const buckets = MATERIAL_BUCKETS.filter((b) => b.iso === iso);
+          const html = buckets
+            .map(
+              (b) =>
+                `<div class="material-group-card es-subgrade"
+                 data-iso="${iso}"
+                 data-bucket-id="${b.id}"
+                 data-vdis="${b.vdis.join('|')}"
+                 data-label="${b.label.replace(/"/g, '&quot;')}">
+                 <div class="mgc-title">${b.label}</div>
+                 <div class="mgc-examples">${b.hint}</div>
+               </div>`
+            )
+            .join('');
+
+          subgradeGrid.innerHTML = html;
+          subgradeWrap.style.display = 'block';
+
+          els('.es-subgrade', subgradeGrid).forEach((sub) => {
+            sub.addEventListener('click', () => {
+              els('.es-subgrade').forEach((s) => s.classList.remove('active'));
+              sub.classList.add('active');
+
+              const vdis = (sub.dataset.vdis || '')
+                .split('|')
+                .map((s) => Number(s.trim()))
+                .filter((n) => !Number.isNaN(n));
+
+              selected.vdis = vdis;
+              selected.materialBucketId = sub.dataset.bucketId || null;
+              selected.iso = iso; // keep ISO + bucket in sync
+              selected.materialLabel = sub.dataset.label || null;
+
+              card.closest('.es-step').querySelector('.es-next').disabled = false;
+            });
+          });
+        });
+      });
+
+      // === Editable summary ===
+      const summaryEl = el('#es-editable-summary');
+      const selOp = () => el('#es-sel-operation');
+      const selISO = () => el('#es-sel-iso');
+      const selMat = () => el('#es-sel-material');
+      const selSh = () => el('#es-sel-shape');
+      const selLen = () => el('#es-sel-length');
+      const selDia = () => el('#es-sel-dia');
+      const btnDiaC = () => el('#es-dia-clear');
+      const selType = () => el('#es-sel-type');
+
+      function buildMaterialOptions(currentBucketId, isoFilter) {
+        const opts = ['<option value="">Any</option>'];
+
+        MATERIAL_BUCKETS.filter((b) => !isoFilter || b.iso === isoFilter).forEach((b) => {
+          const sel = b.id === currentBucketId ? ' selected' : '';
+          const label = `${b.iso} · ${b.label}`;
+          opts.push(`<option value="${b.id}"${sel}>${label}</option>`);
+        });
+
+        selMat().innerHTML = opts.join('');
+      }
+
+      function syncSummaryFromState() {
+        selOp().value = selected.operationTag || '';
+        selISO().value = selected.iso || 'P';
+        buildMaterialOptions(selected.materialBucketId || '', selISO().value || null);
+        selSh().value = selected.shapeTag || '';
+        selDia().value = selected.diameter != null ? String(selected.diameter) : '';
+        selLen().value = selected.lengthTag || '';
+        selType().value = selected.typeTag || '';
+      }
+
+      function attachSummaryHandlersOnce() {
+        if (summaryEl.dataset.bound === '1') return;
+
+        const selSort = () => el('#es-sel-sort');
+
+        selSort().addEventListener('change', () => {
+          selected.sort = selSort().value;
+          queueResultsUpdate();
+        });
+
+        selOp().addEventListener('change', () => {
+          selected.operationTag = selOp().value || null;
+          queueResultsUpdate();
+        });
+
+        selType().addEventListener('change', () => {
+          selected.typeTag = selType().value || null;
+          if (selected.typeTag) {
+            selLen().value = '';
+            selected.lengthTag = null;
+          }
+          queueResultsUpdate();
+        });
+
+        selISO().addEventListener('change', () => {
+          const iso = selISO().value || null;
+          selected.iso = iso;
+          selected.materialBucketId = null;
+          selected.vdis = null;
+          selected.materialLabel = null;
+          buildMaterialOptions('', iso);
+          queueResultsUpdate();
+        });
+
+        selMat().addEventListener('change', () => {
+          const id = selMat().value;
+          if (!id) {
+            selected.materialBucketId = null;
+            selected.vdis = null;
+            selected.materialLabel = null;
+          } else {
+            const bucket = MATERIAL_BUCKETS.find((b) => b.id === id);
+            if (bucket) {
+              selected.materialBucketId = bucket.id;
+              selected.vdis = bucket.vdis.slice();
+              selected.iso = bucket.iso;
+              selISO().value = bucket.iso;
+              selected.materialLabel = bucket.label;
+            }
+          }
+          queueResultsUpdate();
+        });
+
+        selSh().addEventListener('change', () => {
+          selected.shapeTag = selSh().value || null;
+          queueResultsUpdate();
+        });
+
+        selLen().addEventListener('change', () => {
+          selected.lengthTag = selLen().value || null;
+          if (selected.lengthTag) {
+            selType().value = '';
+            selected.typeTag = null;
+          }
+          queueResultsUpdate();
+        });
+
+        selDia().addEventListener('input', () => {
+          const v = selDia().value.trim();
+          selected.diameter = v === '' ? null : Number(v);
+          queueResultsUpdate();
+        });
+
+        btnDiaC().addEventListener('click', () => {
+          selDia().value = '';
+          selected.diameter = null;
+          queueResultsUpdate();
+        });
+
+        summaryEl.dataset.bound = '1';
+      }
+
+      function showUpdateHint() {
+        const hint = document.getElementById('es-update-hint');
+        if (hint) {
+          hint.style.display = 'block';
+        }
+      }
+
+      let esUpdateTimer = null;
+      function queueResultsUpdate() {
+        if (esUpdateTimer) clearTimeout(esUpdateTimer);
+        esUpdateTimer = setTimeout(() => {
+          fetchAndRenderResults();
+          hideUpdateHint && hideUpdateHint(); // safe if exists
+        }, 350);
+      }
+
+      // Hide after new results load
+      function hideUpdateHint() {
+        const hint = document.getElementById('es-update-hint');
+        if (hint) {
+          hint.style.display = 'none';
+        }
+      }
+
+      function showSummary() {
+        summaryEl.style.display = 'block';
+        attachSummaryHandlersOnce();
+        syncSummaryFromState();
+      }
+
+      function clearSelectionsIn(stepEl) {
+        if (!stepEl) return;
+        Array.from(stepEl.querySelectorAll('[aria-selected]')).forEach((b) => b.setAttribute('aria-selected', 'false'));
+        Array.from(stepEl.querySelectorAll('input[type="number"],input[type="text"]')).forEach((i) => (i.value = ''));
+      }
+
+      function doFinish() {
+        setStep(4);
+        renderResults();
+        renderChips();
+        showSummary();
+        window.scrollTo({ top: el('#es-results').offsetTop - 20, behavior: 'smooth' });
+      }
+
+      els('.es-skip').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const stepEl = btn.closest('.es-step');
+          const n = Number(stepEl?.dataset.step || 0);
+
+          switch (n) {
+            case 1:
+              selected.operationTag = null;
+              break;
+            case 2:
+              selected.vdi = null;
+              selected.materialLabel = null;
+              break;
+            case 3:
+              selected.shapeTag = null;
+              break;
+            case 4:
+              selected.lengthTag = null;
+              selected.typeTag = null;
+              break;
+            case 5:
+              selected.diameter = null;
+              el('#es-dia').value = '';
+              clearSelectionsIn(stepEl);
+              doFinish();
+              return;
+          }
+
+          clearSelectionsIn(stepEl);
+          setStep(Math.min(5, n + 1));
+        });
+      });
+
+      els('.es-shape').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          els('.es-shape').forEach((b) => b.setAttribute('aria-selected', 'false'));
+          btn.setAttribute('aria-selected', 'true');
+          selected.shapeTag = btn.dataset.tag;
+          btn.closest('.es-step').querySelector('.es-next').disabled = false;
+        });
+      });
+
+      els('.es-length').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          els('.es-type').forEach((b) => b.setAttribute('aria-selected', 'false'));
+          selected.typeTag = null;
+
+          els('.es-length').forEach((b) => b.setAttribute('aria-selected', 'false'));
+          btn.setAttribute('aria-selected', 'true');
+          selected.lengthTag = btn.dataset.tag;
+
+          btn.closest('.es-step').querySelector('.es-next').disabled = false;
+        });
+      });
+
+      els('.es-type').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          els('.es-length').forEach((b) => b.setAttribute('aria-selected', 'false'));
+          selected.lengthTag = null;
+
+          els('.es-type').forEach((b) => b.setAttribute('aria-selected', 'false'));
+          btn.setAttribute('aria-selected', 'true');
+          selected.typeTag = btn.dataset.tag;
+
+          btn.closest('.es-step').querySelector('.es-next').disabled = false;
+        });
+      });
+
+      els('.es-next').forEach((b) => b.addEventListener('click', () => setStep(Math.min(5, step + 1))));
+      els('.es-prev').forEach((b) => b.addEventListener('click', () => setStep(Math.max(1, step - 1))));
+      el('.es-finish').addEventListener('click', () => {
+        // 1. Pull diameter from wizard input
+        const d = el('#es-dia').value.trim();
+        selected.diameter = d === '' ? null : Number(d);
+
+        // 2. Reflect into summary field immediately
+        selDia().value = d;
+
+        // 3. Move to step 5, show summary, fetch results
+        setStep(5);
+showSummary();
+
+// SHOW RESULTS SECTION
+document.getElementById('es-results').style.display = 'block';
+
+fetchAndRenderResults();
+
+window.scrollTo({
+  top: document.getElementById('es-results').offsetTop - 20,
+  behavior: 'smooth',
+});
+
+      });
+
+      el('#es-reset').addEventListener('click', () => {
+        selected.operationTag = null;
+        selected.iso = 'P';
+        selected.vdi = null;
+        selected.materialLabel = null;
+        selected.shapeTag = null;
+        selected.lengthTag = null;
+        selected.typeTag = null;
+        selected.diameter = null;
+
+        els('.es-op,.es-mat,.es-shape,.es-length,.es-type').forEach((b) => b.setAttribute('aria-selected', 'false'));
+        els('.es-next').forEach((n) => (n.disabled = true));
+        el('#es-dia').value = '';
+        el('#es-chips').style.display = 'none';
+        el('#es-grid').innerHTML = '';
+        el('#es-empty').style.display = 'none';
+        setStep(1);
+
+        summaryEl.style.display = 'none';
+        if (summaryEl.dataset.bound !== '1') attachSummaryHandlersOnce();
+        selOp().value = '';
+        selISO().value = 'P';
+        buildMaterialOptions('P', null);
+        selMat().value = '';
+        selSh().value = '';
+        selDia().value = '';
+        selLen().value = '';
+        selType().value = '';
+      });
+
+      // ---------- Filtering and rendering ----------
+
+      // card pricing + button state
+      // product is the Shopify product JSON. variant is the chosen variant for this card
+      function hydratePrice(card, product, variant) {
+        if (!card) return;
+
+        const incEl = card.querySelector('.ex-price__inc');
+        const exEl  = card.querySelector('.ex-price__ex');
+        const productUrl = product && product.handle ? `/products/${product.handle}` : '#';
+
+        // this will usually be the cloned "Add to Cart" button from the prototype
+        const btn =
+          card.querySelector('.add-to-cart-btn') ||
+          card.querySelector('.btn.btn--buyNow') ||
+          card.querySelector('.btn');
+
+        function toQuoteMode() {
+          // text line
+          if (incEl) {
+            incEl.textContent = 'Pricing available on request';
+          }
+          // remove EX GST row completely
+          if (exEl && exEl.parentElement) {
+            exEl.parentElement.removeChild(exEl);
+          }
+
+          // turn button into "Request Quote" link that goes to PDP
+          if (btn) {
+            btn.classList.remove('add-to-cart-btn');
+            btn.classList.add('is-quote');
+            btn.removeAttribute('data-variant-id');
+            btn.setAttribute('href', productUrl);
+            btn.style.background = '#f88d2b';
+            btn.style.color = '#fff';
+            btn.innerHTML = '<span style="display:flex;align-items:center;gap:10px;">Request Quote</span>';
+          }
+        }
+
+        // No variant or no real price. quote only
+        if (!variant || !variantHasValidPrice(variant)) {
+          toQuoteMode();
+          return;
+        }
+
+        // Variant has a real price
+        let cents = 0;
+        if (typeof variant.price === 'number') {
+          // cents
+          cents = variant.price;
+        } else if (variant.price && typeof variant.price.amount === 'string') {
+          // moneyV2
+          const n = Number(variant.price.amount);
+          if (!Number.isNaN(n)) cents = Math.round(n * 100);
+        }
+
+        // If we still did not get a usable price. treat as quote
+        if (!cents) {
+          toQuoteMode();
+          return;
+        }
+
+        const ex = cents / 100;         // ex GST
+        const inc = ex * 1.1;           // INC GST (10% GST)
+
+        if (incEl) {
+          incEl.innerHTML = `$${inc.toFixed(2)}<span class="inc-price__label">INC GST</span>`;
+        }
+        if (exEl) {
+          exEl.innerHTML = `$${ex.toFixed(2)}<span class="ex-price__label">EX GST</span>`;
+        }
+
+        // Make sure the button is an actual Add to Cart for this variant
+        if (btn) {
+          btn.classList.add('add-to-cart-btn');
+          btn.classList.remove('is-quote');
+          btn.setAttribute('href', 'javascript:void(0);');
+          btn.setAttribute('data-variant-id', String(variant.id));
+          btn.style.background = '#e0592a';
+          btn.style.color = '#fff';
+          btn.innerHTML = `
+            <span style="display:flex;align-items:center;gap:10px;">
+              <i
+                class="fa fa-cart"
+                style="content:url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Asset_Cart-white.png?v=1730169426);height:17px;"
+              ></i>
+              Add to Cart
+            </span>
+          `;
+        }
+      }
+
+
+      function hydrateQuickSpecs(card, product, variant) {
+        if (!product || !variant) return;
+
+        const root = card.querySelector('[data-vqs]');
+        if (!root) return;
+
+        const setVal = (selector, val) => {
+          const el = root.querySelector(selector);
+          if (!el) return;
+          el.textContent = val !== null && val !== undefined && val !== '' ? String(val) : '—';
+        };
+
+        // core variant geometry
+        setVal('[data-vqs__sku]', variant.sku || '');
+        setVal('[data-vqs__dia]', variant.dia_mm != null ? `${variant.dia_mm} mm` : '');
+        const shankDia =
+          variant.shank_diameter_mm_mf != null
+            ? variant.shank_diameter_mm_mf
+            : variant.shank_diameter_mm_opt != null
+            ? variant.shank_diameter_mm_opt
+            : null;
+
+        setVal('[data-vqs__shank]', shankDia != null ? `${shankDia} mm` : '');
+
+        setVal('[data-vqs__loc]', variant.length_of_cut_mm != null ? `${variant.length_of_cut_mm} mm` : '');
+
+        const tags = Array.isArray(product.tags) ? product.tags : [];
+
+        const findTagVal = (prefix) => {
+          const t = tags.find((tt) => tt.startsWith(prefix));
+          return t ? t.slice(prefix.length) : null;
+        };
+
+        const shankType = findTagVal('Shank Type_');
+        const chamferAngle = findTagVal('Chamfer Angle_');
+        const flutes = findTagVal('No. Flutes_');
+        const cornerRadius = findTagVal('Corner Radius_');
+
+        setVal('[data-vqs__shanktype]', shankType || '');
+        setVal('[data-vqs__flutes]', flutes || '');
+
+        // chamfer column: only show if we have a value
+        const chamferCol = root.querySelector('[data-vqs-chamfer]');
+        if (chamferAngle) {
+          setVal('[data-vqs__chamfer]', `${chamferAngle}°`);
+          if (chamferCol) chamferCol.style.display = '';
+        } else {
+          if (chamferCol) chamferCol.style.display = 'none';
+        }
+
+        // corner radius column: only show if we have a value
+        const crCol = root.querySelector('[data-vqs-cr]');
+        if (cornerRadius) {
+          setVal('[data-vqs__cr]', `${cornerRadius} mm`);
+          if (crCol) crCol.style.display = '';
+        } else {
+          if (crCol) crCol.style.display = 'none';
+        }
+
+        // operations
+        const opTags = tags.filter((t) => t.startsWith('Operation_')).map((t) => t.replace('Operation_', ''));
+        setVal('[data-vqs__ops]', opTags.join(', '));
+
+        // workpiece materials: ISO chips (P,M,K,N,S,H)
+        const matsEl = root.querySelector('.vqs-mats[data-vqs__mats]');
+        if (matsEl) {
+          const isoCodes = deriveIsoCodes(product, tags);
+          matsEl.innerHTML = '';
+          if (!isoCodes.length) {
+            matsEl.textContent = '—';
+          } else {
+            isoCodes.forEach((iso) => {
+              const span = document.createElement('span');
+              span.className = `material material-${iso}`;
+              span.textContent = iso;
+              matsEl.appendChild(span);
+            });
+          }
+        }
+
+        const stockEl = root.querySelector('[data-vqs__stock]');
+        if (stockEl) {
+          const isYG1 = Array.isArray(product.tags) && product.tags.some((t) => /yg-?1/i.test(t));
+
+          let status = 'grey';
+          let text = 'Quantity unavailable';
+
+          // Determine if variant has ANY inventory visibility at all
+          const managed =
+            variant.inventory_management ||
+            variant.inventory_policy ||
+            variant.inventory_quantity != null ||
+            variant.incoming != null;
+
+          if (managed) {
+            const q = Number(variant.inventory_quantity || 0);
+
+            if (q > 1) {
+              status = 'green';
+              text = 'In stock';
+            } else if (q > 0) {
+              status = 'orange';
+              text = 'Low stock';
+            } else {
+              if (variant.incoming && variant.next_incoming_date) {
+                status = 'blue';
+                text = 'Restocking';
+              } else if (variant.inventory_policy === 'continue') {
+                status = isYG1 ? 'yellow' : 'red';
+                text = isYG1 ? '5 days' : 'Order in';
+              } else {
+                status = 'red';
+                text = 'No stock';
+              }
+            }
+          }
+
+          stockEl.textContent = text;
+          stockEl.dataset.status = status;
+        }
+      }
+
+      function buildWorkerPayload() {
+        return {
+          shapeTag: selected.shapeTag,
+          operationTag: selected.operationTag,
+          // treat type/length as "flute" dimension server-side
+          typeTag: selected.typeTag,
+          lengthTag: selected.lengthTag,
+          diameter: selected.diameter,
+        };
+      }
+
+      async function fetchAndRenderResults() {
+        const grid = el('#es-grid');
+        grid.innerHTML = '';
+        el('#es-empty').style.display = 'block';
+        el('#es-empty').textContent = 'Loading products...';
+        PRODUCTS_READY = false;
+
+        const payload = buildWorkerPayload();
+        console.log('[ES] Sending payload to worker', payload);
+
+        try {
+          const res = await fetch('https://endmill-selector.marketingexcision.workers.dev/api/endmill-selector', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+
+          if (!res.ok) {
+            throw new Error('Bad status ' + res.status);
+          }
+
+          const json = await res.json();
+          console.log('[ES] Worker response', json);
+
+          PRODUCT_DATA = json.products || [];
+          DATASET = PRODUCT_DATA;
+          PRODUCTS_READY = true;
+
+          renderResults();
+          renderChips();
+        } catch (err) {
+          console.error('[ES] Worker error', err);
+          el('#es-empty').style.display = 'block';
+          el('#es-empty').textContent = 'Error loading products. Please try again.';
+          PRODUCTS_READY = false;
+        }
+      }
+
+      function productMatchesFilters(p) {
+        if (!p) return false;
+
+        const tags = Array.isArray(p.tags) ? p.tags : [];
+        const hasTag = (tag) => !tag || tags.includes(tag);
+
+        // Operation / Shape / Length / Type
+        if (!hasTag(selected.operationTag)) return false;
+        if (!hasTag(selected.shapeTag)) return false;
+        if (!hasTag(selected.lengthTag)) return false;
+        if (!hasTag(selected.typeTag)) return false;
+
+        const selectedVdis = Array.isArray(selected.vdis) ? selected.vdis : null;
+
+        // Material bucket (VDI groups)
+        if (selectedVdis && selectedVdis.length) {
+          function parseVdiList(val) {
+            if (!val) return [];
+
+            if (Array.isArray(val)) return val.map(Number).filter((n) => !isNaN(n));
+
+            if (typeof val === 'string' && val.trim().startsWith('[')) {
+              try {
+                const arr = JSON.parse(val);
+                if (Array.isArray(arr)) {
+                  return arr.map(Number).filter((n) => !isNaN(n));
+                }
+              } catch (e) {}
+            }
+
+            if (typeof val === 'string') {
+              return val
+                .split(',')
+                .map((x) => Number(x.trim()))
+                .filter((n) => !isNaN(n));
+            }
+
+            return [];
+          }
+
+          const good = parseVdiList(p.vdi_good);
+          const excellent = parseVdiList(p.vdi_excellent);
+          const allVdi = [...good, ...excellent];
+
+          if (!allVdi.length) {
+            return false;
+          }
+
+          const hasOverlap = selectedVdis.some((vdi) => allVdi.includes(vdi));
+          if (!hasOverlap) return false;
+        } else if (selected.iso) {
+          // ISO fallback when no bucket selected
+          const isoCodes = deriveIsoCodes(p, tags);
+          if (!isoCodes.includes(selected.iso)) return false;
+        }
+
+        // Diameter filtering
+        if (selected.diameter != null) {
+          const target = Number(selected.diameter);
+          const hasDia = (p.variants || []).some((v) => v.dia_mm != null && Number(v.dia_mm) === target);
+          if (!hasDia) return false;
+        }
+
+        return true;
+      }
+
+      // Used only for sorting. if there is no valid price we return Infinity so it sinks to the bottom
+      function getVariantPrice(variant) {
+        if (!variantHasValidPrice(variant)) return Infinity;
+
+        // cents number
+        if (typeof variant.price === 'number') {
+          return variant.price / 100;
+        }
+
+        // moneyV2 string amount
+        if (variant.price && typeof variant.price.amount === 'string') {
+          const n = Number(variant.price.amount);
+          return Number.isFinite(n) ? n : Infinity;
+        }
+
+        if (variant.compare_at_price && typeof variant.compare_at_price === 'number') {
+          return variant.compare_at_price / 100;
+        }
+
+        return Infinity;
+      }
+
+
+      function sortProducts(list) {
+        const mode = selected.sort;
+
+        if (!mode || mode === 'default') return list;
+
+        switch (mode) {
+          case 'alpha-asc':
+            return list.slice().sort((a, b) => a.title.localeCompare(b.title));
+
+          case 'alpha-desc':
+            return list.slice().sort((a, b) => b.title.localeCompare(a.title));
+
+          case 'price-asc':
+            // cheapest real prices first. quote only items sink to the bottom
+            return list.slice().sort((a, b) => {
+              const av = pickVariantForCard(a);
+              const bv = pickVariantForCard(b);
+              const ap = getVariantPrice(av);
+              const bp = getVariantPrice(bv);
+              return ap - bp;
+            });
+
+          case 'price-desc':
+            // highest price first. quote only items at the end
+            return list.slice().sort((a, b) => {
+              const av = pickVariantForCard(a);
+              const bv = pickVariantForCard(b);
+              const aHas = variantHasValidPrice(av);
+              const bHas = variantHasValidPrice(bv);
+
+              if (!aHas && !bHas) return 0;
+              if (!aHas) return 1;  // a goes after b
+              if (!bHas) return -1; // b goes after a
+
+              const ap = getVariantPrice(av);
+              const bp = getVariantPrice(bv);
+              return bp - ap;
+            });
+
+          default:
+            return list;
+        }
+      }
+
+
+      function renderResults() {
+        const grid = el('#es-grid');
+        grid.innerHTML = '';
+
+        if (!PRODUCTS_READY) {
+          el('#es-empty').style.display = 'block';
+          el('#es-empty').textContent = 'Loading products...';
+          return;
+        }
+
+        let matches = (DATASET || []).filter(productMatchesFilters);
+        matches = sortProducts(matches);
+
+        if (!matches || matches.length === 0) {
+          el('#es-empty').style.display = 'block';
+          el('#es-empty').textContent = 'No matching products. Loosen a filter or clear Diameter.';
+          return;
+        }
+
+        el('#es-empty').style.display = 'none';
+
+        const frag = document.createDocumentFragment();
+
+        matches.forEach((p) => {
+          let card;
+
+          if (protoCard) {
+            // clone the Liquid-rendered prototype card
+            card = protoCard.cloneNode(true);
+          } else {
+            // build a minimal card so we at least show something
+            card = document.createElement('div');
+            card.className = 'grid-item';
+
+            card.innerHTML = `
+    <a class="product-grid-item" href="#">
+      <div class="product-grid-image">
+        <div class="product-grid-image--centered">
+          <img class="product-image single" alt="">
+        </div>
+      </div>
+      <p class="font-bold cpgs_title"></p>
+    </a>
+  `;
+          }
+
+          const link =
+            card.querySelector('.product-grid-item') ||
+            card.querySelector('.product-grid-item__link') ||
+            card.querySelector('a');
+
+          if (link) {
+            // 1. basic wiring
+            link.href = `/products/${p.handle}`;
+            try {
+              link.setAttribute('data-product-json', JSON.stringify(p));
+            } catch (e) {
+              console.warn('[ES] Failed to stringify product JSON', e, p);
+            }
+
+            // 2. pick the variant this card should represent
+            const chosenVariant = pickVariantForCard(p);
+            if (chosenVariant) {
+              link.setAttribute('data-variant-id', String(chosenVariant.id));
+            }
+
+            // 3. optional context attributes
+            if (selected.operationTag) {
+              link.setAttribute('data-op-label', selected.operationTag);
+            }
+            if (selected.materialLabel) {
+              link.setAttribute('data-material-label', selected.materialLabel);
+            }
+
+                        // 4. hydrate price + specs for this specific variant
+            hydratePrice(card, p, chosenVariant);
+            hydrateQuickSpecs(card, p, chosenVariant);
+          }
+
+          const titleEl =
+            card.querySelector('.cpgs_title') ||
+            card.querySelector('.product-grid-item__title') ||
+            card.querySelector('p.font-bold');
+
+          if (titleEl) {
+            titleEl.textContent = p.title;
+          }
+
+          const badge = card.querySelector('.shopify-product-reviews-badge');
+          if (badge) {
+            badge.setAttribute('data-id', String(p.id));
+          }
+
+          // if your prototype card has an image, at least point it somewhere sensible
+          const frontImg =
+            card.querySelector('img.product-image.front') ||
+            card.querySelector('img.product-image.single') ||
+            card.querySelector('.product-grid-image img');
+
+          if (frontImg && p.featuredImage) {
+            frontImg.setAttribute('data-src', p.featuredImage);
+            frontImg.setAttribute('src', p.featuredImage);
+          }
+
+          const backImg = card.querySelector('img.product-image.back');
+          if (backImg) {
+            const hoverUrl = p.hoverImage || p.featuredImage || null;
+            if (hoverUrl) {
+              backImg.setAttribute('data-src', hoverUrl);
+              backImg.setAttribute('src', hoverUrl);
+            } else {
+              // no sensible second image. hide the back one
+              backImg.parentElement && backImg.parentElement.removeChild(backImg);
+            }
+          }
+
+          frag.appendChild(card);
+        });
+
+        grid.appendChild(frag);
+        el('#es-chips').style.display = 'flex';
+      }
+
+      function renderChips() {
+        const chipIso = el('#chip-iso');
+        if (selected.iso) {
+          chipIso.style.display = 'inline-grid';
+          chipIso.dataset.m = selected.iso;
+          chipIso.textContent = selected.iso;
+        } else {
+          chipIso.style.display = 'none';
+        }
+      }
+
+      // ---------- Debug helper for 4G coverage ----------
+      window.ES_DEBUG = window.ES_DEBUG || {};
+      window.ES_DEBUG.dump4G = function () {
+        const all = PRODUCT_DATA || [];
+        const inDataset = DATASET || [];
+
+        const all4g = all.filter(
+          (p) => /4g/i.test(p.title || '') || /4g/i.test(p.handle || '') || (p.tags || []).some((t) => /4g/i.test(t))
+        );
+
+        const dataset4g = inDataset.filter(
+          (p) => /4g/i.test(p.title || '') || /4g/i.test(p.handle || '') || (p.tags || []).some((t) => /4g/i.test(t))
+        );
+
+        console.log('[ES DEBUG] PRODUCT_DATA size:', all.length);
+        console.log('[ES DEBUG] 4G in PRODUCT_DATA:', all4g.length, all4g);
+        console.log('[ES DEBUG] DATASET size (endmills only):', inDataset.length);
+        console.log('[ES DEBUG] 4G in DATASET:', dataset4g.length, dataset4g);
+      };
+
+      // ---------- Boot ----------
+      setStep(1);
+    })();
+  </script>
+
+  <style>
+                        /* Wizard step transitions */
+                        .es-step{
+                          transition: opacity .35s ease, transform .35s ease;
+                          transform: translateY(0);
+                        }
+                        .es-step[aria-hidden="true"]{ transform: translateY(6px); }
+                        .rc-item[aria-selected="true"]{
+                          border: 2px solid var(--color-primary-orange) !important;
+                        }
+                        .rc-item__label.h5 {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        }
+                        button.rc-item {
+                        border-radius: 10px;
+                    }
+                    div#es-material-grid {
+                        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                    }
+                    button.rc-item.es-mat [data-iso="P"] {
+                        background: #0069a720;
+                    }
+                    .grid-item.large--one-quarter.medium-down--one-half{
+                    width: 100%;
+                    }
+                    .product-grid-image--centered {
+                        background: #f1f1f1;
+                        border-radius: 15px;
+                        margin-bottom: var(--space-5);
+                    }
+                    .btn.es-skip { background: transparent; border: 2px solid #e5e5e5; }
+                    .btn.es-skip:hover { background: #fafafa; }
+
+                    .material-groups {
+                  display: grid;
+                  grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
+                  gap: 16px;
+                  margin-top: 15px;
+                }
+
+                .material-group-card {
+                  border: 2px solid #e8e8e8;
+                  border-radius: 10px;
+                  padding: 15px;
+                  cursor: pointer;
+                  background: white;
+                  transition: all .18s ease;
+                }
+
+                .mgc-header {
+                  display: flex;
+                  gap: 10px;
+                  align-items: flex-start;
+                  margin-bottom: 8px;
+                }
+
+                .mgc-iso {
+                  background: #333;
+                  padding: 4px 8px;
+                  border-radius: 6px;
+                  font-size: 14px;
+                  color: white;
+            width: 29px;
+            display: flex;
+            justify-content: center;
+                }
+
+                .mgc-examples {
+                  font-size: 13px;
+                  color: #555;
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 6px;
+                }
+
+                .mgc-example {
+                  background: #f2f2f2;
+                  padding: 2px 7px;
+                  border-radius: 6px;
+                }
+
+                /* ISO colors. matched to your work-mat chips */
+            :root {
+              --iso-P: #0069a7;  /* Steels */
+              --iso-M: #f6b519;  /* Stainless */
+              --iso-K: #e0592a;  /* Cast irons */
+              --iso-N: #109954;  /* Non-ferrous */
+              --iso-S: #f88d2b;  /* Titanium & super alloys */
+              --iso-H: #666666;  /* Hardened */
+            }
+
+            /* Soft background + border tint by ISO */
+            .material-group-card[data-iso="P"] {
+              border-color: #0069a7;
+            }
+            .material-group-card[data-iso="M"] {
+              border-color: #f6b519;
+            }
+            .material-group-card[data-iso="K"] {
+              border-color: #e0592a;
+            }
+            .material-group-card[data-iso="N"] {
+              border-color: #109954;
+            }
+            .material-group-card[data-iso="S"] {
+              border-color: #f88d2b;
+            }
+            .material-group-card[data-iso="H"] {
+              border-color: #666666;
+            }
+
+            /* ISO badge inside the card uses the strong color */
+            .material-group-card[data-iso="P"] .mgc-iso { background: var(--iso-P); }
+            .material-group-card[data-iso="M"] .mgc-iso { background: var(--iso-M); }
+            .material-group-card[data-iso="K"] .mgc-iso { background: var(--iso-K); }
+            .material-group-card[data-iso="N"] .mgc-iso { background: var(--iso-N); }
+            .material-group-card[data-iso="S"] .mgc-iso { background: var(--iso-S); }
+            .material-group-card[data-iso="H"] .mgc-iso { background: var(--iso-H); }
+
+            .material-group-card[data-iso="P"].active { background: var(--iso-P); color: white; }
+            .material-group-card[data-iso="M"].active { background: var(--iso-M); color: white; }
+            .material-group-card[data-iso="K"].active { background: var(--iso-K); color: white; }
+            .material-group-card[data-iso="N"].active { background: var(--iso-N); color: white; }
+            .material-group-card[data-iso="S"].active { background: var(--iso-S); color: white; }
+            .material-group-card[data-iso="H"].active { background: var(--iso-H); color: white; }
+
+            .material-group-card[data-iso="P"].active .mgc-iso { background: white; color: black; }
+            .material-group-card[data-iso="M"].active .mgc-iso { background: white; color: black; }
+            .material-group-card[data-iso="K"].active .mgc-iso { background: white; color: black; }
+            .material-group-card[data-iso="N"].active .mgc-iso { background: white; color: black; }
+            .material-group-card[data-iso="S"].active .mgc-iso { background: white; color: black; }
+            .material-group-card[data-iso="H"].active .mgc-iso { background: white; color: black; }
+
+            .material-group-card[data-iso="P"].active .mgc-examples { color: white; }
+            .material-group-card[data-iso="M"].active .mgc-examples { color: white; }
+            .material-group-card[data-iso="K"].active .mgc-examples { color: white; }
+            .material-group-card[data-iso="N"].active .mgc-examples { color: white; }
+            .material-group-card[data-iso="S"].active .mgc-examples { color: white; }
+            .material-group-card[data-iso="H"].active .mgc-examples { color: white; }
+
+            /* Keep the orange “selected” language. but let ISO color peek through a bit */
+
+    .material-group-card.mgc-unknown.es-iso-card.active {
+    border-color: #e0592a;
+    }
+
+            .mgc-title {
+            font-family: 'Humanist777BT-Bold';
+        }
+
+        #es-results {
+  display: none;
+}
+
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "Endmill Product Selector",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Source collection",
+      "info": "All products to consider for filtering"
+    }
+  ],
+  "presets": [{ "name": "Endmill Product Selector" }]
+}
+{% endschema %}

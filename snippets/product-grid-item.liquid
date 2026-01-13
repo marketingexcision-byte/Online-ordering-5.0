@@ -1,0 +1,1652 @@
+{% render 'wcp_discount' with product %}
+{% assign current_variant = product.selected_or_first_available_variant %}
+{% render 'wcp_variant' with current_variant %}
+
+{% assign temp_wcp_v_price = wcp_v_price %}
+{% assign temp_wcp_v_compare_at_price = wcp_v_compare_at_price %}
+{% unless grid_item_width %}
+  {% assign grid_item_width = 'large--one-quarter medium-down--one-half' %}
+{% endunless %}
+
+{% unless image_size %}
+  {% assign image_size = '600x600' %}
+{% endunless %}
+
+{% unless current_collection %}
+  {% assign current_collection = collection %}
+{% endunless %}
+
+{% assign on_sale = false %}
+{% if wcp_compare_at_price > wcp_price %}
+  {% assign on_sale = true %}
+{% endif %}
+
+<div class="grid-item {{ grid_item_width }}{% if on_sale %} on-sale{% endif %}">
+  <a href="{{ product.url | within: current_collection }}" class="product-grid-item">
+    <div class="product-grid-image">
+      <div class="product-grid-image--centered">
+        {% if product.tags contains 'New'%}
+          <span class="new-badge font-bold">New</span>
+        {% endif %}
+        {% if product.tags contains 'YG-1' %}
+          <div
+            class="yg-logo-wrapper"
+            style="position: absolute; top: 0; right: 0; z-index: 10; padding: 15px; background: #d52e30; border-radius: 0px 15px;"
+          >
+            <img
+              src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/YG_Logo_White.png?v=1748387180"
+              alt="YG-1 Logo"
+              class="yg-logo"
+              style="max-width: 50px; height: auto;"
+              width="50px"
+            >
+          </div>
+        {% endif %}
+
+        {% if product.featured_image %}
+          {% assign first_image = product.featured_image %}
+
+          {% if product.images.size > 1 %}
+            {% assign second_image = product.images[1] %}
+            <div class="product-image-wrapper">
+              <!-- First (Default) Image -->
+              <img
+                class="product-image front lazyload"
+                data-src="{{ first_image | img_url: '540x' }}"
+                data-widths="[125, 180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                data-sizes="auto"
+                alt="{{ first_image.alt | escape }}"
+              >
+
+              <!-- Second (Hover) Image -->
+              <img
+                class="product-image back lazyload"
+                data-src="{{ second_image | img_url: '540x' }}"
+                data-widths="[125, 180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                data-sizes="auto"
+                alt="{{ second_image.alt | escape }}"
+              >
+            </div>
+          {% else %}
+            <div class="product-image-wrapper" style="transition: none;">
+              <!-- Single Image (No Hover Effect) -->
+              <img
+                class="product-image single lazyload"
+                data-src="{{ first_image | img_url: '540x' }}"
+                data-widths="[125, 180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                data-sizes="auto"
+                alt="{{ first_image.alt | escape }}"
+              >
+            </div>
+          {% endif %}
+        {% else %}
+          <div>
+            <img
+              class="product-placeholder-image"
+              src=" https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Excision_Logo_2025.svg?v=1745463654"
+              alt="Excision"
+            >
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <p class="font-bold {% if product.metafields.custom.title.value != blank %} cpgs_title{% endif %}">
+      {{ product.title }}
+    </p>
+    {% if product.metafields.custom.title.value != blank %}
+      <span class="secondary--product_title ">{{ product.metafields.custom.title }}</span>
+    {% endif %}
+
+    <!-- Start of Judge.me code --> 
+  <div class='jdgm-widget jdgm-preview-badge' data-id='{{ product.id }}'> 
+    {{ product.metafields.judgeme.badge }} 
+  </div> 
+<!-- End of Judge.me code -->
+
+
+    <div class="product-item--price">
+      <span class="medium--left">
+{% if on_sale %}
+  <span class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+{% else %}
+  <span class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+{% endif %}
+
+{%- comment -%} === PRICE BLOCK (INC dominant + small EX) === {%- endcomment -%}
+{%- assign is_matrix = false -%}
+{%- if product.metafields.custom.price_matrix.value != blank or product.metafields.custom.price_matrix != blank -%}
+  {%- assign is_matrix = true -%}
+{%- endif -%}
+
+{%- assign taxable  = product.selected_or_first_available_variant.taxable | default: true -%}
+
+{%- if is_matrix -%}
+{%- comment -%} Parse minimum price from the matrix text (robust) {%- endcomment -%}
+{%- assign raw = product.metafields.custom.price_matrix.value | default: product.metafields.custom.price_matrix -%}
+{%- assign text = raw | strip | replace: '\r\n', '\n' | replace: '\r', '\n' -%}
+{%- assign lines = text | split: '\n' -%}
+{%- assign header = lines.first | default: '' -%}
+
+{%- capture tab %}	{% endcapture %}{% comment %} real tab {% endcomment %}
+{%- assign comma_cols = header | split: ',' | size -%}
+{%- assign tab_cols   = header | split: tab | size -%}
+{%- assign delim = ',' -%}
+{%- if tab_cols > comma_cols -%}{%- assign delim = tab -%}{%- endif -%}
+
+{%- assign cols = header | split: delim -%}
+{%- assign price_col = -1 -%}
+{%- for c in cols -%}
+  {%- assign k = c | strip | downcase -%}
+  {%- if price_col < 0 -%}
+    {%- if k == 'price' or k contains 'web price' or k contains 'price 1+' or k contains 'inc gst' or k contains 'ex gst' or k contains 'price inc' or k contains 'price ex' -%}
+      {%- assign price_col = forloop.index0 -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- assign min_price_cents = blank -%}
+{%- if price_col >= 0 -%}
+  {%- for l in lines offset:1 -%}
+    {%- assign parts = l | split: delim -%}
+    {%- if parts.size != cols.size -%}{% continue %}{%- endif -%}{% comment %} skip malformed rows {% endcomment %}
+
+    {%- assign rawp = parts[price_col] | default: '' -%}
+    {%- assign p = rawp | strip | remove: 'AU$' | remove: '$' | replace: ',', '' -%}
+    {%- if p == '' -%}{% continue %}{%- endif -%}{% comment %} empty price cell {% endcomment %}
+
+    {%- assign cents = p | plus: 0 | times: 100 | round -%}
+    {%- if cents > 0 -%}
+      {%- if min_price_cents == blank or cents < min_price_cents -%}
+        {%- assign min_price_cents = cents -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+
+
+  {%- if min_price_cents != blank -%}   {# or: if min_price_cents > 0 #}
+    {%- assign from_ex  = min_price_cents -%}
+    {%- assign from_inc = min_price_cents -%}
+    {%- if taxable -%}
+      {%- if shop.taxes_included -%}
+        {%- assign from_inc = min_price_cents -%}
+        {%- assign from_ex  = min_price_cents | times: 10 | divided_by: 11 -%}
+      {%- else -%}
+        {%- assign from_ex  = min_price_cents -%}
+        {%- assign from_inc = min_price_cents | times: 11 | divided_by: 10 -%}
+      {%- endif -%}
+    {%- endif -%}
+
+    <span class="ex-price ex-price--stack from-price">
+      <strong class="ex-price__inc">
+  From&nbsp;{{ from_inc | money }}<span class="inc-price__label">INC GST</span>
+</strong>
+{% if taxable %}
+  <div class="ex-price__ex">
+    From&nbsp;{{ from_ex | money }} <span class="ex-price__label">EX GST</span>
+  </div>
+{% endif %}
+
+    </span>
+{%- else -%}
+  {%- comment -%} Fallback if matrix couldn’t be parsed — find lowest non-zero variant price instead of $0 {%- endcomment -%}
+  {%- assign safe_min = blank -%}
+  {%- for v in product.variants -%}
+    {%- if v.price > 0 -%}
+      {%- if safe_min == blank or v.price < safe_min -%}{%- assign safe_min = v.price -%}{%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- if safe_min != blank -%}
+    {%- assign ex_cents  = safe_min -%}
+    {%- assign inc_cents = safe_min -%}
+    {%- if taxable -%}
+      {%- if shop.taxes_included -%}
+        {%- assign ex_cents  = safe_min | times: 10 | divided_by: 11 -%}
+      {%- else -%}
+        {%- assign inc_cents = safe_min | times: 11 | divided_by: 10 -%}
+      {%- endif -%}
+    {%- endif -%}
+    <span class="ex-price ex-price--stack from-price">
+      <strong class="ex-price__inc">
+  From&nbsp;{{ inc_cents | money }}<span class="inc-price__label">INC GST</span>
+</strong>
+{% if taxable %}
+  <div class="ex-price__ex">
+    From&nbsp;{{ ex_cents | money }} <span class="ex-price__label">EX GST</span>
+  </div>
+{% endif %}
+
+    </span>
+  {%- else -%}
+    <span class="ex-price ex-price--stack from-price">
+      <strong class="ex-price__inc">Select your blade</strong>
+    </span>
+  {%- endif -%}
+{%- endif -%}
+
+
+{%- else -%}
+  {%- comment -%} Normal products — min/max across variants {%- endcomment -%}
+  {%- assign min_price_cents = nil -%}
+  {%- assign max_price_cents = nil -%}
+  {%- for v in product.variants -%}
+    {%- if v.price > 0 -%}
+      {%- if min_price_cents == nil or v.price < min_price_cents -%}{%- assign min_price_cents = v.price -%}{%- endif -%}
+      {%- if max_price_cents == nil or v.price > max_price_cents -%}{%- assign max_price_cents = v.price -%}{%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- if min_price_cents -%}
+    {% assign show_from = false %}
+{% if product.variants.size > 1 and min_price_cents != max_price_cents %}
+  {% assign show_from = true %}
+{% endif %}
+
+
+    {%- assign ex_cents  = min_price_cents -%}
+    {%- assign inc_cents = min_price_cents -%}
+    {%- if taxable -%}
+      {%- if shop.taxes_included -%}
+        {%- assign inc_cents = min_price_cents -%}
+        {%- assign ex_cents  = min_price_cents | times: 10 | divided_by: 11 -%}
+      {%- else -%}
+        {%- assign ex_cents  = min_price_cents -%}
+        {%- assign inc_cents = min_price_cents | times: 11 | divided_by: 10 -%}
+      {%- endif -%}
+    {%- endif -%}
+
+    <span class="ex-price ex-price--stack {%- if show_from -%}from-price{%- endif -%}">
+      <strong class="ex-price__inc">
+  {%- if show_from -%}From&nbsp;{%- endif -%}{{ inc_cents | money }}<span class="inc-price__label">INC GST</span>
+</strong>
+{% if taxable %}
+  <div class="ex-price__ex">
+    {%- if show_from -%}From&nbsp;{%- endif -%}{{ ex_cents | money }} <span class="ex-price__label">EX GST</span>
+  </div>
+{% endif %}
+
+    </span>
+{%- else -%}
+  {%- comment -%} No non-zero variant prices → show a request label instead of $0.00 {%- endcomment -%}
+  <span class="ex-price ex-price--stack from-price">
+    <strong class="ex-price__inc">Pricing available on request</strong>
+  </span>
+{%- endif -%}
+{%- endif -%}
+
+</span>
+
+      <style>
+                  .product-item--price small {
+                    font-size: 18px;
+                  }
+                  .product-item--price small:hover {
+                    color: black;
+                  }
+                  div.product-item--price {
+                    text-align: left;
+                  }
+                  .product-item--price span {
+                    display: flex;
+                    line-height: unset;
+                    flex-direction: column;
+                  }
+                  a:hover {
+                    color: unset;
+                  }
+                  /* default: no footprint */
+        .icon-container{
+          min-height: 0;
+          position: absolute;
+        }
+
+        /* show + space only when it actually has element children */
+        .icon-container:has(> *){
+          position: relative;
+        }
+
+        /* fallback for older browsers; may miss whitespace-only nodes */
+        .icon-container:empty{ display:none; }
+      
+        .card-variants {
+          margin-bottom: 15px;
+        }
+
+        .card-variants-label {
+            font-size: 16px !important;
+            font-weight: 400 !important;
+            color: #666666;
+            margin-bottom: 7px !important;
+            text-align: start;
+        }
+
+        .card-variants-chips {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 9px;
+        }
+
+        .variant-chip {
+            padding: 8px 12px;
+            border: 2px solid #e8e8e8;
+            border-radius: 99px;
+            white-space: nowrap;
+            line-height: 1;
+            min-height: 40px;
+            align-content: center;
+        }
+
+        .variant-chip--more {
+            color: #666666;
+            border: 2px solid #f1f1f1;
+        }
+      </style>
+
+      {% if product.selected_or_first_available_variant.available
+        and product.selected_or_first_available_variant.unit_price_measurement
+      %}
+        {% render 'product-unit-price', variant: product.selected_or_first_available_variant %}
+      {% endif %}
+    </div>
+
+{% render 'auto-discount-note', product: product %}
+
+
+    {% assign first_opt = product.options_with_values | first %}
+    {% if first_opt %}
+      {% assign vals = first_opt.values | uniq %}
+      {% assign opt_name = first_opt.name | strip %}
+
+      {% unless vals.size == 1 and vals.first == 'Default Title' %}
+        <div class="card-variants">
+          <div class="card-variants-label">
+            Available in{% if opt_name and opt_name != 'Title' %} {{ opt_name }}{% endif %}
+          </div>
+
+          <div class="card-variants-chips">
+            {% for v in vals limit: 3 %}
+              <span class="variant-chip">{{ v }}</span>
+            {% endfor %}
+
+            {% assign extra = vals.size | minus: 3 %}
+            {% if extra > 0 %}
+              <span class="variant-chip variant-chip--more">+{{ extra }}</span>
+            {% endif %}
+          </div>
+        </div>
+      {% endunless %}
+    {% endif %}
+
+    {% comment %}
+      {% if product.variants.first.sku %}
+        <p style="padding-top: 0; font-size: 17px; color: #666666;">{{ product.variants.first.sku }}</p>
+      {% endif %}
+    {% endcomment %}
+
+    {% if section.settings.product_reviews_enable %}
+      <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+    {% endif %}
+
+{% assign total_qty = 0 %}
+{% assign any_managed = false %}
+{% assign any_available = false %}
+{% assign any_continue = false %}
+{% assign any_incoming = false %}
+{% assign next_date = blank %}
+
+{% assign is_yg1 = false %}
+{% if product and product.tags and product.tags contains 'YG-1' %}
+  {% assign is_yg1 = true %}
+{% endif %}
+
+{% for v in product.variants %}
+  {% if v.inventory_management %}
+    {% assign any_managed = true %}
+    {% assign total_qty = total_qty | plus: v.inventory_quantity %}
+  {% endif %}
+  {% if v.available %}{% assign any_available = true %}{% endif %}
+  {% if v.inventory_policy == 'continue' %}{% assign any_continue = true %}{% endif %}
+  {% if v.incoming and v.next_incoming_date %}
+    {% assign any_incoming = true %}
+    {% assign next_date = v.next_incoming_date %}
+  {% endif %}
+{% endfor %}
+
+{% assign status = '' %}
+{% capture status_text %}
+  {% if any_managed %}
+    {% if total_qty > 5 %}
+      {% assign status = 'green' %}In stock
+    {% elsif total_qty > 0 %}
+      {% assign status = 'orange' %}Low stock
+    {% else %}
+      {% if any_incoming and next_date %}
+        {% assign status = 'blue' %}Restocking
+        {% comment %} If you want the due date, swap the line above for:
+           {% assign status = 'blue' %}Restocking · Due {{ next_date | date: "%-d %b %Y" }}
+        {% endcomment %}
+      {% elsif any_continue %}
+        {% if is_yg1 %}
+          {% assign status = 'yellow' %}5 days
+        {% else %}
+          {% assign status = 'red' %}Order in
+        {% endif %}
+      {% else %}
+        {% assign status = 'red' %}No stock
+      {% endif %}
+    {% endif %}
+  {% else %}
+    {% assign status = 'grey' %}Quantity unavailable
+  {% endif %}
+{% endcapture %}
+
+
+    <div class="ex-card-badge" data-status="{{ status | strip }}">
+      {{ status_text | strip }}
+    </div>
+  </a>
+
+  <div class="icon-container">
+    {% if product.tags contains 'Ball Radius Tolerance_0.001-0.005' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/0.001-0.005_radius_4a843657-7968-4759-ae72-3e04d7dc927a.png?v=1762808199">
+    {% endif %}
+    {% if product.tags contains 'Ball Radius Tolerance_0.02' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/0.02_radius_e43c1422-3201-47a8-8ad4-eb556cf51972.png?v=1762808199">
+    {% endif %}
+    {% if product.tags contains 'Corner Radius Tolerance_0.01' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/0.01_corner_radius_c27e4d36-a8ff-40e5-83dc-90969afd0261.png?v=1762808199">
+    {% endif %}
+    {% if product.tags contains 'Ball Radius Tolerance_0.01' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/0.01_radius_3a63cb67-1238-4d1a-9aa8-c722ac755407.png?v=1762808199">
+    {% endif %}
+    {% if product.tags contains 'Corner Radius Tolerance_0.02' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/0.02_corner_radius_8e07cc38-94a0-4df8-b131-ffc1ceaf543b.png?v=1762808200">
+    {% endif %}
+    {% if product.tags contains 'Ball Radius Tolerance_0.03-0.007' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/0.03-0.007_radius_8e510bc5-6705-4f81-88b0-4a78bf7692f1.png?v=1762808200">
+    {% endif %}
+    {% if product.tags contains 'Corner Radius Tolerance_0.005' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/0.005_corner_radius_a4f477d0-550d-417c-8ea6-4e41ec8583e5.png?v=1762808200">
+    {% endif %}
+    {% if product.tags contains 'Corner Radius Tolerance_0.015' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/0.015_corner_radius_8f3ac315-ff99-4d9f-9c6c-6e4a79881a51.png?v=1762808200">
+    {% endif %}
+    {% if product.tags contains 'No. Flutes_1' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/1_flute_fa0fc352-7e2b-45a5-8de1-3d62e3a5335f.png?v=1762808200">
+    {% endif %}
+    {% if product.tags contains 'No. Flutes_2' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/2_flutes_b7d1f67a-9096-41a9-81d9-c7d6e4965de9.png?v=1762808201">
+    {% endif %}
+    {% if product.tags contains 'No. Flutes_3' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/3_flutes_13eba11d-0d8f-44b9-bd40-1b6dd13efe0c.png?v=1762808201">
+    {% endif %}
+    {% if product.tags contains 'No. Flutes_5' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/No._Flutes_5_022de08c-710a-4598-8356-100fa6f0ea25.png?v=1762808214"
+        alt="No. Flutes 5"
+      >
+    {% endif %}
+    {% if product.tags contains 'No. Flutes_3-5' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/3-5_flutes_a7545bd6-a2d8-47f6-892d-17bdc74c088c.png?v=1762808201">
+    {% endif %}
+    {% if product.tags contains 'No. Flutes_4 & 6' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/4-6_flutes_914d17d3-af10-4444-afb9-c70656d448a6.png?v=1762808202">
+    {% endif %}
+    {% if product.tags contains 'No. Flutes_4' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/4_flutes_5cd966dd-b1fe-44ee-8f01-493252a31ab8.png?v=1762808201">
+    {% endif %}
+    {% if product.tags contains 'No. Flutes_4 & 5' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/4-5_flutes_4085df67-4f7a-4999-b4b1-1d93fcbb23ab.png?v=1762808201"
+        alt="YG-1 LEGEND 4-5 flutes"
+      >
+    {% endif %}
+    {% if product.tags contains 'No. Flutes_4-6' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/4-6_flutes_914d17d3-af10-4444-afb9-c70656d448a6.png?v=1762808202"
+        alt="YG-1 LEGEND 4-6 flutes"
+      >
+    {% endif %}
+    {% if product.tags contains 'No. Flutes_6 & 8' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/6_8_flutes_4182695e-c69d-472d-b339-ebbc972c53ed.png?v=1762808202"
+        alt="YG-1 LEGEND 6 & 8 flutes"
+      >
+    {% endif %}
+    {% if product.tags contains 'No. Flutes_6' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/6_flutes_3c145b5d-f14b-4d79-9395-87314f9293fc.png?v=1762808202"
+        alt="YG-1 LEGEND 6 flutes"
+      >
+    {% endif %}
+    {% if product.tags contains 'No. Flutes_12' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/12_flutes_e1d12e2f-001d-4e15-b324-908353c29ba6.png?v=1762808203"
+        alt="YG-1 LEGEND 12 flutes"
+      >
+    {% endif %}
+    {% if product.tags contains 'Morse Taper Shank_1-2' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/1_2_cc796800-aa7b-4b79-aab1-36eafcb5ed46.png?v=1762808200">
+    {% endif %}
+    {% if product.tags contains 'Morse Taper Shank_1-3' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/1_3_c814cf29-c761-4521-93c9-03f9e2ce4865.png?v=1762808200">
+    {% endif %}
+    {% if product.tags contains 'Morse Taper Shank_1-4' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/1_4_5ff0ffea-eede-4cee-85bd-e9fdfcbcb5c4.png?v=1762808201">
+    {% endif %}
+    {% if product.tags contains 'Morse Taper Shank_1-5' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/1_5_8980a06c-501e-4c17-ba0b-47e47aee5fb5.png?v=1762808200">
+    {% endif %}
+    {% if product.tags contains 'Morse Taper Shank_1-6' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/1_6_ebcdaa3e-e2c9-462f-b770-179995829c80.png?v=1762808200">
+    {% endif %}
+    {% if product.tags contains 'Morse Taper Shank_2-4' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/2_4_56f9771d-12d8-4329-9d66-c51073b0ed39.png?v=1762808201">
+    {% endif %}
+    {% if product.tags contains 'Morse Taper Shank_MT1' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MT_1_2dfe3653-a94c-4d9a-960e-effb8475fe09.png?v=1762808213"
+        alt="YG-1 LEGEND MT#1"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Class_1B' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/1B_98ac29aa-5aac-4ea2-b0ba-74fb2ccc4242.png?v=1762808201">
+    {% endif %}
+    {% if product.tags contains 'Balancing Grade_2.5G' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/2.5G_604f81d0-e509-46ed-931e-81d0173b683d.png?v=1762808201">
+    {% endif %}
+    {% if product.tags contains 'Thread Form_2.5P' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/2.5P_a0471c70-2688-4f23-8d84-b12d68125861.png?v=1762808201">
+    {% endif %}
+    {% if product.tags contains 'Thread Class_2B' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/2B_2d19a47d-fa96-4706-94ab-caaa1c983b60.png?v=1762808201">
+    {% endif %}
+    {% if product.tags contains 'Thread Class_2BX' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/2BX_dd00952c-e527-41e3-a125-4cbb6179be36.png?v=1762808201">
+    {% endif %}
+    {% if product.tags contains 'Thread Form_2P-3P' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/2P_3P_75760866-12ec-4b44-8442-18993bf4eb8e.png?v=1762808201">
+    {% endif %}
+    {% if product.tags contains 'Runout_3µm' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/3_um_a0187153-959e-43e8-b857-7d5fe1de229b.png?v=1762808202">
+    {% endif %}
+    {% if product.tags contains 'Thread Class_3B' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/3B_c6173cc3-c095-4271-a67d-78c25da19f82.png?v=1762808201">
+    {% endif %}
+    {% if product.tags contains 'Thread Class_4H' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/4H_599ae030-c01d-4895-a4c9-fd6a7a253bfc.png?v=1762808202"
+        alt="YG-1 LEGEND 4H"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Form_4P-5P' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/4P_5P_1f54118e-d472-4292-9517-93f9177423c2.png?v=1762808202"
+        alt="YG-1 LEGEND 4P~5P"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Form_5P' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/5P_1734f6d6-a8e5-41c7-b271-d945a222192f.png?v=1762808203" alt="YG-1 LEGEND 5P">
+    {% endif %}
+
+    {% if product.tags contains 'Balancing Grade_6.3G' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/6.3G_3675464a-48dd-459e-86ca-1f7a87c46f0b.png?v=1762808202"
+        alt="YG-1 LEGEND 6.3G"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Class_6G' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/6G_28a871a4-6a0d-4769-910e-a39090c553c5.png?v=1762808202"
+        alt="YG-1 LEGEND 6G"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Class_6H Mod' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/6H_MOD_14fdb785-d20c-42c2-bdcc-a313ec6e5401.png?v=1762808202"
+        alt="YG-1 LEGEND 6H MOD"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Class_6H' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/6H.png?v=1734557877" alt="YG-1 LEGEND 6H">
+    {% endif %}
+    {% if product.tags contains 'Thread Class_6H+0.1' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/6H_0.1_30c55fa9-4ae3-4404-b7a5-a52cface2b45.png?v=1762808203"
+        alt="YG-1 LEGEND 6H+0.1"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Class_6HX' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/6HX_243675e5-a049-4062-b111-1eb5b8e5f6f6.png?v=1762808203"
+        alt="YG-1 LEGEND 6HX"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Class_7G' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/7G_818cef17-814b-4f09-be5f-edd1aed395b1.png?v=1762808203" alt="YG-1 LEGEND 7G">
+    {% endif %}
+    {% if product.tags contains 'Thread Class_II' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/II_542b6724-2939-4bec-8c96-822a026b6bcf.png?v=1762808212"
+        alt="YG-1 LEGEND II"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Class_YH' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/YH_d72a1e2f-5a0a-4787-aa22-218c3a5f90e7.png?v=1762808245"
+        alt="YG-1 LEGEND YH"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Class_Over Size' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/OVER_SIZE_a5f0da68-7ac5-41fa-8447-07d4bc48e037.png?v=1762808215"
+        alt="YG-1 LEGEND OVER SIZE"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Form_B' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/FORM_B_68e20af7-e28c-43a0-a72c-4c252e0beb66.png?v=1762808207"
+        alt="YG-1 LEGEND FORM B"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Form_C' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/FORM_C_b2aaaf42-57b6-4c7d-b5ef-beccc98445a4.png?v=1762808208"
+        alt="YG-1 LEGEND FORM C"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Form_D' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/FORM_D_bccdf9f9-86aa-4b51-a978-311bf40488cf.png?v=1762808208"
+        alt="YG-1 LEGEND FORM D"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Form_E' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/FORM_E_a76d0a01-f6db-4e19-af52-5720b204c5ea.png?v=1762808208"
+        alt="YG-1 LEGEND FORM E"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Form_Long' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/LONG_870ba3e1-7d84-496b-870d-5c59c1a68092.png?v=1762808212"
+        alt="YG-1 LEGEND LONG"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Shape_M' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/M_2e04bc66-6c69-4504-938d-a008abde76d1.png?v=1762808213"
+        alt="YG-1 LEGEND M"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Shape_PS' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/PS_330f10bd-0d98-44a5-ba5e-93cfe168341a.png?v=1762808215"
+        alt="YG-1 LEGEND PS"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Shape_MF' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MF_bbf278bf-a9bc-453f-add2-13c5d99d2ec0.png?v=1762808213"
+        alt="YG-1 LEGEND MF"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Shape_G' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/G_dcbfc13e-e2de-4fe1-81df-c1ea2614f56b.png?v=1762808208"
+        alt="YG-1 LEGEND G"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Shape_M/MF' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/M-MF_647d8efc-4758-48e0-8f8d-8718989a81f5.png?v=1762808213"
+        alt="YG-1 LEGEND M-MF"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Shape_NPT' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/NPT_d0669da4-c8c6-4f7f-ac00-9fec14284199.png?v=1762808214"
+        alt="YG-1 LEGEND NPT"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Shape_UNC' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/UNC_88996900-99bc-45ad-90c9-4049c2373ca4.png?v=1762808245"
+        alt="YG-1 LEGEND UNC"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Shape_UNF' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/UNF_414abb52-fbfe-4ec8-93c8-c9cb8967bbd5.png?v=1762808245"
+        alt="YG-1 LEGEND UNF"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Shape_W' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/W_378bd2f8-231f-4015-b121-ce0e0a66efb4.png?v=1762808245"
+        alt="YG-1 LEGEND W"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Angle_55' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/55_e4e794de-0ac6-44b5-898c-cb120eb43b62.png?v=1762808203"
+        alt="YG-1 LEGEND 55°"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Angle_60' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/60_2877ef74-2226-46ea-a2dd-09b1afb46ef1.png?v=1762808203"
+        alt="YG-1 LEGEND 60°"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Direction_RH' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/RH_THREAD_ec5f7767-08af-4062-ade5-fae340b435fd.png?v=1762808215"
+        alt="YG-1 LEGEND RH THREAD"
+      >
+    {% endif %}
+    {% if product.tags contains 'Thread Direction_RH/LH' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/RH-LH_THREAD_eda9ad92-c1ee-439d-ab86-5b87da202192.png?v=1762808215"
+        alt="YG-1 LEGEND RH-LH THREAD"
+      >
+    {% endif %}
+    {% if product.tags contains 'Chamfer Angle_15' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/14_CHAMFER_ANGLE_e131efb6-4638-4799-84e8-83267c76c1b2.png?v=1762808203"
+        alt="YG-1 LEGEND 15 CHAMFER ANGLE"
+      >
+    {% endif %}
+    {% if product.tags contains 'Chamfer Angle_45' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/45_CHAMFER_ANGLE_cf5c7577-043c-4b88-9191-aa0ca199ac15.png?v=1762808203"
+        alt="YG-1 LEGEND 45 CHAMFER ANGLE"
+      >
+    {% endif %}
+
+    {% if product.tags contains 'RPM_15,000' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/15000_RPM_96c301e0-8bf1-4773-9225-5a2680546254.png?v=1762808204"
+        alt="YG-1 LEGEND 15000 RPM"
+      >
+    {% endif %}
+    {% if product.tags contains 'RPM_25,000' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/25000_RPM_67b2dd3f-605a-4f06-8e14-5465dae962c3.png?v=1762808204"
+        alt="YG-1 LEGEND 25000 RPM"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_Aluminium Titanium Nitride Coating' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/AlTiN_65be3e2e-e3c8-4616-b7cd-a4b45012d139.png?v=1762808204"
+        alt="YG-1 LEGEND AlTiN"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_YG-1 Blue Coating' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/BLUE_993f5e0d-dafa-4dc0-8c92-a56f7483c055.png?v=1762808204"
+        alt="YG-1 LEGEND BLUE"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_Bright' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/BRIGHT_4980532d-e516-4027-a8e3-b941fbe7350c.png?v=1762808204"
+        alt="YG-1 LEGEND BRIGHT"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_YG-1 C Coating' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/C_COATING_9c05a9cb-07fe-4271-b4e8-e1b4ed81ab65.png?v=1762808205"
+        alt="YG-1 LEGEND C COATING"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_YG-1 H Coating' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Coating_H_85b40562-ebf0-4253-b656-b1a07f521fb1.png?v=1762808205"
+        alt="YG-1 LEGEND H COATING"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_Diamond Coating' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIAMOND_e3375cdc-4a44-49ed-8e54-84f865cbb99a.png?v=1762808205"
+        alt="YG-1 LEGEND DIAMOND"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_DLC' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DLC_a32c5d1f-ad86-406f-ac93-d31122505289.png?v=1762808207"
+        alt="YG-1 LEGEND DLC"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_Nitride Steam Oxide Coating' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/NITRIDE_STEAM_HOMO_cc3a1f5b-e9a4-47bc-9c38-619673961e8c.png?v=1762808214"
+        alt="YG-1 LEGEND NITRIDE STEAM HOMO"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_RCH Coating' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/RCH_COATING_0fb4d718-a973-4d82-a061-d24ccd6ce959.png?v=1762808215"
+        alt="YG-1 LEGEND RCH COATING"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_Steam Oxide Coating' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/STEAM_HOMO_f903ac87-c821-46a6-a616-2c62276bb850.png?v=1762808244"
+        alt="YG-1 LEGEND STEAM HOMO"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_Titanium Aluminium Nitride Coating' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/TiAIN_9085013b-51b5-4833-871d-00719100ebf2.png?v=1762808244"
+        alt="YG-1 LEGEND TiAIN"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_Titanium Carbon Nitride Coating' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/TiCN_5abbe1e3-212a-4f14-b0ec-384571c2ee00.png?v=1762808244"
+        alt="YG-1 LEGEND TiCN"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_Titanium Nitride Coating' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/TiN_a5093910-c18b-4fd2-87e5-97ec5f777d4e.png?v=1762808244"
+        alt="YG-1 LEGEND TiN"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_Uncoated' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/UNCOATED_4a14b925-29bb-4ca8-8dcf-6c336f863b95.png?v=1762808245"
+        alt="YG-1 LEGEND UNCOATED"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_YG-1 X Coating' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/X_COATING_0e710f22-148a-46af-8268-ce15cef1b87a.png?v=1762808246"
+        alt="YG-1 LEGEND X COATING"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_YG-1 Y Coating' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Y_COATING_396b6fae-a664-4470-b53d-089d1671bddc.png?v=1762808245"
+        alt="YG-1 LEGEND Y COATING"
+      >
+    {% endif %}
+    {% if product.tags contains 'Surface Treatment_YG-1 Z Coating' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Z_COATING_5964ad6d-80f0-4b89-a70c-45faeb68fffe.png?v=1762808244"
+        alt="YG-1 LEGEND Z COATING"
+      >
+    {% endif %}
+    {% if product.tags contains 'Finish Type_Alu' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/ALU_7d7160dd-c810-4b56-b62a-89b196c955c3.png?v=1762808204"
+        alt="YG-1 LEGEND ALU"
+      >
+    {% endif %}
+    {% if product.tags contains 'Finish Type_Coarse' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/COARSE_166a116f-9f7c-4940-a6a9-3d416b40a13a.png?v=1762808205"
+        alt="YG-1 LEGEND COARSE"
+      >
+    {% endif %}
+    {% if product.tags contains 'Finish Type_Fine' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/FINE_0fa55b7d-0d7a-4ca5-a6e5-8b17e411046c.png?v=1762808208"
+        alt="YG-1 LEGEND FINE"
+      >
+    {% endif %}
+    {% if product.tags contains 'Finish Type_Roughing & Finishing' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/ROUGHING_FINISHING_4ed29e20-b9d5-4732-9e33-690aa6e9912c.png?v=1762808215"
+        alt="YG-1 LEGEND ROUGHING & FINISHING"
+      >
+    {% endif %}
+    {% if product.tags contains 'Taper Tolerance_AT3' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/AT3_a1ab186f-026d-4862-9529-79215aceb7a5.png?v=1762808205"
+        alt="YG-1 LEGEND AT3"
+      >
+    {% endif %}
+
+    {% if product.tags contains 'Tool Material_Carbide' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/CARBIDE_2365d432-2968-4533-9f39-e2620ca1c3d4.png?v=1762808205"
+        alt="YG-1 LEGEND CARBIDE"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Material_CBN' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/CBN_636e437b-0e53-41be-ba5b-d1ad7d54835d.png?v=1762808204"
+        alt="YG-1 LEGEND CBN"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Material_5% Cobalt HSS' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HSS_Co5_6bc10561-cfb4-4f52-b4b5-ad321d7a8a76.png?v=1762808211"
+        alt="YG-1 LEGEND HSS Co5"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Material_8% Cobalt HSS' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HSS_Co8_acc70276-2fde-46be-8ebd-8b0fe37a9ce0.png?v=1762808211"
+        alt="YG-1 LEGEND HSS Co8"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Material_HSS EX' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HSS_EX_791bc50d-c972-48dc-8521-2ae182221c35.png?v=1762808211"
+        alt="YG-1 LEGEND HSS EX"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Material_HSS PM' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HSS_PM_e27fe12f-fcaf-4e82-9920-46e6b67e9451.png?v=1762808211"
+        alt="YG-1 LEGEND HSS PM"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Material_HSS-E' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HSS-E_59600486-b786-4a98-87f4-53926a392fac.png?v=1762808211"
+        alt="YG-1 LEGEND HSS-E"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Material_MG' %}
+      <img src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MG_3c9deb59-8e0c-42de-baea-58cd1e769097.png?v=1762808213" alt="YG-1 LEGEND MG">
+    {% endif %}
+    {% if product.tags contains 'Tool Material_NG HM' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/NG_HM_388ba30c-5ac0-4add-8984-4d428227a497.png?v=1762808214"
+        alt="YG-1 LEGEND NG HM"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Material_PM 60' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/PM_60_661a8f42-af0a-4538-ba02-2a661b5ad522.png?v=1762808215"
+        alt="YG-1 LEGEND PM 60"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Material_Premium HSS-PM' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HSS_PM_e27fe12f-fcaf-4e82-9920-46e6b67e9451.png?v=1762808211"
+        alt="YG-1 LEGEND PREMIUM HSS-PM"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Material_Super HSS' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/SUPER_HSS_c4dd05b4-f1dc-4bf5-9747-7e59e98377da.png?v=1762808245"
+        alt="YG-1 LEGEND SUPER HSS"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Material_YPM' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/YPM_998efc00-9f37-4228-9a85-7ca795a7bdaf.png?v=1762808245"
+        alt="YG-1 LEGEND YPM"
+      >
+    {% endif %}
+    {% if product.tags contains 'Toolholder Classification_CBT' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/CBT_37cdcdbb-e5df-41b7-a7a2-262432480468.png?v=1762808205"
+        alt="YG-1 LEGEND CBT"
+      >
+    {% endif %}
+    {% if product.tags contains 'Toolholder Classification_DIN 2080-NT' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_2080-NT_2e02e827-d5d7-4aec-a320-68def442cd46.png?v=1734481018"
+        alt="YG-1 LEGEND DIN 2080-NT"
+      >
+    {% endif %}
+    {% if product.tags contains 'Toolholder Classification_DIN 2080-ISO' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_2088-ISO_110c9e0c-24f7-4aea-881d-f83629e000b5.png?v=1762808207"
+        alt="YG-1 LEGEND DIN 2080-ISO"
+      >
+    {% endif %}
+    {% if product.tags contains 'Toolholder Classification_GOST 25827-93' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/GOST_25827-93_56a2b986-7950-4de8-8e70-80f33759199a.png?v=1762808208"
+        alt="YG-1 LEGEND GOST 25827-93"
+      >
+    {% endif %}
+    {% if product.tags contains 'Toolholder Classification_ISO 25' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/ISO_25_50e7f557-b944-463e-8ac8-423ae13ce099.png?v=1762808212"
+        alt="YG-1 LEGEND ISO 25"
+      >
+    {% endif %}
+    {% if product.tags contains 'Toolholder Classification_JIS B6339-BT' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/JIS_B6339-BT_4699003e-77a4-4b0d-a8d0-0fedb75f3705.png?v=1762808212"
+        alt="YG-1 LEGEND JIS B6339-BT"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 327' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_327_1_71d751d8-5f14-4885-9e96-4d24f0941ce0.png?v=1762808205"
+        alt="YG-1 LEGEND DIN 327"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 333' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_333_c36312d8-6b14-41d4-bcc6-5bb2844d9dec.png?v=1762808205"
+        alt="YG-1 LEGEND DIN 333"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 338' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_338_3c7971b5-6178-47d1-a4f8-515484fe0334.png?v=1762808206"
+        alt="YG-1 LEGEND DIN 338"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 341' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_341_c73e2d47-61b5-4fa6-a555-4ae8e669e072.png?v=1762808205"
+        alt="YG-1 LEGEND DIN 341"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 345' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_345_87438062-2c35-44d0-80b3-3905a865a70d.png?v=1762808206"
+        alt="YG-1 LEGEND DIN 345"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 357' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_357_ce71aa90-02ee-4bcf-a90b-c5a551d08a0f.png?v=1762808205"
+        alt="YG-1 LEGEND DIN 357"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 371-374' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_371-374_8d12c597-82eb-49ce-8e12-57b44792adf9.png?v=1762808205"
+        alt="YG-1 LEGEND DIN 371-374"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 371-376' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_371-376_6b45b3ca-2304-4392-9b27-eb591adf969c.png?v=1762808206"
+        alt="YG-1 LEGEND DIN 371-376"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 374' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_374_949cfa85-b91a-47f4-bd86-a82467e0a623.png?v=1762808206"
+        alt="YG-1 LEGEND DIN 374"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 841' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_841_28a909d2-94b2-480d-a1e6-82c8a08ae3c2.png?v=1762808206"
+        alt="YG-1 LEGEND DIN 841"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 844' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_844_449ebe71-f9d3-46f1-b036-720e218e1d41.png?v=1762808206"
+        alt="YG-1 LEGEND DIN 844"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 845' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_845_5446c7ce-d733-4f26-b643-658245ff2a71.png?v=1762808206"
+        alt="YG-1 LEGEND DIN 845"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 855-A' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_855-A_a0b22136-974d-4056-a7d9-5b39b90e972c.png?v=1762808206"
+        alt="YG-1 LEGEND DIN 855-A"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 855-B' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_855-B_a9c5bbab-63bd-440e-929f-45e307e77c31.png?v=1762808206"
+        alt="YG-1 LEGEND DIN 855-B"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 1833' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_1833_a4d14501-ba32-4f35-b4c6-b6dfff3af3a7.png?v=1762808206"
+        alt="YG-1 LEGEND DIN 1833"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 1870-1' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_1870-1_a5ac38eb-5ecc-4e78-9e68-9d5b73ce58ca.png?v=1762808207"
+        alt="YG-1 LEGEND DIN 1870-1"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 1880' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_1880_c8bcd567-f465-45b2-a4df-f6b46f591bd2.png?v=1762808206"
+        alt="YG-1 LEGEND DIN 1880"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 1889' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_1889_c6f5eb9c-25a3-4986-81a7-7053df9ad550.png?v=1762808206"
+        alt="YG-1 LEGEND DIN 1889"
+      >
+    {% endif %}
+
+    {% if product.tags contains 'Tool Standard_DIN 2182-2183' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_2182-2183_7aef85ed-87c6-4be6-a6ec-89a5df0007c7.png?v=1762808207"
+        alt="YG-1 LEGEND DIN 2182-2183"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 5156' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_5156_a2f4359c-7621-434f-8919-c8c07c7599ed.png?v=1762808207"
+        alt="YG-1 LEGEND DIN 5156"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 6537' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_6537_9b4836df-c8a8-48ff-af47-653e4a1208da.png?v=1762808207"
+        alt="YG-1 LEGEND DIN 6537"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_DIN 6539' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/DIN_6539_6baacd63-3b60-4ade-9008-c17c83ca1edf.png?v=1762808207"
+        alt="YG-1 LEGEND DIN 6539"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tool Standard_YG-1 Standard' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/SHANK_YG-1_STANDARD_1aed6c1e-87a7-45a9-b3ec-06abc21d1fcf.png?v=1762808244"
+        alt="YG-1 LEGEND YG STD"
+      >
+    {% endif %}
+    {% if product.tags contains 'YG-1 LEGEND H7' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/H7_6cf0d5ae-3838-406b-92dd-aa8dfb579e5e.png?v=1762808208"
+        alt="YG-1 LEGEND H7"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_15' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_15.png?v=1732749736"
+        alt="YG-1 LEGEND HELIX 15"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_30' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_30_06863bf0-289f-46e9-abda-fa3aae6efab4.png?v=1762808209"
+        alt="YG-1 LEGEND HELIX 30"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_30N' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_30N_b00fb5b8-a27f-4e72-b08f-9affe5b8a194.png?v=1762808209"
+        alt="YG-1 LEGEND HELIX 30N"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_33N' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_33N_d62a3f1f-0c3b-4450-8003-9978a4dc6b92.png?v=1762808209"
+        alt="YG-1 LEGEND HELIX 33N"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Ball Nose ~30' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_BALL_30.png?v=1732749736"
+        alt="YG-1 LEGEND HELIX BALL ~30"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Ball Nose 30' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_BALL_30_358acefd-0888-499c-b9ec-8cec834d7345.png?v=1762808209"
+        alt="YG-1 LEGEND HELIX BALL 30"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Square 0' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_0_c50d9219-306f-45ae-9bb5-134ba470f648.png?v=1762808210"
+        alt="YG-1 LEGEND HELIX SQUARE 0"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Square 10' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_10_a28f16f0-224b-442e-a027-3bbfe13524b3.png?v=1762808209"
+        alt="YG-1 LEGEND HELIX SQUARE 10"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Square 15' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_15_1_0bd16606-f682-46b7-a113-0a67c387438b.png?v=1762808209"
+        alt="YG-1 LEGEND HELIX SQUARE 15"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Square 20' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_20_b2f3b804-1741-46d1-8f93-1c918487cf9e.png?v=1762808209"
+        alt="YG-1 LEGEND HELIX SQUARE 20"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Multiple Helix 27/30' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_27-30_8e8f8ac2-20a0-4129-8dad-95c8fec1af1a.png?v=1762808210"
+        alt="YG-1 LEGEND HELIX SQUARE 27-30"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Square 30' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_30_42cf6128-016f-4df1-a949-9de04113dfdd.png?v=1762808210"
+        alt="YG-1 LEGEND HELIX SQUARE 30"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Multiple Helix 35/37' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_35-37_45e3f52f-ead1-40b9-9bd5-b9577abbb48e.png?v=1762808210"
+        alt="YG-1 LEGEND HELIX SQUARE 35-37"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Square 37' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_37_1_2c6f3656-1988-4f45-813a-71ddcbdd39e1.png?v=1762808210"
+        alt="YG-1 LEGEND HELIX SQUARE 37"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Square 40' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_40_04f243bd-5605-48bb-a02c-d8d10d025256.png?v=1762808210"
+        alt="YG-1 LEGEND HELIX SQUARE 40"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Multiple Helix 43/44/45' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_43-44-45_1_008eec5a-3b96-4294-aa6a-a58519f566ff.png?v=1762808211"
+        alt="YG-1 LEGEND HELIX SQUARE 43-44-45"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Square 45' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_45_1_d7da52cc-e251-4953-87a9-cee60ccb20b0.png?v=1762808210"
+        alt="YG-1 LEGEND HELIX SQUARE 45"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Square 50' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_50_0ebec313-f234-4b78-be4d-1773796e847e.png?v=1762808210"
+        alt="YG-1 LEGEND HELIX SQUARE 50"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Square 60' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_60_1_76cfd35c-70a2-4fca-9bed-aaa06ebef185.png?v=1762808211"
+        alt="YG-1 LEGEND HELIX SQUARE 60"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Square 20 Left' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_L20_a811e161-d237-416b-836c-5fbbff1aa500.png?v=1762808211"
+        alt="YG-1 LEGEND HELIX SQUARE L20"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Square 7 Left' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_LH7_24007050-21ce-499d-96b9-0aea28ab9abc.png?v=1762808211"
+        alt="YG-1 LEGEND HELIX SQUARE LH7"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_Square 42' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HELIX_SQUARE_42_2d382b59-c164-4ca9-9cc2-3ec5c3a3e9b7.png?v=1762808210"
+        alt="YG-1 LEGEND HELIX SQUARE 42"
+      >
+    {% endif %}
+    {% if product.tags contains 'Helix Angle_M-Helix' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/M-HELIX_SQUARE_23d1e288-9dd6-4ab3-ae64-07a37dd57ecc.png?v=1762808213"
+        alt="YG-1 LEGEND M-HELIX"
+      >
+    {% endif %}
+    {% if product.tags contains 'Periphery Type_Roughing - Fine' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/HR_776aa0ad-1cc7-48e0-b84f-1d3439f146a5.png?v=1762808211"
+        alt="YG-1 LEGEND HR"
+      >
+    {% endif %}
+    {% if product.tags contains 'YG-1 LEGEND JIS I' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/JIS_I_01026091-cb61-4b55-b955-69757d416a0c.png?v=1762808212"
+        alt="YG-1 LEGEND JIS I"
+      >
+    {% endif %}
+    {% if product.tags contains 'YG-1 LEGEND JIS J' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/JIS_J_2d866809-de21-4299-a72c-96e0e1ce8553.png?v=1762808213"
+        alt="YG-1 LEGEND JIS J"
+      >
+    {% endif %}
+    {% if product.tags contains 'YG-1 LEGEND JIS' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/JIS_bb0ff912-a2fe-4fec-b497-8a3df7d239ab.png?v=1762808212"
+        alt="YG-1 LEGEND JIS"
+      >
+    {% endif %}
+    {% if product.tags contains 'Cutting Direction_LH' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/LH_CUT_4ddf9b70-a5a9-43de-a215-91fced5b6b87.png?v=1762808212"
+        alt="YG-1 LEGEND LH CUT"
+      >
+    {% endif %}
+    {% if product.tags contains 'Cutting Direction_RH' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/RH_CUT_b9ce4531-eb13-491a-9841-01a3275e7c43.png?v=1762808215"
+        alt="YG-1 LEGEND RH CUT"
+      >
+    {% endif %}
+    {% if product.tags contains 'YG-1 LEGEND move ball profiling' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/move_ball_profiling_e79b0850-8004-4575-b465-e23f0f46337f.png?v=1762808213"
+        alt="YG-1 LEGEND move ball profiling"
+      >
+    {% endif %}
+    {% if product.tags contains 'YG-1 LEGEND move square side cutting ~20' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/move_square_side_cutting_20_ec2679b5-8011-43e2-beb4-c2491133ca04.png?v=1762808213"
+        alt="YG-1 LEGEND move square side cutting ~20"
+      >
+    {% endif %}
+    {% if product.tags contains 'YG-1 LEGEND move square side cutting' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/move_square_side_cutting_92536d97-b35c-4a62-b41c-9ee61fc80696.png?v=1762808214"
+        alt="YG-1 LEGEND move square side cutting"
+      >
+    {% endif %}
+    {% if product.tags contains 'YG-1 LEGEND move square slotting ~22' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/move_square_slotting_22_592ed4d1-cf6e-4fcb-82c4-3c70e6d426ee.png?v=1762808213"
+        alt="YG-1 LEGEND move square slotting ~22"
+      >
+    {% endif %}
+    {% if product.tags contains 'YG-1 LEGEND move square slotting' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/move_square_slotting_55f43582-a7e4-46c0-bf88-c099235c6438.png?v=1762808214"
+        alt="YG-1 LEGEND move square slotting"
+      >
+    {% endif %}
+    {% if product.tags contains 'Periphery Type_Roughing - Coarse' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/COARSE_166a116f-9f7c-4940-a6a9-3d416b40a13a.png?v=1762808205"
+        alt="YG-1 LEGEND N"
+      >
+    {% endif %}
+    {% if product.tags contains 'Periphery Type_Roughing & Finishing' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/NR_eda3ceb6-9015-45fb-a8d1-df7cfcff2ffb.png?v=1762808214"
+        alt="YG-1 LEGEND NR"
+      >
+    {% endif %}
+    {% if product.tags contains 'Periphery Type_Roughing - Aluminium' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/WR_216d4b25-ee92-4176-9abd-3835ce8130d5.png?v=1762808245"
+        alt="YG-1 LEGEND WR"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tolerance Grade_H7' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/OD_Tol_h7_ca1eba9b-178f-4b8d-b6da-080537a0d333.png?v=1762808214"
+        alt="YG-1 LEGEND OD_Tol_h7"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tolerance Grade_H8' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/OD_Tol_h8_1788e5e6-a68b-4902-958f-ffda8551921c.png?v=1762808214"
+        alt="YG-1 LEGEND OD_Tol_h8"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tolerance Grade_K12' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/OD_Tol_k12_3c8e47ca-07fb-4422-9bd8-68fc60851345.png?v=1762808215"
+        alt="YG-1 LEGEND OD_Tol_k12"
+      >
+    {% endif %}
+
+    {% if product.tags contains 'Shank Type_6535HA' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/SHANK_6535HA_35dd0e27-2d6c-4be5-a395-346d8fb1d2b9.png?v=1762808215"
+        alt="YG-1 LEGEND SHANK 6535HA"
+      >
+    {% endif %}
+    {% if product.tags contains 'Shank Type_1835B' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/SHANK_DIN_1835B_1.png?v=1762808315"
+        alt="YG-1 LEGEND SHANK 1835B"
+      >
+    {% endif %}
+    {% if product.tags contains 'Shank Type_1835D' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/SHANK_DIN_1835D_11538a5f-9b6f-47c4-9cec-d8161c31d8eb.png?v=1762808199"
+        alt="YG-1 LEGEND SHANK 1835D"
+      >
+    {% endif %}
+    {% if product.tags contains 'Shank Type_Flat' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Flat_Shank_5912c46f-83ab-4e32-9953-1cfb88748ee9.png?v=1762808207"
+        alt="YG-1 LEGEND SHANK FLAT"
+      >
+    {% endif %}
+    {% if product.tags contains 'Shank Type_Plain H6' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/SHANK_H6_3a4aa625-448e-4410-8d0c-ee6519bf2f74.png?v=1762808244"
+        alt="YG-1 LEGEND SHANK H6"
+      >
+    {% endif %}
+    {% if product.tags contains 'Shank Type_Plain H8' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/SHANK_H8_b34bf458-1bcf-4e3e-aacc-9750157898a5.png?v=1762808244"
+        alt="YG-1 LEGEND SHANK H8"
+      >
+    {% endif %}
+    {% if product.tags contains 'Shank Type_Plain' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/SHANK_PLAIN_f79ab71c-c17c-49c7-9744-059d885dd042.png?v=1762808244"
+        alt="YG-1 LEGEND SHANK PLAIN"
+      >
+    {% endif %}
+    {% if product.tags contains 'Shank Type_Plain YG-1 Standard' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/SHANK_YG-1_STANDARD_d8891b07-44ee-4e58-adf7-b9de0187b794.png?v=1734481027"
+        alt="YG-1 LEGEND SHANK YG-1 STANDARD"
+      >
+    {% endif %}
+    {% if product.tags contains 'Toolholder Coolant_45 Bar' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/TOOLHOLDER_COOLANT_45_BAR_cc89dcd4-8ba0-4f0e-aa93-997482bb03d1.png?v=1762808244"
+        alt="YG-1 LEGEND TOOLHOLDER COOLANT 45 BAR"
+      >
+    {% endif %}
+    {% if product.tags contains 'Toolholder Coolant_A' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/TOOLHOLDER_COOLANT_A_df1d0f55-25c9-4997-9da7-c3437a51b72c.png?v=1762808245"
+        alt="YG-1 LEGEND TOOLHOLDER COOLANT A"
+      >
+    {% endif %}
+    {% if product.tags contains 'Toolholder Coolant_AD' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/TOOLHOLDER_COOLANT_AD_beba9380-a19a-45de-9a30-b59d7503185a.png?v=1762808244"
+        alt="YG-1 LEGEND TOOLHOLDER COOLANT AD"
+      >
+    {% endif %}
+    {% if product.tags contains 'Toolholder Coolant_AD-B' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/TOOLHOLDER_COOLANT_AD-B_bab49d3e-9989-4762-af7e-1337cefdbd46.png?v=1734481027"
+        alt="YG-1 LEGEND TOOLHOLDER COOLANT AD-B"
+      >
+    {% endif %}
+    {% if product.tags contains 'Toolholder Coolant_20-Bar' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/TOOLHOLDER_COOLANT_20_BAR_5f3c139e-fff8-442e-ab1b-0980c84a49a7.png?v=1762808245"
+        alt="YG-1 LEGEND TOOLHOLDER_COOLANT 20 BAR"
+      >
+    {% endif %}
+    {% if product.tags contains 'Shank Type_Morse Taper 2' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MT2_Shank_899f4df9-efb4-4edc-b325-ffe7d9d0146e.png?v=1762808213"
+        alt="Morse Taper 2 Shank"
+      >
+    {% endif %}
+    {% if product.tags contains 'Shank Type_Morse Taper 3' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MT3_Shank_afa94fa6-324b-45e2-8e6b-6554b8b52e91.png?v=1762808214"
+        alt="Morse Taper 3 Shank"
+      >
+    {% endif %}
+    {% if product.tags contains 'Shank Type_Morse Taper 4' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/MT4_Shank_62d57f08-092f-49bc-9aae-e6d922b5bc3e.png?v=1762808214"
+        alt="Morse Taper 4 Shank"
+      >
+    {% endif %}
+    {% if product.tags contains 'Shank Type_19mm Weldon' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/19mm_Weldon_Shank_bc70cdac-0bd0-4a70-a4a0-61bc86c73b50.png?v=1762808203"
+        alt="19mm Weldon Shank"
+      >
+    {% endif %}
+    {% if product.tags contains 'Magnet Type_Electric' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Electro_Magnet_672a2402-c500-4bdc-8ca4-63bd4ec02d10.png?v=1762808207"
+        alt="Electric Magnet Type"
+      >
+    {% endif %}
+    {% if product.tags contains 'Magnet Type_Permanent' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Permanent_Magnet_3f310353-014d-4b24-884d-bcae368292ea.png?v=1762808215"
+        alt="Permanent Magnet Type"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tapping Capacity_M20' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/M20_b938c3ad-61b9-46c5-817c-7cd8cf70ac44.png?v=1762808213"
+        alt="M20 Tapping Capacity"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tapping Capacity_M30' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/M30_ec2ff479-ac3d-4f7f-a3a4-6a5586e9ae81.png?v=1762808212"
+        alt="M30 Tapping Capacity"
+      >
+    {% endif %}
+    {% if product.tags contains 'Tapping Capacity_M42' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/M42_3540b2a0-f58b-4677-82f6-17e645e329fc.png?v=1762808213"
+        alt="M42 Tapping Capacity"
+      >
+    {% endif %}
+    {% if product.tags contains 'Gearbox Direction_Forward-Reverse' %}
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Forward-Reverse_30c9adc8-1490-4fff-be12-68dd8f1d7afe.png?v=1762808208"
+        alt="Forward-Reverse"
+      >
+    {% endif %}
+  </div>
+
+  <div class="payment-buttons payment-buttons--medium form-payment-buttons">
+    {% assign first_avail = product.selected_or_first_available_variant | default: product.first_available_variant %}
+    {% assign _price_cents = first_avail.price | default: product.price | plus: 0 %}
+
+    {% if product.tags contains 'Custom Length' %}
+      <!-- Custom-length products must be configured on the PDP -->
+      <a href="{{ product.url }}" class="btn btn--wide btn--buyNow" style="background:#f88d2b;color:#fff;">
+        <span style="display:flex;align-items:center;gap:10px;"> Select your blade </span>
+      </a>
+
+    {% else %}
+      {% if _price_cents == 0 %}
+        <!-- $0.00 → send them to PDP to request a quote -->
+        <a href="{{ product.url }}" class="btn btn--wide btn--buyNow is-quote" style="background:#f88d2b;color:#fff;">
+          <span style="display:flex;align-items:center;gap:10px;"> Request Quote </span>
+        </a>
+      {% elsif first_avail %}
+        <!-- normal priced product → keep Add to Cart -->
+        <a
+          href="javascript:void(0);"
+          class="btn btn--wide btn--buyNow add-to-cart-btn"
+          data-variant-id="{{ first_avail.id }}"
+          style="background:#e0592a;color:#fff;"
+          onclick="gtag_report_conversion()"
+        >
+          <span style="display:flex;align-items:center;gap:10px;">
+            <i
+              class="fa fa-cart"
+              style="content:url(https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Asset_Cart-white.png?v=1730169426);height:17px;"
+            ></i>
+            Add to Cart
+          </span>
+        </a>
+      {% else %}
+        <button class="btn btn--wide" disabled>Sold out</button>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <style>
+    /* Ensure the hover effect only applies to the image container */
+    .product-image-wrapper {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      padding-top: 100%; /* Maintain aspect ratio */
+    }
+
+    .product-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: none !important;
+    }
+
+    /* Default image visible, second image hidden */
+    .product-image.front {
+      opacity: 1;
+      z-index: 2;
+    }
+
+    .product-image.back {
+      opacity: 0;
+      z-index: 100;
+      transform: scale(1.04);
+    }
+
+    /* Hide default image and show hover image on hover */
+    .product-grid-item:hover .product-image-wrapper .product-image.front {
+      opacity: 0 !important;
+    }
+
+    .product-grid-item:hover .product-image-wrapper .product-image.back {
+      opacity: 1 !important;
+      transform: scale(1);
+      transition: 0.3s ease !important;
+
+    }
+
+    /* Single image stays visible without hover effect */
+    .product-image.single {
+      opacity: 1;
+      z-index: 2;
+    }
+  </style>
+
+  <div class="product-comparison">
+    <button class="add-to-compare" data-handle="{{ product.handle }}">
+      <img
+        src="https://cdn.shopify.com/s/files/1/0439/5597/8399/files/Icon_Black_Plus_Thin.png?v=1748498027"
+        style="margin-left: -5px; width: 20px; position: relative; margin-right: 10px;"
+        alt="plus icon"
+      >
+      <span class="compare-text">Compare</span>
+    </button>
+    <a href="#" class="view-compare">View Comparison</a>
+  </div>
+</div>
