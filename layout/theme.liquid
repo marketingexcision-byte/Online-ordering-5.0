@@ -116,15 +116,7 @@
     <script src="{{ 'theme.js' | asset_url }}" defer></script>
     <!-- Excision: Minimum Order logic -->
     <script src="{{ 'ex-min-order.js' | asset_url }}" defer></script>
-    {% comment %}<link rel="stylesheet" href="{{ 'bootstrap.min.css' | asset_url }}" media="print" as="style" onload="this.media='all'"> {% endcomment %}
-    <link
-      rel="stylesheet"
-      href="{{ 'bootstrap.min.css' | asset_url }}"
-      media="print"
-      as="style"
-      onload="this.media='all'"
-      async="async"
-    >
+    {% comment %}Bootstrap CSS removed - replaced with modern components.css{% endcomment %}
     {% comment %}<link rel="stylesheet" defer="defer" type="text/css" href="" media="all" /> {% endcomment %}
     <link
       rel="preload"
